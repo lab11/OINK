@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "473127682708",
+    "firebase_url": "https://paymenttoy.firebaseio.com",
+    "project_id": "paymenttoy",
+    "storage_bucket": "paymenttoy.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:473127682708:android:fb571dbe54fe875e",
+        "android_client_info": {
+          "package_name": "edu.berkeley.gridwatch.paymenttoy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "473127682708-tlrt509ua5r5pjd1i0d96h1m32jt02nv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.berkeley.gridwatch.paymenttoy",
+            "certificate_hash": "87acc1013e838ff01a0bf53872247987805e0121"
+          }
+        },
+        {
+          "client_id": "473127682708-g07iurie47b9k0mgcs74d35c4ekcg3k4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0h4OvvuWiJEX0YpTky9NmiGRAR8sLRoc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "473127682708-g07iurie47b9k0mgcs74d35c4ekcg3k4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
