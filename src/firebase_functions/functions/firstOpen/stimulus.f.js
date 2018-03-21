@@ -30,6 +30,8 @@ var FieldValue = admin.firestore.FieldValue;
 exports = module.exports = functions.https.onRequest((request, response) => {
     response.send("Hello from Joe");
 })
+
+quick change
 */
 
 exports = module.exports = functions.firestore
