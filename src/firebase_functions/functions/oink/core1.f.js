@@ -66,7 +66,7 @@ exports = module.exports = functions.firestore
                         userPaymentInfo['amount'] = data.amount;
                         userPaymentInfo['type'] = data.type;
                         userPaymentInfo['user_id'] = data.user_id;
-                        userPaymentInfo['transaction_id'] = new Date().getUTCMilliseconds();
+                        userPaymentInfo['transaction_id'] = data.user_id + Math.random().toString(36).substr(2, 9);
                         userPaymentInfo['description'] = 'payment of '+ userPaymentInfo.type +' to user : '+ userPaymentInfo.user_id;
                         console.log(`user payment info is: ${util.inspect(userPaymentInfo)}`);
                         var namePaymentService = userPaymentInfo.payment_service;
@@ -98,18 +98,8 @@ exports = module.exports = functions.firestore
                                         return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
                                     }
                                     else {
-                                        var logDb = {}
-                                        return db.collection('rx_core_payment').add({
-                                            amount:data.amount,
-                                            type: data.type,
-                                            user_id: data.user_id,
-                                            transaction: userPaymentInfo.transaction_id,
-                                            tx_core_doc_id: docId
-                                            
-                                        }).then(() =>{
-                                            localMsgs.push('Payment completed')
-                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'completed', msgs: localMsgs});
-                                        });
+                                        localMsgs.push('Payment submitted.')
+                                        return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'submitted', msgs: localMsgs});
                                     }
                         });
         
@@ -159,7 +149,7 @@ exports = module.exports = functions.firestore
                 userPaymentInfo['amount'] = data.amount;
                 userPaymentInfo['type'] = data.type;
                 userPaymentInfo['user_id'] = data.user_id;
-                userPaymentInfo['transaction_id'] = new Date().getUTCMilliseconds();
+                userPaymentInfo['transaction_id'] = data.user_id + Math.random().toString(36).substr(2, 9);
                 userPaymentInfo['description'] = 'payment of '+ userPaymentInfo.type +' to user : '+ userPaymentInfo.user_id;
                 console.log(`user payment info is: ${util.inspect(userPaymentInfo)}`);
                 var namePaymentService = userPaymentInfo.payment_service;
@@ -193,19 +183,9 @@ exports = module.exports = functions.firestore
                                 return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
                             }
                             else {
-                                var logDb = {}
-                                return db.collection('rx_core_payment').add({
-                                    amount:data.amount,
-                                    type: data.type,
-                                    user_id: data.user_id,
-                                    transaction: userPaymentInfo.transaction_id,
-                                    tx_core_doc_id: docId
-                            
-
-                                }).then(() =>{
-                                    localMsgs.push('Payment completed')
-                                    return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'completed', msgs: localMsgs});
-                                });
+                                localMsgs.push('Payment submitted.')
+                                return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'submitted', msgs: localMsgs});
+                                
                             }
                 });
 
