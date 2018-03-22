@@ -96,7 +96,7 @@ exports = module.exports = functions.firestore
                                         }
                                         else {
                                             localMsgs.push('Payment submitted.')
-                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'submitted', msgs: localMsgs});
+                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'submitted', msgs: localMsgs, transaction_id:userPaymentInfo.transaction_id});
                                         }
                             });             
                         }
@@ -177,7 +177,7 @@ exports = module.exports = functions.firestore
                                         }
                                         else {
                                             localMsgs.push('Payment submitted.')
-                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'submitted', msgs: localMsgs});
+                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'submitted', msgs: localMsgs, transaction_id:userPaymentInfo.transaction_id});
                                             
                                         }
                                 });
