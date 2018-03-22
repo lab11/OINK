@@ -22,7 +22,7 @@ exports = module.exports = functions.https.onRequest((req, res) => {
         "amount": reqBody.amount,    
         "transaction_id": reqBody.transaction_id,
         "network_code": reqBody.network_code,
-        "callback_url": "https://us-central1-paymenttoy.cloudfunctions.net/paymentApicallback",
+        "callback_url": "https://us-central1-paymenttoy.cloudfunctions.net/oinkCore2",
         "description": reqBody.description,
         "client_id": 14
         }
