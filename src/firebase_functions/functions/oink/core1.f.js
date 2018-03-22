@@ -116,7 +116,7 @@ exports = module.exports = functions.firestore
         }).then(() => {
             //Updating the status of the document that generated the transaction:
             var doc_path_string = data.type + '_transaction'
-            return db.collection(doc_path_string).doc(data.stimulus_doc_id).update({tx_core_doc_id: docId});
+            return db.collection(doc_path_string).doc(data.stimulus_doc_id).update({status: "pending", tx_core_doc_id: docId});
 
             //Getting the info from user_list to complete the API request
         }).then(() => {
