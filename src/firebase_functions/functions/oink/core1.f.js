@@ -50,7 +50,9 @@ exports = module.exports = functions.firestore
                         if (!doc.exists){
                             //TODO: Maybe trigger an alarm here.
                             db.collection('alarms_db').add({timestamp: FieldValue.serverTimestamp(),user_id:data.user_id, reason:"User ID does not exist.",tx_core_doc_id:docId });
-                            throw new Error('Invalid or unexisting User ID.');
+                            //throw new Error('Invalid or unexisting User ID.');
+                            console.log("Invalid or unexisting User ID.");
+                            return null;
                             // No reattempt since this should be trigger an alarm for possible fraud.
                         } else {
                             var userPaymentData = doc.data()
@@ -58,54 +60,47 @@ exports = module.exports = functions.firestore
                             userPaymentInfo['customer_number'] = userPaymentData.customer_number;
                             userPaymentInfo['network_code'] = userPaymentData.network_code;
                             userPaymentInfo['payment_service'] = userPaymentData.payment_service;
-                            
+                            userPaymentInfo['amount'] = data.amount;
+                            userPaymentInfo['type'] = data.type;
+                            userPaymentInfo['user_id'] = data.user_id;
+                            userPaymentInfo['transaction_id'] = data.user_id + Math.random().toString(36).substr(2, 9);
+                            userPaymentInfo['description'] = 'payment of '+ userPaymentInfo.type +' to user : '+ userPaymentInfo.user_id;
+                            console.log(`user payment info is: ${util.inspect(userPaymentInfo)}`);
+                            var namePaymentService = userPaymentInfo.payment_service;
+                            namePaymentService = namePaymentService.charAt(0).toUpperCase() + namePaymentService.slice(1)
+            
+                            return request({
+                                uri: 'https://us-central1-paymenttoy.cloudfunctions.net/payment'+namePaymentService,
+                                method: 'POST',
+                                headers:{
+                                    'Content-Type':'application/json',
+                                },
+                                json: true,
+                                body: userPaymentInfo,
+                                resolveWithFullResponse: true,
+                            }).then((response) => {
+                                        if (response.statusCode >= 400) {
+                                            localMsgs.push('HTTP Error')
+                                            console.log(`HTTP Error: ${response.statusCode}`);
+                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
+                                        }
+                                        
+                                        console.log('Posted with payment service response: ', response.body);
+                                        console.log('Payment service status: ', response.statusCode);
+                                        var checkErrorFromBody = response.body;
+            
+                                        if (checkErrorFromBody.success === 'false' || checkErrorFromBody.error_code != null || checkErrorFromBody.detail == "Invalid Signature."){
+                                            console.log('Error in transaction:', checkErrorFromBody);
+                                            localMsgs.push('Transaction Error')
+                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
+                                        }
+                                        else {
+                                            localMsgs.push('Payment submitted.')
+                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'submitted', msgs: localMsgs});
+                                        }
+                            });             
                         }
-                    })
-                    //Creating the format of the body for the HTTP request
-                    .then(() => {
-                        userPaymentInfo['amount'] = data.amount;
-                        userPaymentInfo['type'] = data.type;
-                        userPaymentInfo['user_id'] = data.user_id;
-                        userPaymentInfo['transaction_id'] = data.user_id + Math.random().toString(36).substr(2, 9);
-                        userPaymentInfo['description'] = 'payment of '+ userPaymentInfo.type +' to user : '+ userPaymentInfo.user_id;
-                        console.log(`user payment info is: ${util.inspect(userPaymentInfo)}`);
-                        var namePaymentService = userPaymentInfo.payment_service;
-                        namePaymentService = namePaymentService.charAt(0).toUpperCase() + namePaymentService.slice(1)
-        
-                        return request({
-                            uri: 'https://us-central1-paymenttoy.cloudfunctions.net/payment'+namePaymentService,
-                            method: 'POST',
-                            headers:{
-                                'Content-Type':'application/json',
-                            },
-                            json: true,
-                            body: userPaymentInfo,
-                            resolveWithFullResponse: true,
-                        }).then((response) => {
-                                    if (response.statusCode >= 400) {
-                                        localMsgs.push('HTTP Error')
-                                        console.log(`HTTP Error: ${response.statusCode}`);
-                                        return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
-                                    }
-                                    
-                                    console.log('Posted with payment service response: ', response.body);
-                                    console.log('Payment service status: ', response.statusCode);
-                                    var checkErrorFromBody = response.body;
-        
-                                    if (checkErrorFromBody.success === 'false' || checkErrorFromBody.error_code != null || checkErrorFromBody.detail == "Invalid Signature."){
-                                        console.log('Error in transaction:', checkErrorFromBody);
-                                        localMsgs.push('Transaction Error')
-                                        return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
-                                    }
-                                    else {
-                                        localMsgs.push('Payment submitted.')
-                                        return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'submitted', msgs: localMsgs});
-                                    }
-                        });
-        
                     });
-                
-
             }
 
         }
@@ -121,80 +116,75 @@ exports = module.exports = functions.firestore
         }).then(() => {
             //Updating the status of the document that generated the transaction:
             var doc_path_string = data.type + '_transaction'
-            return db.collection(doc_path_string).doc(data.stimulus_doc_id).update({status:'pending',tx_core_doc_id: docId});
+            return db.collection(doc_path_string).doc(data.stimulus_doc_id).update({tx_core_doc_id: docId});
 
             //Getting the info from user_list to complete the API request
-            }).then(() => {
-                return db.collection('user_list').doc(data.user_id).get()
-                    .then(doc => {
-                        if (!doc.exists){
-                            //TODO: Maybe trigger an alarm here.
-                            console.log('The user does not exist in the user_list collection!')
-                            db.collection('alarms_db').add({timestamp: FieldValue.serverTimestamp(),user_id:data.user_id, reason:"User ID does not exist.",tx_core_doc_id:docId });
-                            throw new Error('Invalid or unexisting User ID.');
-                        } else {
-                            var userPaymentData = doc.data()
-                            //send all the common data among all APIs and trigger an HTTP function based on the user payment service.
-                            userPaymentInfo['customer_number'] = userPaymentData.customer_number;
-                            userPaymentInfo['network_code'] = userPaymentData.network_code;
-                            userPaymentInfo['payment_service'] = userPaymentData.payment_service;
-                            
-                        }
-                    }).then(() => {
-                        return db.collection('tx_core_payment').doc(docId).update({payment_service: userPaymentInfo.payment_service, num_attempts: data.num_attempts + 1});
-                    });
+        }).then(() => {
+            return db.collection('user_list').doc(data.user_id).get()
+                .then(doc => {
+                    if (!doc.exists){
+                        //TODO: Maybe trigger an alarm here.
+                        console.log('The user does not exist in the user_list collection!')
+                        db.collection('alarms_db').add({timestamp: FieldValue.serverTimestamp(),user_id:data.user_id, reason:"User ID does not exist.",tx_core_doc_id:docId });
+                        //throw new Error('Invalid or unexisting User ID.');
+                        console.log("Invalid or unexisting User ID.");
+                        return null;
 
-            //Creating the format of the body for the HTTP request
-            }).then(() => {
-                userPaymentInfo['amount'] = data.amount;
-                userPaymentInfo['type'] = data.type;
-                userPaymentInfo['user_id'] = data.user_id;
-                userPaymentInfo['transaction_id'] = data.user_id + Math.random().toString(36).substr(2, 9);
-                userPaymentInfo['description'] = 'payment of '+ userPaymentInfo.type +' to user : '+ userPaymentInfo.user_id;
-                console.log(`user payment info is: ${util.inspect(userPaymentInfo)}`);
-                var namePaymentService = userPaymentInfo.payment_service;
-                namePaymentService = namePaymentService.charAt(0).toUpperCase() + namePaymentService.slice(1)
+                    } else {
+                        var userPaymentData = doc.data()
+                        //send all the common data among all APIs and trigger an HTTP function based on the user payment service.
+                        userPaymentInfo['customer_number'] = userPaymentData.customer_number;
+                        userPaymentInfo['network_code'] = userPaymentData.network_code;
+                        userPaymentInfo['payment_service'] = userPaymentData.payment_service;
+                        userPaymentInfo['amount'] = data.amount;
+                        userPaymentInfo['type'] = data.type;
+                        userPaymentInfo['user_id'] = data.user_id;
+                        userPaymentInfo['transaction_id'] = data.user_id + Math.random().toString(36).substr(2, 9);
+                        userPaymentInfo['description'] = 'payment of '+ userPaymentInfo.type +' to user : '+ userPaymentInfo.user_id;
 
-
-                return request({
-                    uri: 'https://us-central1-paymenttoy.cloudfunctions.net/payment'+namePaymentService,
-                    method: 'POST',
-                    headers:{
-                        'Content-Type':'application/json',
-                    },
-                    json: true,
-                    body: userPaymentInfo,
-                    resolveWithFullResponse: true,
-                }).then((response) => {
-                            //Checking the API response:
-                            if (response.statusCode >= 400) {
-                                localMsgs.push("HTTP Error")
-                                return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
-                            }
-                            
-                            console.log('Posted with payment service response: ', response.body);
-                            console.log('Payment service status: ', response.statusCode);
-                            var checkErrorFromBody = response.body;
-                            
-
-                            if (checkErrorFromBody.success === 'false' || checkErrorFromBody.error_code != null || checkErrorFromBody.detail == "Invalid Signature."){
-                                console.log('Error in transaction:', checkErrorFromBody);
-                                localMsgs.push('Transaction Error')
-                                return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
-                            }
-                            else {
-                                localMsgs.push('Payment submitted.')
-                                return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'submitted', msgs: localMsgs});
-                                
-                            }
+                        console.log(`user payment info is: ${util.inspect(userPaymentInfo)}`);
+                        
+                        var namePaymentService = userPaymentInfo.payment_service;
+                        namePaymentService = namePaymentService.charAt(0).toUpperCase() + namePaymentService.slice(1)
+                        return db.collection('tx_core_payment').doc(docId).update({payment_service: userPaymentInfo.payment_service, num_attempts: data.num_attempts + 1})
+                            .then(() => {
+                
+                                return request({
+                                    uri: 'https://us-central1-paymenttoy.cloudfunctions.net/payment'+namePaymentService,
+                                    method: 'POST',
+                                    headers:{
+                                        'Content-Type':'application/json',
+                                    },
+                                    json: true,
+                                    body: userPaymentInfo,
+                                    resolveWithFullResponse: true,
+                                }).then((response) => {
+                                            //Checking the API response:
+                                        if (response.statusCode >= 400) {
+                                            localMsgs.push("HTTP Error")
+                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
+                                        }
+                                        
+                                        console.log('Posted with payment service response: ', response.body);
+                                        console.log('Payment service status: ', response.statusCode);
+                                        var checkErrorFromBody = response.body;
+                                        
+            
+                                        if (checkErrorFromBody.success === 'false' || checkErrorFromBody.error_code != null || checkErrorFromBody.detail == "Invalid Signature."){
+                                            console.log('Error in transaction:', checkErrorFromBody);
+                                            localMsgs.push('Transaction Error')
+                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
+                                        }
+                                        else {
+                                            localMsgs.push('Payment submitted.')
+                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'submitted', msgs: localMsgs});
+                                            
+                                        }
+                                });
+                
+                            });                            
+                    }
                 });
-
-            });
-
-        
-
-        
-
-         
+        });     
     });
 
