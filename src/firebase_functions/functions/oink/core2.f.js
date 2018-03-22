@@ -17,5 +17,12 @@ exports = module.exports = functions.https
         console.log(util.inspect(req.query));
 
         res.status(200).send(req.query);
+        // return db.collection('rx_core_payment').add({
+        //     amount:data.amount,
+        //     type: data.type,
+        //     user_id: data.user_id,
+        //     transaction: userPaymentInfo.transaction_id,
+        //     tx_core_doc_id: docId
+        // });
     
 });
