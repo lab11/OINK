@@ -34,6 +34,31 @@ exports = module.exports = functions.https.onRequest((request, response) => {
 */
 
 exports = module.exports = functions.firestore
+    .document('firstOpen_transaction/{docId}').onCreate((event)=>{
+        const data = event.data.data()
+        const docId = event.params.docId
+        const costFirstOpen = 5
+        let previouslyOpened =false;
+        if(data.processed) {
+            return
+        }
+        console.log(`The docId of the creation was: ${util.inspect(docId)}`)
+        return db.collection('firstOpen_transaction').add({
+            user_id: data.user_id,
+            processed: true,
+            amount: costFirstOpen,
+            previouslyOpened: previouslyOpened,
+            msgs: [],
+            time_stimulus_added: data.time,
+            time_processed: FieldValue.serverTimestamp(),
+            type: "firstOpen",
+            stimulus_doc_id: docId
+        })
+    })
+
+
+
+exports = module.exports = functions.firestore
     .document('firstOpen_transaction/{docId}').onCreate((event) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = event.data.data();
@@ -45,7 +70,22 @@ exports = module.exports = functions.firestore
         console.log(`The docId of the creation was: ${util.inspect(docId)}`);
 
         return db.collection('firstOpen_transaction').where('user_id','==', data.user_id).get()              
-});
+})
+.then(() => {
+return db.collection('tx_core_payment').add({
+    user_id: data.user_id,
+    amount: toPay,
+    msgs: [],
+    num_attempts: 0,
+    time: FieldValue.serverTimestamp(),
+    type: 'invite',
+    stimulus_doc_id: docId,
+    status: 'pending',
+    reattempt: false
+    
+})
+})
+
 
 
 
