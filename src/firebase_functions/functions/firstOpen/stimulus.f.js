@@ -32,7 +32,7 @@ exports = module.exports = functions.https.onRequest((request, response) => {
 })
 
 */
-
+/*
 exports = module.exports = functions.firestore
     .document('firstOpen_transaction/{docId}').onCreate((event)=>{
         const data = event.data.data()
@@ -85,6 +85,7 @@ return db.collection('tx_core_payment').add({
     
 })
 })
+*/
 
 
 
