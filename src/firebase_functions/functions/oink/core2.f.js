@@ -18,6 +18,8 @@ exports = module.exports = functions.https
         console.log(util.inspect(req.query));
         console.log(util.inspect(db.collection('tx_core_payment').where('transaction_id','==', req.query.transaction_id).get()))
         res.status(200).send(req.query);
+
+    });
     //     .then(doc => {
     //         if (!doc.exists){
     //             // db.collection('alarms_db').add({timestamp: FieldValue.serverTimestamp(),user_id:data.user_id, reason:"User ID does not exist.",tx_core_doc_id:docId });
