@@ -15,7 +15,17 @@ var FieldValue = admin.firestore.FieldValue;
 exports = module.exports = functions.https
     .onRequest((req, res) => {
         console.log(util.inspect(req.query));
+        var core1_transaction_doc = db.collection('tx_core_payment').where('transaction_id','==', req.query.transaction_id).get()
+        console.log(util.inspect(core1_transaction_doc))
 
+        db.collection('rx_core_payment').add({
+            timestamp: FieldValue.serverTimestamp(),
+            //type: data.type,
+            user_id: req.query.transaction_id.slice(0,-9),
+            transaction_id: req.query.transaction_id,
+            status: req.query.status,
+            message: req.query.message
+        });
         res.status(200).send(req.query);
     
 });
