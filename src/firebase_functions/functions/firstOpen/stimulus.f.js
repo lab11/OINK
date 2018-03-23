@@ -154,20 +154,6 @@ exports = module.exports = functions.firestore
 
 
 
-
-
-
-
-exports = module.exports = functions.https
-    .onRequest((req, res) => {
-    const reqBody = req.body
-    reqBody['time'] = FieldValue.serverTimestamp()
-    var dummyCron = db.collection('firstOpen_transaction').add(reqBody);
-    res.status(200).send(reqBody);
-});
-
-
-
 //https://us-central1-paymenttoy.cloudfunctions.net/generatorsFirstOpen
 
 //validation and build snapshot and amount copy and paste from invite function
