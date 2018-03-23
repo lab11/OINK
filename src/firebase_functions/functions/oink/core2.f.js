@@ -16,7 +16,7 @@ var FieldValue = admin.firestore.FieldValue;
 exports = module.exports = functions.https
     .onRequest((req, res) => {
         console.log(util.inspect(req.query));
-        db.collection('rx_core_payment').add({
+        return db.collection('rx_core_payment').add({
             timestamp: FieldValue.serverTimestamp(),
             //type: docData.type,
             //amount: docData.amount,
@@ -25,8 +25,11 @@ exports = module.exports = functions.https
             status: req.query.status,
             message: req.query.message
         
-        });
-        res.status(200).send("OK");
+        })
+        .then(() =>{
+            res.status(200).send("OK");
+        })
+        
 
     });
     //     .then(doc => {
