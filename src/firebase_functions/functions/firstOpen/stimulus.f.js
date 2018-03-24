@@ -12,12 +12,17 @@ try {admin.initializeApp(functions.config().firebase);} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
+//stimulus_firstOpen funtion:
+// - Triggers on creation of firstOpen_transaction events. Checks if user_id already exists. If not, calculate the amount to be paid and enqueue the transaction
+//   to tx_core_payment collection and sets status of the firstOpen_transaction doc to "previouslyOpened". If this function fails to perform the task, throw an error and
+//   update the firstOpen_transaction status to "failed".
+
 exports = module.exports = functions.firestore
     .document('firstOpen_transaction/{docId}').onCreate((event)=>{
         const data = event.data.data()
         const docId = event.params.docId
         const costFirstOpen = 5
-        let previouslyOpened =false;
+        let status = "previouslyOpened"
         if(data.processed) {
             return
         }
@@ -26,13 +31,22 @@ exports = module.exports = functions.firestore
             user_id: data.user_id,
             processed: true,
             amount: costFirstOpen,
-            previouslyOpened: previouslyOpened,
+            status: status,
             msgs: [],
             time_stimulus_added: data.time,
             time_processed: FieldValue.serverTimestamp(),
             type: "firstOpen",
             stimulus_doc_id: docId
         })
+
+        // Should I be looping over the documents to determine if any documents have user_id + status == unopened before delivering payment?
+        // Or can I simply just set status to previouslyOpened, send payment and be done?
+        /*
+        return db.collection('firstOpen_transaction').where('user_id','==', data.user_id).get()
+            .then(snapshot => {
+                return snapshot.forEach(doc => {
+                    counter++
+        */
     })
 
 //https://us-central1-paymenttoy.cloudfunctions.net/generatorsFirstOpen
