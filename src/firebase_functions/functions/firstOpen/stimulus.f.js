@@ -37,7 +37,8 @@ exports = module.exports = functions.firestore
             time_processed: FieldValue.serverTimestamp(),
             type: "firstOpen",
             stimulus_doc_id: docId
-        }).then(document => {
+        })
+        /*.then(document => {
             db.collection('tx_core_payment').add({
                 user_id: document.data().user_id,
                 amount: document.data().amount,
@@ -49,6 +50,7 @@ exports = module.exports = functions.firestore
                 reattempt: false
             })
         })
+        */
 
         // Should I be looping over the documents to determine if any documents have user_id + status == unopened before delivering payment?
         // Or can I simply just set status to previouslyOpened, send payment and be done?
