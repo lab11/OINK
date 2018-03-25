@@ -46,7 +46,12 @@ exports = module.exports = functions.firestore
                 Timestamp: ${data.timestamp}.
                 User ID: ${data.user_id}.
                 Alarm ID: ${docId}.`,
-            html: '<img src="https://firebasestorage.googleapis.com/v0/b/paymenttoy.appspot.com/o/Screen%20Shot%202018-02-19%20at%204.52.01%20PM.png?alt=media&token=85aeafe0-c985-4a5e-bd52-c9779cfcfcc2">'
+            html: 'Embedded image: <img src="cid:oinklogo"/>',
+            attachments: [{
+                    filename: 'oink.png',
+                    path: 'https://firebasestorage.googleapis.com/v0/b/paymenttoy.appspot.com/o/Screen%20Shot%202018-02-19%20at%204.52.01%20PM.png?alt=media&token=85aeafe0-c985-4a5e-bd52-c9779cfcfcc2',
+                    cid: 'oinklogo' //same cid value as in the html img src
+                }]
         }
         return mailTransport.sendMail(mailOptions).then(()=>{
             console.log(`Email to ${emails.join()} sent.`)
