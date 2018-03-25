@@ -40,13 +40,15 @@ exports = module.exports = functions.firestore
             from: `"OINK" <${alarmEmail}>`,
             bcc: emails.join(),
             subject: "OINK alarm notification",
-            text:`Thanks for using OINK!
-                Something didn't work out.
-                Details: ${data.reason}
-                Timestamp: ${data.timestamp}.
-                User ID: ${data.user_id}.
-                Alarm ID: ${docId}.`,
-            html: 'Embedded image: <img src="cid:oinklogo"/>',
+            html: '<img src="cid:oinklogo"/>' +
+                    '<h2>Thank you for using OINK!</h2>' +
+                    '<p>An event has triggered one of your alarms. These are the details:</p>' +
+                    `<p><b>Reason: </b> ${data.reason}<br>`+
+                    `<b>Timestamp: </b> ${data.timestamp}<br>`+
+                    `<b>User ID: </b> ${data.timestamp}<br>`+
+                    `<b>Alarm ID: </b> ${data.timestamp}<br>`+
+                    `<b>Document that triggered the alarm: </b> ${data.tx_core_doc_id}</p>`+
+                    '<p>Best,<br> OINK Team.</p>',
             attachments: [{
                     filename: 'oink.png',
                     path: 'https://firebasestorage.googleapis.com/v0/b/paymenttoy.appspot.com/o/Screen%20Shot%202018-02-19%20at%204.52.01%20PM.png?alt=media&token=85aeafe0-c985-4a5e-bd52-c9779cfcfcc2',
