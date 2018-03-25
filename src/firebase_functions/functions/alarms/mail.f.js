@@ -48,10 +48,10 @@ exports = module.exports = functions.firestore
                 Alarm ID: ${docId}.`
         }
         return mailTransport.sendMail(mailOptions).then(()=>{
-            console.log(`Email to ${emails.joint()} sent.`)
+            console.log(`Email to ${emails.join()} sent.`)
             return event.data.ref.set({status: "notified"}, {merge: true});
         }).catch(error => {
-            console.log(`Error sending email to ${emails.joint()}.`)
+            console.log(`Error sending email to ${emails.join()}.`)
             return event.data.ref.set({status: "failed"}, {merge: true});
         })
     });
