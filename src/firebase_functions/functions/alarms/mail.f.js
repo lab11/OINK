@@ -34,19 +34,19 @@ exports = module.exports = functions.firestore
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = event.data.data();
         const docId = event.params.docId;
-        const emails = ["scorreacardo@umass.edu"]
+        const emails = ["scorreacardo@umass.edu", "nklugman@berkeley.edu", "namesjbreda@gmail.com"]
         console.log("sending emails to " + emails.join())
         const mailOptions = {
             from: `"OINK" <${alarmEmail}>`,
             bcc: emails.join(),
-            subject: "OINK alarm notification",
+            subject: "OINK Alarm Notification",
             html: '<img src="cid:oinklogo"/>' +
                     '<h2>Thank you for using OINK!</h2>' +
                     '<p>An event has triggered one of your alarms. These are the details:</p>' +
                     `<p><b>Reason: </b> ${data.reason}<br>`+
                     `<b>Timestamp: </b> ${data.timestamp}<br>`+
                     `<b>User id: </b> ${data.user_id}<br>`+
-                    `<b>Alarm id: </b> ${data.docId}<br>`+
+                    `<b>Alarm docId: </b> ${data.docId}<br>`+
                     `<b>Document that triggered the alarm: </b> ${data.tx_core_doc_id}</p>`+
                     '<p>Best,<br> OINK Team.</p>',
             attachments: [{
