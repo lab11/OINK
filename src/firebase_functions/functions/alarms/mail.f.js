@@ -1,6 +1,7 @@
 //Function to send email to admins when there is an alarm
 
 const functions = require('firebase-functions');
+const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 try {admin.initializeApp(functions.config().firebase);} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
