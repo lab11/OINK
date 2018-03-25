@@ -46,7 +46,7 @@ exports = module.exports = functions.firestore
                     `<p><b>Reason: </b> ${data.reason}<br>`+
                     `<b>Timestamp: </b> ${data.timestamp}<br>`+
                     `<b>User id: </b> ${data.user_id}<br>`+
-                    `<b>Alarm docId: </b> ${data.docId}<br>`+
+                    `<b>Alarm docId: </b> ${docId}<br>`+
                     `<b>Document that triggered the alarm: </b> ${data.tx_core_doc_id}</p>`+
                     '<p>Best,<br> OINK Team.</p>',
             attachments: [{
