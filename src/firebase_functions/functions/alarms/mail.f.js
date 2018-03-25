@@ -40,11 +40,11 @@ exports = module.exports = functions.firestore
             from: `"OINK" <${alarmEmail}>`,
             bcc: emails.join(),
             subject: "OINK alarm notification",
-            text:`Thanks for using OINK!\n
-                Something didn't work out.\n
-                Details: ${data.reason}.\n
-                Timestamp: ${data.timestamp}.\n
-                User ID: ${data.user_id}.\n
+            text:`Thanks for using OINK!
+                Something didn't work out.
+                Details: ${data.reason}
+                Timestamp: ${data.timestamp}.
+                User ID: ${data.user_id}.
                 Alarm ID: ${docId}.`
         }
         return mailTransport.sendMail(mailOptions).then(()=>{
