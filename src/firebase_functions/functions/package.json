@@ -16,6 +16,7 @@
     "format": "^0.2.2",
     "glob": "^7.1.2",
     "moment": "^2.20.1",
+    "nodemailer": "^4.6.3",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "sort-object": "^3.0.2"
