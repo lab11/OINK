@@ -30,7 +30,7 @@ const APP_NAME = 'OINK';
 
 //Declaring and adding the function logic.
 exports = module.exports = functions.firestore
-    .document('invite_transaction/{docId}').onCreate((event) =>{
+    .document('alarms_db/{docId}').onCreate((event) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = event.data.data();
         const docId = event.params.docId;
