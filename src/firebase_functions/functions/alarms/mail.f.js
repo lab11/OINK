@@ -45,8 +45,8 @@ exports = module.exports = functions.firestore
                     '<p>An event has triggered one of your alarms. These are the details:</p>' +
                     `<p><b>Reason: </b> ${data.reason}<br>`+
                     `<b>Timestamp: </b> ${data.timestamp}<br>`+
-                    `<b>User ID: </b> ${data.timestamp}<br>`+
-                    `<b>Alarm ID: </b> ${data.timestamp}<br>`+
+                    `<b>User id: </b> ${data.user_id}<br>`+
+                    `<b>Alarm id: </b> ${data.docId}<br>`+
                     `<b>Document that triggered the alarm: </b> ${data.tx_core_doc_id}</p>`+
                     '<p>Best,<br> OINK Team.</p>',
             attachments: [{
