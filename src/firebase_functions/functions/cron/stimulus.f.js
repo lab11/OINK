@@ -16,7 +16,7 @@ var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.https
     .onRequest((req, res) => {
-	"
+	
 	return null;
 
     })
