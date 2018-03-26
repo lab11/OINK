@@ -13,13 +13,20 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 //stimulus_firstOpen funtion:
-// - Triggers on creation of firstOpen_transaction events. Checks if user_id already exists. If not, calculate the amount to be paid and enqueue the transaction
-//   to tx_core_payment collection and sets status of the firstOpen_transaction doc to "previouslyOpened". If this function fails to perform the task, throw an error and
+// - Triggers on creation of firstOpen_transaction events. Checks if user_id already exists (via user_activity collection). If it does, checks if active
+//   or inactive and sets to active if not already. If not present in user_activity collection, calculate the amount to be paid and enqueue the transaction
+//   to tx_core_payment collection and sets status of the firstOpen_transaction doc to "previouslyOpened". If this function fails to perform the task, 
+//    throw an error
 //   update the firstOpen_transaction status to "failed".
+// - Sends email to user confirming app installation by adding document to alarm_db
+
 
 //write to tx
 //send a message to user
-//alarm: alarms_db.add(time, reason, userID)
+//alarm: alarms_db.add(time, reason, userID) "thank you for installing the app"
+//try catch
+//check user_activity collection to make sure they are not already present if they are check activity and update it 
+// fraud detection by checking if locaility and time is centered around the same time. 
 
 exports = module.exports = functions.firestore
     .document('firstOpen_transaction/{docId}').onCreate((event)=>{
