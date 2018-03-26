@@ -17,6 +17,10 @@ var FieldValue = admin.firestore.FieldValue;
 //   to tx_core_payment collection and sets status of the firstOpen_transaction doc to "previouslyOpened". If this function fails to perform the task, throw an error and
 //   update the firstOpen_transaction status to "failed".
 
+//write to tx
+//send a message to user
+//alarm: alarms_db.add(time, reason, userID)
+
 exports = module.exports = functions.firestore
     .document('firstOpen_transaction/{docId}').onCreate((event)=>{
         const data = event.data.data()
@@ -33,6 +37,7 @@ exports = module.exports = functions.firestore
             amount: costFirstOpen,
             status: status,
             msgs: [],
+            token: [], 
             time_stimulus_added: data.time,
             time_processed: FieldValue.serverTimestamp(),
             type: "firstOpen",
