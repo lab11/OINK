@@ -16,8 +16,10 @@ var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.https
     .onRequest((req, res) => {
+        const currentTime = new Date().getTime()
+        const lastHalfDay = currentTime - 43200000
     
-        return db.collection('user_activity').orderBy('timestamp').get() //TODO: Need to add the startAt() part
+        return db.collection('user_activity').orderBy('timestamp').startAt(lastHalfDay).get() //TODO: Need to add the startAt() part
                 .then(snapshot => {
                     snapshot.forEach(doc => {
                         console.log(doc.id, '=>', doc.data());
