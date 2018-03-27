@@ -16,7 +16,7 @@ var FieldValue = admin.firestore.FieldValue;
 // - Triggers on creation of firstOpen_transaction events. Checks if user_id already exists (via user_activity collection). If it does, checks if active
 //   or inactive and sets to active if not already. If not present in user_activity collection, calculate the amount to be paid and enqueue the transaction
 //   to tx_core_payment collection and sets status of the firstOpen_transaction doc to "previouslyOpened". If this function fails to perform the task, 
-//    throw an error
+//   throw an error
 //   update the firstOpen_transaction status to "failed".
 // - Sends email to user confirming app installation by adding document to alarm_db
 

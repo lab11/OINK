@@ -14,7 +14,7 @@ var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.https
     .onRequest((req, res) => {
-    const reqBody = req.body
+    const reqBody = req.body                                                
     reqBody['time'] = FieldValue.serverTimestamp()
     //reqBody['hello'] = FieldValue.serverTimestamp()
     var dummyCron = db.collection('firstOpen_transaction').add(reqBody);
