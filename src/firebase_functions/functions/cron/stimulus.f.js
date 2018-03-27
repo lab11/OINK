@@ -16,7 +16,18 @@ var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.https
     .onRequest((req, res) => {
-	
-	return null;
+    
+        return db.collection('user_activity').orderBy('timestamp').get() //TODO: Need to add the startAt() part
+                .then(snapshot => {
+                    snapshot.forEach(doc => {
+                        console.log(doc.id, '=>', doc.data());
+                    });
+                })
+                .then(() => {
+                    res.status(200).send("OK");
+                })
+                .catch(err =>{
+                    console.log('Error getting the documents', err);
+                });
 
-    })
+    });
