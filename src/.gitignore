@@ -1,2 +1,4 @@
 #Firebase specifics
 node_modules
+.DS_Store
+commitdeploy.sh
