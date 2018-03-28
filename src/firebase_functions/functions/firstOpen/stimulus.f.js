@@ -22,6 +22,7 @@ var FieldValue = admin.firestore.FieldValue;
 
 add try catches
 add user_list conditionals
+stem out tx_core_payment add to a separate function that occurs onCreate of user_list
 */
 
 exports = module.exports = functions.firestore
@@ -35,10 +36,6 @@ exports = module.exports = functions.firestore
         const tx_core_doc_id = data.tx_core_doc_id
         const token = data.token
 
-        if(data.user_activity == "active") {
-            return
-        }
-
         console.log(`The docId of the creation was: ${util.inspect(docId)}`)
 
         return db.collection('firstOpen_transaction').doc(docId).update({
@@ -47,6 +44,26 @@ exports = module.exports = functions.firestore
             time_processed: FieldValue.serverTimestamp(),
             stimulus_doc_id: docId
         })
+        /*
+        if(snapshot = db.collection('user_list').doc('user_id').get()){
+            if(snapshot.data.active){
+                return
+            } else {
+                db.collection('user_list').doc('user_id').update({
+                    active: true
+                })
+            }
+        } else {
+            db.collection('user_list').add({
+                active: true,
+                imei: imei,
+                instance_id: "?",
+                phone_num: "unknown",
+                time: FieldValue.serverTimestamp(),
+                token: token
+            })
+        }
+        */
 
         .then(() => {
             return db.collection('tx_core_payment').add({
