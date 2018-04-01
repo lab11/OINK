@@ -1,4 +1,4 @@
-import { currentId } from 'async_hooks';
+//import { currentId } from 'async_hooks';
 
 const functions = require('firebase-functions');
 const curl = require('curlrequest');
@@ -15,15 +15,6 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 //stimulus_firstOpen funtion:
-/* 
-1.  user opens app -> creates firstOpen document in firebase
-2.  firebase function checks user_list for user_id
-3.1 if( user_id present in user_list and active ) {no nothing}
-3.2 if( user_id present in user_list and inactive ) {set to active}
-3.3 if( user_id not present in user_list ) {add to user_list and add to tx_core_payment}
-
-add try catches
-*/
 
 exports = module.exports = functions.firestore
     .document('firstOpen_Queue/{docId}').onCreate((event)=>{
@@ -39,7 +30,7 @@ exports = module.exports = functions.firestore
         var user = db.collection('user_list').doc(user_id)
 
         return user.get()
-        /*.then((doc) => {
+        .then((doc) => {
             if(doc.exists) {
                 // Case 1.1 (edge coverage): Just in case of packet loss or double packet being sent and user was already set to active
                 if(doc.data().active){
@@ -98,7 +89,7 @@ exports = module.exports = functions.firestore
                 })
             }
         })
-        */
+        
     })
 
 //https://us-central1-paymenttoy.cloudfunctions.net/generatorsFirstOpen
