@@ -23,8 +23,6 @@ var FieldValue = admin.firestore.FieldValue;
 3.3 if( user_id not present in user_list ) {add to user_list and add to tx_core_payment}
 
 add try catches
-break out into two functions one for queueing and one for paying
-should I be using .then calls for things that are independent 
 */
 
 exports = module.exports = functions.firestore
