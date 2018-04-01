@@ -17,7 +17,7 @@ exports = module.exports = functions.https
     const reqBody = req.body                                                
     reqBody['time'] = FieldValue.serverTimestamp()
     //reqBody['hello'] = FieldValue.serverTimestamp()
-    var dummyCron = db.collection('firstOpen_transaction').add(reqBody);
+    var dummyCron = db.collection('firstOpen_Queue').add(reqBody);
     res.status(200).send(reqBody);
 
 });
