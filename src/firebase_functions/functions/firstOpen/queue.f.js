@@ -38,7 +38,8 @@ exports = module.exports = functions.firestore
         // Case 1.0: User is already present in user_list meaning they just reinstalled the app.
         var user = db.collection('user_list').doc(user_id)
 
-        return user.get().then((doc) => {
+        return user.get()
+        /*.then((doc) => {
             if(doc.exists) {
                 // Case 1.1 (edge coverage): Just in case of packet loss or double packet being sent and user was already set to active
                 if(doc.data().active){
@@ -97,6 +98,7 @@ exports = module.exports = functions.firestore
                 })
             }
         })
+        */
     })
 
 //https://us-central1-paymenttoy.cloudfunctions.net/generatorsFirstOpen
