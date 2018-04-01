@@ -1,4 +1,4 @@
-import { currentId } from 'async_hooks';
+//import { currentId } from 'async_hooks';
 
 const functions = require('firebase-functions');
 const curl = require('curlrequest');
