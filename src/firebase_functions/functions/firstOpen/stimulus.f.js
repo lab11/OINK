@@ -1,3 +1,5 @@
+import { currentId } from 'async_hooks';
+
 const functions = require('firebase-functions');
 const curl = require('curlrequest');
 const admin = require('firebase-admin');
@@ -21,71 +23,72 @@ var FieldValue = admin.firestore.FieldValue;
 3.3 if( user_id not present in user_list ) {add to user_list and add to tx_core_payment}
 
 add try catches
-add user_list conditionals
-stem out tx_core_payment add to a separate function that occurs onCreate of user_list
+break out into two functions one for queueing and one for paying
+should I be using .then calls for things that are independent 
 */
 
 exports = module.exports = functions.firestore
-    .document('firstOpen_transaction/{docId}').onCreate((event)=>{
+    .document('firstOpen_Queue/{docId}').onCreate((event)=>{
         const docId = event.params.docId
         const data = event.data.data()
         const costFirstOpen = 5
         const user_id = data.user_id
-        const status = data.status
         const imei = data.imei
-        const tx_core_doc_id = data.tx_core_doc_id
         const token = data.token
-
+        const currentTimestamp = Firebase.ServerValue.TIMESTAMP
         console.log(`The docId of the creation was: ${util.inspect(docId)}`)
+        // Case 1.0: User is already present in user_list meaning they just reinstalled the app.
+        var user = db.collection('user_list').doc(user_id)
 
-        return db.collection('firstOpen_transaction').doc(docId).update({
-            user_activity: "active",
-            amount: costFirstOpen,
-            time_processed: FieldValue.serverTimestamp(),
-            stimulus_doc_id: docId
-        })
-        /*
-        if(snapshot = db.collection('user_list').doc('user_id').get()){
-            if(snapshot.data.active){
-                return
-            } else {
-                db.collection('user_list').doc('user_id').update({
-                    active: true
+        return user.get().then((doc) => {
+            if(doc.exists) {
+                // Case 1.1 (edge coverage): Just in case of packet loss or double packet being sent and user was already set to active
+                if(doc.data().active){
+                    console.log('The user was already active...')
+                    return
+                } 
+                // Case 1.2: Update user to active & log user_activity
+                else {
+                    return db.collection('user_list').doc(user_id).update({
+                        active: true
+                    })
+                    .then(() => {
+                        return db.collection('user_activity').add({
+                            user_id: user_id,
+                            active: true,
+                            timestamp: currentTimestamp
+                        })
+                    })
+                }
+            }
+            // Case 2.0 User was not present in user_list meaning this is the first time they are ever opening the app
+            else {
+                return db.collection('user_list').doc(user_id).set({
+                    active: true,
+                    imei: imei,
+                    instance_id: "?",
+                    phone_num: "unknown",
+                    timestamp: currentTimestamp,
+                    token: token
+                })
+                .then(() => {
+                    return db.collection('user_activity').add({
+                        user_id: user_id,
+                        active: true,
+                        timestamp: currentTimestamp
+                    })
+                })
+                .then(() => {
+                    return db.collection('user_timers').doc(user_id).set({
+                        cycle: 1,
+                        elapsedTime: 0,
+                        firstOpenTime: 0,
+                        lastTimeActive: 0,
+                        active: true,
+                        timePaidArr: []
+                    })
                 })
             }
-        } else {
-            db.collection('user_list').add({
-                active: true,
-                imei: imei,
-                instance_id: "?",
-                phone_num: "unknown",
-                time: FieldValue.serverTimestamp(),
-                token: token
-            })
-        }
-        */
-
-        .then(() => {
-            return db.collection('tx_core_payment').add({
-                user_id: user_id,
-                amount: costFirstOpen,
-                msgs: [],
-                num_attempts: 0,
-                time: FieldValue.serverTimestamp(),
-                type: 'firstOpen',
-                stimulus_doc_id: docId,
-                status: 'pending',
-                reattempt: false
-            })
-        })
-
-        .then(() => {
-            return db.collection('alarms_db').add({
-                timestamp: FieldValue.serverTimestamp(),
-                user_id:data.user_id,
-                reason:"User has opened application for the first time.",
-                tx_core_doc_id:docId 
-            })
         })
     })
 
