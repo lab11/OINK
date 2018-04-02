@@ -15,7 +15,7 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.firestore
-    .document('invite_transaction/{docId}').onCreate((event) =>{
+    .document('user_activity/{docId}').onCreate((event) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = event.data.data();
         const docId = event.params.docId;
