@@ -30,7 +30,7 @@ exports = module.exports = functions.firestore
         const threshold = 100;
         var totalNumInv = 0;
         var totalNumFailedInv = 0;
-        const costInvite = 0.1;
+        const costInvite = 1;
 
         console.log(`The onCreate event document is: ${util.inspect(data)}`);
         console.log(`The docId of the creation was: ${util.inspect(docId)}`);
