@@ -36,8 +36,12 @@ exports = module.exports = functions.https
                 json: true,
                 body: {transaction_id: req.query.transaction_id},
                 resolveWithFullResponse: true,
-            }, function(error, response, body){
-                console.log(body);
+            }).then( response =>{
+                if (response.statusCode >= 400) {
+                    console.log(`HTTP Error: ${response.statusCode}`);
+                }
+                console.log('Response body: ', response.body);
+                console.log('Status code: ', response.statusCode);
             });
         })
         .then(() => {
