@@ -26,25 +26,25 @@ exports = module.exports = functions.https
             message: req.query.message
         
         })
-        .then(() =>{
-            request({
-                uri: 'http://graphs.grid.watch',
-                port: 3111,
-                method: 'POST',
-                headers:{
-                    'Content-Type':'application/json',
-                },
-                json: true,
-                body: {transaction_id: req.query.transaction_id},
-                resolveWithFullResponse: true,
-            }).then( response =>{
-                if (response.statusCode >= 400) {
-                    console.log(`HTTP Error: ${response.statusCode}`);
-                }
-                console.log('Response body: ', response.body);
-                console.log('Status code: ', response.statusCode);
-            });
-        })
+        // .then(() =>{
+        //     request({
+        //         uri: 'http://graphs.grid.watch',
+        //         port: 3111,
+        //         method: 'POST',
+        //         headers:{
+        //             'Content-Type':'application/json',
+        //         },
+        //         json: true,
+        //         body: {transaction_id: req.query.transaction_id},
+        //         resolveWithFullResponse: true,
+        //     }).then( response =>{
+        //         if (response.statusCode >= 400) {
+        //             console.log(`HTTP Error: ${response.statusCode}`);
+        //         }
+        //         console.log('Response body: ', response.body);
+        //         console.log('Status code: ', response.statusCode);
+        //     });
+        // })
         .then(() => {
             res.status(200).send("OK");
         });
