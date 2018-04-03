@@ -21,6 +21,8 @@ exports = module.exports = functions.https
         var elapsedPaid = 0;
         var newElapsedTime = 0;
 
+        //TODO: set a minimum of payment per cycle.
+
         return db.collection('user_timers').get()
             .then(snapshot => {
                 snapshot.forEach(doc =>{
@@ -31,13 +33,14 @@ exports = module.exports = functions.https
                             elapsedPaid = paymentThr
                             newElapsedTime = doc.data().elapsedTime - paymentThr
                         }
-
-                        elapsedPaid = doc.data().elapsedTime
+                        else {
+                            elapsedPaid = doc.data().elapsedTime
+                        }
 
                         return db.collection('cron_transaction').add({
                             event:'cron', 
                             imei: doc.data().imei,
-                            time_elapsed: elapsedPaid,
+                            time_elapsed: elapsedPaid, //TODO: set this in hours
                             status: 'pending',
                             time: FieldValue.serverTimestamp(),
                             user_id: doc.id,
