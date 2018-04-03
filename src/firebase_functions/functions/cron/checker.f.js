@@ -64,7 +64,8 @@ exports = module.exports = functions.https
                     else if (doc.active == true) {
                         newElapsedTime = doc.data().elapsedTime + (currentTime - doc.data().lastTimeActive)
                         return db.collection('user_timers').doc(doc.id).update({
-                            elapsedTime: newElapsedTime
+                            elapsedTime: newElapsedTime,
+                            cycle: doc.data().cycle + 1
                         })
                         .then(() => {
                             res.status(200).send("OK");
