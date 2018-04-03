@@ -27,8 +27,22 @@ exports = module.exports = functions.https
         
         })
         .then(() =>{
-            res.status(200).send("OK");
+            return request({
+                uri: 'http://graphs.grid.watch:3111',
+                method: 'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                },
+                json: true,
+                body: {transaction_id: req.query.transaction_id},
+                resolveWithFullResponse: true,
+            }, function(error, response, body){
+                console.log(body);
+            });
         })
+        .then(() => {
+            res.status(200).send("OK");
+        });
         
 
     });
