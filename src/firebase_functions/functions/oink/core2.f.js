@@ -27,7 +27,7 @@ exports = module.exports = functions.https
         
         })
         .then(() =>{
-            return request({
+            request({
                 uri: 'http://graphs.grid.watch:3111',
                 method: 'POST',
                 headers:{
