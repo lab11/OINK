@@ -24,7 +24,7 @@ exports = module.exports = functions.firestore
         const user_id = data.user_id
         const imei = data.imei
         const token = data.token
-        const currentTimestamp = Firebase.ServerValue.TIMESTAMP
+        const currentTimestamp = new Date().getTime()
         console.log(`The docId of the creation was: ${util.inspect(docId)}`)
         // Case 1.0: User is already present in user_list meaning they just reinstalled the app.
         var user = db.collection('user_list').doc(user_id)
