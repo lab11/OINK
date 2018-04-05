@@ -35,7 +35,7 @@ exports = module.exports = functions.firestore
         const amount = data.amount
         const imei = data.imei
         const token = data.token
-        const currentTimestamp = Firebase.ServerValue.TIMESTAMP
+        const currentTimestamp = new Date().getTime()
         console.log(`The docId of the creation was: ${util.inspect(docId)}`)
 
         return db.collection('firstOpen_transaction').doc(docId).update({
