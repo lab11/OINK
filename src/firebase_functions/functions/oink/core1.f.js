@@ -175,7 +175,23 @@ exports = module.exports = functions.firestore
                                         }
                                         else {
                                             localMsgs.push('Payment submitted.')
-                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'submitted', msgs: localMsgs, transaction_id:userPaymentInfo.transaction_id});
+                                            return db.collection('tx_core_payment').doc(docId).update({
+                                                reattempt: false, 
+                                                status:'submitted', 
+                                                msgs: localMsgs, 
+                                                transaction_id:userPaymentInfo.transaction_id
+                                            })
+                                            .then(() => {
+                                                return db.collection('notifications_db').add({
+                                                    amount: data.amount,
+                                                    type: data.type,
+                                                    status: 'pending',
+                                                    timestamp: new Date().getTime(),
+                                                    body: `Your ${data.type} transaction has been submitted for ${data.amount} CHD. Thank you!`,
+                                                    title:"Transaction submitted",
+                                                    user_id: data.user_id
+                                                });
+                                            })
                                             
                                         }
                                 });
