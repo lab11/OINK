@@ -37,12 +37,7 @@ exports = module.exports = functions.firestore
                         timestamp: currentTimestamp
                     })
                 })
-                .then(() => {
-                    return db.collection('user_timers').doc(user_id).update({
-                        lastTimeActive: currentTimestamp,
-                        active: false
-                    })
-                })
+                
             } else {
                 console.log('user does not exist...')
                 return

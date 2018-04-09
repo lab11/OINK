@@ -28,8 +28,8 @@ exports = module.exports = functions.https
         })
         // .then(() =>{
         //     request({
-        //         uri: 'http://graphs.grid.watch',
-        //         port: 3111,
+        //         uri: 'http://graphs.grid.watch:3245',
+        //  
         //         method: 'POST',
         //         headers:{
         //             'Content-Type':'application/json',

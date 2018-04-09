@@ -15,8 +15,8 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.firestore
-    .document('user_activity/{docId}').onCreate((event) =>{
-        //Getting the data that was modified and initializing all the parameters for payment.
+    .document('user_activity/{docId}').onCreate((event) => {
+        //Getting the data that was modified and initializing all the parameters.
         const data = event.data.data();
         const docId = event.params.docId;
         var docRef = db.collection('user_timers').doc(data.user_id);
@@ -28,20 +28,30 @@ exports = module.exports = functions.firestore
                 if (doc.exists) {
                     var tempLastTimeActive = doc.data().lastTimeActive;
                     var tempElapsedTime = doc.data().elapsedTime;
-                    var newElapsedTime = tempElapsedTime + (data.timestamp - tempLastTimeActive)
+                    var newElapsedTime = tempElapsedTime + (data.timestamp - tempLastTimeActive); 
                 }
                 else {
                     console.log('No such document!');
                 }
             })
             .then(() => {
-                return docRef.update({elapsedTime: newElapsedTime })
+                return docRef.update({
+                    active: false,
+                    elapsedTime: newElapsedTime,
+                    lastTimeActive: data.timestamp
+
+                })
             })
             .catch( err => {
                 console.log(err);
             });
         }
-        else { return null; }
+        else { 
+            return docRef.update({
+                active: true,
+                lastTimeActive: data.timestamp 
+            })
+        }
 
     });
         

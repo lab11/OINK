@@ -18,6 +18,7 @@ exports = module.exports = functions.https
     .onRequest((req, res) => {
         const currentTime = new Date().getTime()
         const paymentThr = 30 * 24 * 60 * 60 * 1000; //30 days 
+        const cronRunFreq = 5 * 60 * 1000; //TODO: Currently set each Every 5 min> set tthis up to the real value.
         var elapsedPaid = 0;
         var newElapsedTime = 0;
 
@@ -26,21 +27,35 @@ exports = module.exports = functions.https
         return db.collection('user_timers').get()
             .then(snapshot => {
                 snapshot.forEach(doc =>{
+                    
+                    if (((doc.data().cycle * paymentThr) - (currentTime - doc.data().firstOpenTime) <= 0) || (doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint) >= paymentThr)) {
+                        var elapsedPaid = 0;
 
-                    if (((doc.data().cycle * paymentThr) - (currentTime - doc.data().firstOpenTime) <= 0) || (doc.data().elapsedTime >= paymentThr)) {
-
-                        if (doc.data().elapsedTime >= paymentThr){
-                            elapsedPaid = paymentThr
-                            newElapsedTime = doc.data().elapsedTime - paymentThr
+                        if (doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint) >= paymentThr){
+                            elapsedPaid = paymentThr;
+                            newElapsedTime = doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint) - paymentThr;
                         }
                         else {
-                            elapsedPaid = doc.data().elapsedTime
+                            if ( ! doc.data().active){
+                                elapsedPaid = doc.data().elapsedTime;
+                                
+                            }
+                            else{
+                                if (doc.data().lastCheckpoint <= doc.data().lastTimeActive){
+                                    elapsedPaid = doc.data().elapsedTime + (currentTime - doc.data().lastTimeActive)
+                                }
+                                else {
+                                    elapsedPaid = doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint)
+                                }  
+                            }
+                        newElapsedTime = 0;
+                            
                         }
 
                         return db.collection('cron_transaction').add({
                             event:'cron', 
                             imei: doc.data().imei,
-                            time_elapsed: elapsedPaid, //TODO: set this in hours
+                            time_elapsed: Math.round((elapsedPaid/3600000) * 100) / 100  , //Sending the value to the cron_transaction in hours
                             status: 'pending',
                             time: FieldValue.serverTimestamp(),
                             user_id: doc.id,
@@ -51,7 +66,8 @@ exports = module.exports = functions.https
                             .doc(doc.id).update({
                                 elapsedTime: newElapsedTime, 
                                 timePaidArr: doc.data().timePaidArr.push(elapsedPaid), 
-                                cycle: doc.data().cycle + 1
+                                cycle: doc.data().cycle + 1,
+                                lastCheckpoint: currentTime
                             });
 
 
@@ -61,18 +77,31 @@ exports = module.exports = functions.https
                         });
                     }
 
-                    else if (doc.active == true) {
-                        newElapsedTime = doc.data().elapsedTime + (currentTime - doc.data().lastTimeActive)
-                        return db.collection('user_timers').doc(doc.id).update({
-                            elapsedTime: newElapsedTime,
-                            cycle: doc.data().cycle + 1
-                        })
-                        .then(() => {
-                            res.status(200).send("OK");
-                        })
-                        .catch( err => {
-                            console.log(err);
-                        });
+                    else {
+                        if (doc.active){
+
+                            if (doc.data().lastCheckpoint <= doc.data().lastTimeActive){
+                                newElapsedTime = doc.data().elapsedTime + (currentTime - doc.data().lastTimeActive)
+
+                            }
+                            else {
+                                newElapsedTime = doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint)
+                            }
+                            
+                            return db.collection('user_timers').doc(doc.id).update({
+                                elapsedTime: newElapsedTime,
+                                lastCheckpoint: currentTime
+                                
+                            })
+                            .then(() => {
+                                res.status(200).send("OK");
+                            })
+                            .catch( err => {
+                                console.log(err);
+                                //TODO:CHeck how to handle this error (fail state?)
+                            });
+                        }
+                        else {return null;}
                     }
                 });
             });
