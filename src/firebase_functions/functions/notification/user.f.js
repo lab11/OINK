@@ -16,42 +16,65 @@ exports = module.exports = functions.firestore
         const data = event.data.data();
         const docId = event.params.docId;
 
-        request({
-            uri: 'https://fcm.googleapis.com/v1/projects/paymenttoy/messages:send HTTP/1.1',
-        
-            method: 'POST',
-            headers:{
-                'Content-Type':'application/json',
-                'Authorization': '' //TODO: Add the token from the server.
+    // This registration token comes from the client FCM SDKs.
+    var registrationToken = 'fD_bk9Px43w:APA91bFOaVQp7fwTiXMGqwEbRQoA0uNIuv0tt-hjci0WonjdMEQv3HMK9FTljBQ4tNIYJH6rbljV9bnzUua63Rc27WDOCQo0-C7ZrxI-fh7J8Im0u4bCwSgkbEXR8LSPozSpPTNdmQZH';
 
-            },
-            json: true,
-            body: {
-                "message":{
-                  "token" : "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...", //TODO: Ask for the token based on the user ID.
-                  "notification" : {
-                    "body" : data.body,
-                    "title" : data.title,
-                    }
-                 }
-              },
-            resolveWithFullResponse: true,
-        })
-        .then(response =>{
-            console.log('Response body: ', response.body);
-            console.log('Status code: ', response.statusCode);
+    // See documentation on defining a message payload.
+    var message = {
+    data: {
+        score: '850',
+        time: '2:45'
+    },
+    token: registrationToken
+    };
+
+    // Send a message to the device corresponding to the provided
+    // registration token.
+    return admin.messaging().send(message)
+    .then((response) => {
+        // Response is a message ID string.
+        console.log('Successfully sent message:', response);
+    })
+    .catch((error) => {
+        console.log('Error sending message:', error);
+    });
+
+        // request({
+        //     uri: 'https://fcm.googleapis.com/v1/projects/paymenttoy/messages:send HTTP/1.1',
+        
+        //     method: 'POST',
+        //     headers:{
+        //         'Content-Type':'application/json',
+        //         'Authorization': '' //TODO: Add the token from the server.
+
+        //     },
+        //     json: true,
+        //     body: {
+        //         "message":{
+        //           "token" : "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...", //TODO: Ask for the token based on the user ID.
+        //           "notification" : {
+        //             "body" : data.body,
+        //             "title" : data.title,
+        //             }
+        //          }
+        //       },
+        //     resolveWithFullResponse: true,
+        // })
+        // .then(response =>{
+        //     console.log('Response body: ', response.body);
+        //     console.log('Status code: ', response.statusCode);
             
-            if (response.statusCode >= 400) {
-                console.log(`HTTP Error: ${response.statusCode}`);
-                return event.data.ref.set({status: "failed"}, {merge: true});
-            }
-            console.log('Response body: ', response.body);
-            console.log('Status code: ', response.statusCode);
-            return event.data.ref.set({status: "notified"}, {merge: true});
+        //     if (response.statusCode >= 400) {
+        //         console.log(`HTTP Error: ${response.statusCode}`);
+        //         return event.data.ref.set({status: "failed"}, {merge: true});
+        //     }
+        //     console.log('Response body: ', response.body);
+        //     console.log('Status code: ', response.statusCode);
+        //     return event.data.ref.set({status: "notified"}, {merge: true});
             
             
-        }).catch(error => {
-            console.log(`Error sending email to ${emails.join()}.`)
-            return event.data.ref.set({status: "failed"}, {merge: true});
-        })
+        // }).catch(error => {
+        //     console.log(`Error sending email to ${emails.join()}.`)
+        //     return event.data.ref.set({status: "failed"}, {merge: true});
+        // })
     });
