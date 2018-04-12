@@ -2,7 +2,7 @@
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-try {admin.initializeApp(functions.config().firebase);} catch(e) {}
+try {admin.initializeApp();} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
 
 //Creating a firebase object to navigate it:
@@ -11,10 +11,10 @@ var FieldValue = admin.firestore.FieldValue;
 
 //Declaring and adding the function logic.
 exports = module.exports = functions.firestore
-    .document('notifications_db/{docId}').onCreate((event) =>{
+    .document('notifications_db/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
-        const data = event.data.data();
-        const docId = event.params.docId;
+        const data = snap.data();
+        const docId = context.params.docId;
 
     // This registration token comes from the client FCM SDKs.
     var registrationToken = 'fD_bk9Px43w:APA91bFOaVQp7fwTiXMGqwEbRQoA0uNIuv0tt-hjci0WonjdMEQv3HMK9FTljBQ4tNIYJH6rbljV9bnzUua63Rc27WDOCQo0-C7ZrxI-fh7J8Im0u4bCwSgkbEXR8LSPozSpPTNdmQZH';
