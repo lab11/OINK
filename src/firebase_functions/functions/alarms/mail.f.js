@@ -3,7 +3,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
-try {admin.initializeApp(functions.config().firebase);} catch(e) {}
+try {admin.initializeApp();} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
 
 //Creating a firebase object to navigate it:
@@ -30,10 +30,10 @@ const APP_NAME = 'OINK';
 
 //Declaring and adding the function logic.
 exports = module.exports = functions.firestore
-    .document('alarms_db/{docId}').onCreate((event) =>{
+    .document('alarms_db/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
-        const data = event.data.data();
-        const docId = event.params.docId;
+        const data = snap.data();
+        const docId = context.params.docId;
         const emails = ["scorreacardo@umass.edu", "nklugman@berkeley.edu", "namesjbreda@gmail.com"]
         console.log("sending emails to " + emails.join())
         const mailOptions = {
@@ -57,9 +57,9 @@ exports = module.exports = functions.firestore
         }
         return mailTransport.sendMail(mailOptions).then(()=>{
             console.log(`Email to ${emails.join()} sent.`)
-            return event.data.ref.set({status: "notified"}, {merge: true});
+            return snap.ref.set({status: "notified"}, {merge: true});
         }).catch(error => {
             console.log(`Error sending email to ${emails.join()}.`)
-            return event.data.ref.set({status: "failed"}, {merge: true});
+            return snap.ref.set({status: "failed"}, {merge: true});
         })
     });
