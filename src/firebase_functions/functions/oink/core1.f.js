@@ -5,7 +5,7 @@ const util = require('util');
 const request = require('request-promise');
 const crypto = require('crypto');
 const sortObj = require('sort-object');
-try {admin.initializeApp(functions.config().firebase);} catch(e) {}
+try {admin.initializeApp();} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
 
 //Creating a firebase object to navigate it:
@@ -23,21 +23,21 @@ var FieldValue = admin.firestore.FieldValue;
 //    * There are not specific parameters for this function.
 
 exports = module.exports = functions.firestore
-    .document('tx_core_payment/{docId}').onWrite((event) =>{
+    .document('tx_core_payment/{docId}').onWrite((change, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
-        const data = event.data.data();
-        const previousData = event.data.previous.data();
-        const docId = event.params.docId;
+        const data = change.after.data();
+        const previousData = change.before.data();
+        const docId = context.params.docId;
         var userPaymentInfo = {}
         var localMsgs = []
         
         //Check if the document was deleted, if so return null (for avoiding infinite loop)
-        if (!event.data.exists){
+        if (!change.after.exists){
             return null;
         }
 
         //Check if the document is not new, if so check the status, num_attempts and reattempt flag (for avoiding infinite loops)
-        if (event.data.previous.exists){
+        if (change.before.exists){
             if (data.status != 'failed' || data.num_attempts >= 5 || data.reattempt){
                 return null;
 
