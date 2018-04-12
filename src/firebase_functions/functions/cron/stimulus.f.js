@@ -5,7 +5,7 @@ const util = require('util');
 const request = require('request-promise');
 const crypto = require('crypto');
 const sortObj = require('sort-object');
-try {admin.initializeApp(functions.config().firebase);} catch(e) {}
+try {admin.initializeApp();} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
 
 //Creating a firebase object to navigate it:
@@ -23,10 +23,10 @@ var FieldValue = admin.firestore.FieldValue;
 //    * event: Event that triggered the function. In this case this is the new document created by the App. It has many parameter including the doc_id and the fields of each document.
 
 exports = module.exports = functions.firestore
-    .document('cron_transaction/{docId}').onCreate((event) =>{
+    .document('cron_transaction/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
-        const data = event.data.data();
-        const docId = event.params.docId;
+        const data = snap.data();
+        const docId = context.params.docId;
         const threshold = 1440000;// 24 hours, milisecs //TODO:For how much time in total do we want to run this incentive? 3,6 months, a year?
         var totalPaidDuration = 0; //Total elapsed time paid in the collection.
         var totalFailedDuration = 0; //total elapsed time to be paid that failed during the transaction.
