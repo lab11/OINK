@@ -5,7 +5,7 @@ const util = require('util');
 const request = require('request-promise');
 const crypto = require('crypto');
 const sortObj = require('sort-object');
-try {admin.initializeApp(functions.config().firebase);} catch(e) {}
+try {admin.initializeApp();} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
 
 //Creating a firebase object to navigate it:
@@ -23,10 +23,10 @@ var FieldValue = admin.firestore.FieldValue;
 //    * event: Event that triggered the function. In this case this is the new document created by the App. It has many parameter including the doc_id and the fields of each document.
 
 exports = module.exports = functions.firestore
-    .document('invite_transaction/{docId}').onCreate((event) =>{
+    .document('invite_transaction/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
-        const data = event.data.data();
-        const docId = event.params.docId;
+        const data = snap.data();
+        const docId = context.params.docId;
         const threshold = 100;
         var totalNumInv = 0;
         var totalNumFailedInv = 0;
