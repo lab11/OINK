@@ -7,7 +7,7 @@ const util = require('util');
 const request = require('request-promise');
 const crypto = require('crypto');
 const sortObj = require('sort-object');
-try {admin.initializeApp(functions.config().firebase);} catch(e) {}
+try {admin.initializeApp();} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
 
 //Creating a firebase object to navigate it:
@@ -15,10 +15,10 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.firestore
-    .document('user_activity/{docId}').onCreate((event) => {
+    .document('user_activity/{docId}').onCreate((snap, context) => {
         //Getting the data that was modified and initializing all the parameters.
-        const data = event.data.data();
-        const docId = event.params.docId;
+        const data = snap.data();
+        const docId = context.params.docId;
         var docRef = db.collection('user_timers').doc(data.user_id);
 
         if (!data.active) {
