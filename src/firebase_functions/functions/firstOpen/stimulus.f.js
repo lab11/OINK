@@ -7,7 +7,7 @@ const util = require('util');
 const request = require('request-promise');
 const crypto = require('crypto');
 const sortObj = require('sort-object');
-try {admin.initializeApp(functions.config().firebase);} catch(e) {}
+try {admin.initializeApp();} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
 
 //Creating a firebase object to navigate it:
@@ -28,9 +28,9 @@ should I be using .then calls for things that are independent
 */
 
 exports = module.exports = functions.firestore
-    .document('firstOpen_transaction/{docId}').onCreate((event)=>{
-        const docId = event.params.docId
-        const data = event.data.data()
+    .document('firstOpen_transaction/{docId}').onCreate((snap, context)=>{
+        const docId = context.params.docId
+        const data = snap.data()
         const user_id = data.user_id
         const amount = data.amount
         const imei = data.imei
