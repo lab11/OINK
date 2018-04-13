@@ -17,7 +17,7 @@ exports = module.exports = functions.firestore
         const docId = context.params.docId;
 
     // This registration token comes from the client FCM SDKs.
-    var registrationToken = 'fD_bk9Px43w:APA91bFOaVQp7fwTiXMGqwEbRQoA0uNIuv0tt-hjci0WonjdMEQv3HMK9FTljBQ4tNIYJH6rbljV9bnzUua63Rc27WDOCQo0-C7ZrxI-fh7J8Im0u4bCwSgkbEXR8LSPozSpPTNdmQZH';
+    var registrationToken = 'dEawatk9rYw:APA91bF7Cep-n1uUibyxaN5U7KbjfeESqAt-IqhLpJq0XreN19bHZLkdwTh0vpY6ulucqQModon3BcVD3ABzeJ5IcYpgd1mdgRK80iy5UhpV5u6gqPRWDaZ1MSaUbXwK3jc19-fmrjg1';
 
     // See documentation on defining a message payload.
     var message = {
