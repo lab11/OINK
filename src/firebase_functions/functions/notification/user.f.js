@@ -31,6 +31,7 @@ exports = module.exports = functions.firestore
     })
     .then(() => {
         // See documentation on defining a message payload.
+        console.log(registrationToken)
         var message = {
                 data: {
                     title: data.title,
