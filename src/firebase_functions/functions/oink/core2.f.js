@@ -50,10 +50,10 @@ exports = module.exports = functions.https
             .then(snapshot =>{
                 
                     //Calculating the total num of invites that the specific user has sent.
-                    return snapshot.forEach(doc => {
-                            console.log(doc)
-                            console.log(doc.user_id)
-                            console.log(doc.amount)
+                    snapshot.forEach(doc => {
+                        console.log(doc.id, " => ", doc.data());
+                            //console.log(doc.user_id)
+                            //console.log(doc.amount)
                                 //totalNumInv += doc.data().num_invites;
                     });
                 
