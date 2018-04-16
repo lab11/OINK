@@ -63,7 +63,7 @@ exports = module.exports = functions.https
                         tx_core_doc_id = doc.id;
                         amount_doc = doc.data().amount;
                         type_doc = doc.data().type;
-                        userId_doc = doc.data(),user_id;
+                        userId_doc = doc.data().user_id;
                         stimulus_doc = doc.data().stimulus_doc_id;
                         console.log(doc.id, " => ", doc.data());
                             
