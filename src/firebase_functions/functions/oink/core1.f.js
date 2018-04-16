@@ -12,12 +12,11 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
-//core1 funtion:
+//core1 function:
 // - Triggers on creation of tx_core_payment events. Checks the user information for payment in the user_list collection. 
 //   If so, start to structuring the body for the payment request and update invite_transaction,tx_core_payment status and 
 //   set the payment service of the user based on user_list information.
-// - Send payment request to the scific payment service module. In this case core1 triggers a https function (korba).
-//   id transaction is successful, log information into rx_core_payment.
+// - Send payment request to the specific payment service module. In this case core1 triggers a https function (korba).
 
 // - Parameters:
 //    * There are not specific parameters for this function.
@@ -48,12 +47,13 @@ exports = module.exports = functions.firestore
                 return db.collection('user_list').doc(data.user_id).get()
                     .then(doc => {
                         if (!doc.exists){
-                            //TODO: Maybe trigger an alarm here.
+                        
                             db.collection('alarms_db').add({timestamp: FieldValue.serverTimestamp(),user_id:data.user_id, reason:"User ID does not exist.",tx_core_doc_id:docId });
-                            //throw new Error('Invalid or unexisting User ID.');
                             console.log("Invalid or unexisting User ID.");
-                            return null;
                             // No reattempt since this should be trigger an alarm for possible fraud.
+                            return null;
+
+                            
                         } else {
                             var userPaymentData = doc.data()
                             //send all the common data among all APIs and trigger an HTTP function based on the user payment service.
@@ -68,7 +68,8 @@ exports = module.exports = functions.firestore
                             console.log(`user payment info is: ${util.inspect(userPaymentInfo)}`);
                             var namePaymentService = userPaymentInfo.payment_service;
                             namePaymentService = namePaymentService.charAt(0).toUpperCase() + namePaymentService.slice(1)
-            
+                            
+                            //Sending payment request to Firebase function for Korba
                             return request({
                                 uri: 'https://us-central1-paymenttoy.cloudfunctions.net/payment'+namePaymentService,
                                 method: 'POST',
