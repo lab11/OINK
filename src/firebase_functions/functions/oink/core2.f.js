@@ -51,15 +51,40 @@ exports = module.exports = functions.https
                 
                     //Calculating the total num of invites that the specific user has sent.
                     snapshot.forEach(doc => {
+                        var tx_core_doc_id = doc.id;
+                        var amount_doc = doc.data().amount;
+                        var type_doc = doc.data().type;
+                        var userId_doc = doc.data(),user_id;
+                        var stimulus_doc = doc.data().stimulus_doc_id;
                         console.log(doc.id, " => ", doc.data());
-                            //console.log(doc.user_id)
-                            //console.log(doc.amount)
-                                //totalNumInv += doc.data().num_invites;
+                            
                     });
-                
+                  
+            })
+
+        })
+        .then(() => {
+            if (req.query.status == 'SUCCESS') {
+                return db.collection('notifications_db').add({
+                    amount: amount_doc,
+                    type: type_doc,
+                    status: 'success',
+                    timestamp: new Date().getTime(),
+                    body: `Your ${type_doc} transaction has been submitted for ${amount_doc} CHD. Thank you!`,
+                    title:"Transaction submitted",
+                    user_id: userId_doc
+                });
+
+            }
+            else {
+                return db.collection('alarms_db').add({
+                    timestamp: FieldValue.serverTimestamp(),
+                    user_id:userId_doc, 
+                    reason:`Transaction No. ${req.query.transaction_id} for ${type_doc} failed. ${req.query.message}`,
+                    tx_core_doc_id:tx_core_doc_id });
+
+            }
             
-                
-            });
         })
         .then(() => {
             res.status(200).send("OK");
