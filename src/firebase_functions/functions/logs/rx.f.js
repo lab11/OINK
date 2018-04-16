@@ -12,8 +12,8 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.Field
 
-//Function logsTx:
-//Triggers when tx_core_payment changes. 
+//Function logsRx:
+//Triggers when a rx_core_payment doc changes. 
 exports = module.exports = functions.firestore
     .document('rx_core_payment/{docId}').onUpdate((change, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
