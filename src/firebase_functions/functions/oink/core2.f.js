@@ -48,9 +48,17 @@ exports = module.exports = functions.https
         .then(() => {
             return db.collection('tx_core_payment').where('transaction_id','==', req.query.transaction_id).get()
             .then(snapshot =>{
-                console.log(snapshot)
-                console.log(snapshot.user_id)
-                console.log(snapshot.amount)
+                
+                    //Calculating the total num of invites that the specific user has sent.
+                    return snapshot.forEach(doc => {
+                            console.log(doc)
+                            console.log(doc.user_id)
+                            console.log(doc.amount)
+                                //totalNumInv += doc.data().num_invites;
+                    });
+                
+            
+                
             });
         })
         .then(() => {
