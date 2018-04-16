@@ -13,8 +13,17 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 
+
+
 exports = module.exports = functions.https
     .onRequest((req, res) => {
+        
+        //Creating variables of the document in tx_core_payment that triggered the payment.
+        var tx_core_doc_id;
+        var amount_doc;
+        var type_doc;
+        var userId_doc;
+        var stimulus_doc;
         console.log(util.inspect(req.query));
         return db.collection('rx_core_payment').add({
             timestamp: FieldValue.serverTimestamp(),
@@ -51,11 +60,11 @@ exports = module.exports = functions.https
                 
                     //Calculating the total num of invites that the specific user has sent.
                     snapshot.forEach(doc => {
-                        var tx_core_doc_id = doc.id;
-                        var amount_doc = doc.data().amount;
-                        var type_doc = doc.data().type;
-                        var userId_doc = doc.data(),user_id;
-                        var stimulus_doc = doc.data().stimulus_doc_id;
+                        tx_core_doc_id = doc.id;
+                        amount_doc = doc.data().amount;
+                        type_doc = doc.data().type;
+                        userId_doc = doc.data(),user_id;
+                        stimulus_doc = doc.data().stimulus_doc_id;
                         console.log(doc.id, " => ", doc.data());
                             
                     });
