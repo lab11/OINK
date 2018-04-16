@@ -46,6 +46,14 @@ exports = module.exports = functions.https
         //     });
         // })
         .then(() => {
+            return db.collection('tx_core_payment').where('transaction_id','==', req.query.transaction_id).get()
+            .then(snapshot =>{
+                console.log(snapshot)
+                console.log(snapshot.user_id)
+                console.log(snapshot.amount)
+            });
+        })
+        .then(() => {
             res.status(200).send("OK");
         });
         
