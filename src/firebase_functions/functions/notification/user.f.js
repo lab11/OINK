@@ -21,7 +21,7 @@ exports = module.exports = functions.firestore
 
     // This registration token comes from the client FCM SDKs.
     var registrationToken;
-    return db.collection('user_list').where('user_id','==', data.user_id).get()
+    return db.collection('user_list').doc(data.user_id).get()
         .then(snapshot =>{
             snapshot.forEach(doc => {
                 registrationToken = doc.data().token
