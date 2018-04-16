@@ -181,17 +181,6 @@ exports = module.exports = functions.firestore
                                                 msgs: localMsgs, 
                                                 transaction_id:userPaymentInfo.transaction_id
                                             })
-                                            .then(() => {
-                                                return db.collection('notifications_db').add({
-                                                    amount: data.amount,
-                                                    type: data.type,
-                                                    status: 'pending',
-                                                    timestamp: new Date().getTime(),
-                                                    body: `Your ${data.type} transaction has been submitted for ${data.amount} CHD. Thank you!`,
-                                                    title:"Transaction submitted",
-                                                    user_id: data.user_id
-                                                });
-                                            })
                                             
                                         }
                                 });
