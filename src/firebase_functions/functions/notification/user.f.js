@@ -22,12 +22,8 @@ exports = module.exports = functions.firestore
     // This registration token comes from the client FCM SDKs.
     var registrationToken;
     return db.collection('user_list').doc(data.user_id).get()
-        .then(doc =>{
-            registrationToken = doc.data().token
-                
-    })
-    .then(() => {
-        // See documentation on defining a message payload.
+    .then(doc =>{
+        registrationToken = doc.data().token
         console.log(registrationToken)
         var message = {
                 data: {
@@ -39,6 +35,7 @@ exports = module.exports = functions.firestore
         // Send a message to the device corresponding to the provided
         // registration token.
         return admin.messaging().send(message)
+                
     })
     .then((response) => {
         // Response is a message ID string.
