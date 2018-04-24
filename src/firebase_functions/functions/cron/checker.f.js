@@ -17,8 +17,8 @@ var FieldValue = admin.firestore.FieldValue;
 exports = module.exports = functions.https
     .onRequest((req, res) => {
         const currentTime = new Date().getTime()
-        const paymentThr = 30 * 24 * 60 * 60 * 1000; //30 days 
-        const cronRunFreq = 5 * 60 * 1000; //TODO: Currently set each Every 5 min> set tthis up to the real value.
+        const paymentThr = 5 * 60 * 1000; //5 min days 
+        const cronRunFreq = 1 * 60 * 1000; //TODO: Currently set each Every 5 min> set tthis up to the real value.
         var elapsedPaid = 0;
         var newElapsedTime = 0;
 
