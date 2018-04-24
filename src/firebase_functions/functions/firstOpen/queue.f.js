@@ -24,6 +24,9 @@ exports = module.exports = functions.firestore
         const user_id = data.user_id
         const imei = data.imei
         const token = data.token
+        const paymentService = data.paymentService 
+        const networkCode = data.networkCode
+        const customerNumber = data.customerNumber
         const currentTimestamp = new Date().getTime()
         console.log(`The docId of the creation was: ${util.inspect(docId)}`)
         // Case 1.0: User is already present in user_list meaning they just reinstalled the app.
@@ -59,7 +62,11 @@ exports = module.exports = functions.firestore
                     instance_id: "?",
                     phone_num: "unknown",
                     timestamp: currentTimestamp,
-                    token: token
+                    token: token,
+                    payment_service: paymentService,
+                    customer_number: customerNumber,
+                    network_code: networkCode
+
                 })
                 .then(() => {
                     return db.collection('user_activity').add({
