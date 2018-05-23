@@ -59,8 +59,6 @@ exports = module.exports = functions.firestore
                 return db.collection('user_list').doc(user_id).set({
                     active: true,
                     imei: imei,
-                    instance_id: "?",
-                    phone_num: "unknown",
                     timestamp: currentTimestamp,
                     token: token,
                     payment_service: paymentService,
