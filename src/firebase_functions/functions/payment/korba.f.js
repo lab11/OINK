@@ -38,6 +38,7 @@ exports = module.exports = functions.https.onRequest((req, res) => {
             body: jsonInfo,
             resolveWithFullResponse: true,
          }).then((response) => {
+                console.log(`Response status: ${response.statusCode}`)
                 if (response.statusCode >= 400) {
                 throw new Error(`HTTP Error: ${response.statusCode}`);
                 res.status(response.statusCode).send(response.body)
@@ -48,6 +49,7 @@ exports = module.exports = functions.https.onRequest((req, res) => {
                 res.status(response.statusCode).send(response.body)
                 
         }).catch((error) => { 
+            console.log(`This is the error: ${error}`)
             res.send(error)
         });
 
