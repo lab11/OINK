@@ -61,8 +61,8 @@ exports = module.exports = functions.firestore
                             userPaymentInfo['network_code'] = userPaymentData.network_code;
                             userPaymentInfo['payment_service'] = userPaymentData.payment_service;
                             userPaymentInfo['amount'] = data.amount;
-                            //userPaymentInfo['type'] = data.type;
-                            userPaymentInfo['type'] = "GridWatch";
+                            userPaymentInfo['type'] = data.type;
+                            //userPaymentInfo['type'] = "GridWatch";
                             userPaymentInfo['user_id'] = data.user_id;
                             userPaymentInfo['transaction_id'] = data.user_id + Math.random().toString(36).substr(2, 9);
                             userPaymentInfo['description'] = 'payment of '+ userPaymentInfo.type +' to user : '+ userPaymentInfo.user_id;
@@ -138,8 +138,8 @@ exports = module.exports = functions.firestore
                         userPaymentInfo['network_code'] = userPaymentData.network_code;
                         userPaymentInfo['payment_service'] = userPaymentData.payment_service;
                         userPaymentInfo['amount'] = data.amount;
-                        //userPaymentInfo['type'] = data.type;
-                        userPaymentInfo['type'] = "GridWatch";
+                        userPaymentInfo['type'] = data.type;
+                        //userPaymentInfo['type'] = "GridWatch";
                         userPaymentInfo['user_id'] = data.user_id;
                         userPaymentInfo['transaction_id'] = data.user_id + Math.random().toString(36).substr(2, 9);
                         userPaymentInfo['description'] = 'payment of '+ userPaymentInfo.type +' to user : '+ userPaymentInfo.user_id;
