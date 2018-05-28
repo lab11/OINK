@@ -21,6 +21,7 @@ exports = module.exports = functions.https
         const cronRunFreq = 1 * 60 * 1000; //TODO: Currently set each Every 5 min> set tthis up to the real value.
         var elapsedPaid = 0;
         var newElapsedTime = 0;
+        var minPayment = 1 * 60 * 1000;
 
         //TODO: set a minimum of payment per cycle.
 
@@ -51,7 +52,16 @@ exports = module.exports = functions.https
                         newElapsedTime = 0;
                             
                         }
+                        //Adding an if for elapsedPaid < = minimum payment per cycle,
+                         if  (elapsedPaid <  minPayment){
+                            return db.collection('user_timers').doc(doc.id).update({
+                                    elapsedTime: elapsedPaid,
+                                    lastCheckpoint: currentTime
 
+                            });
+                        }
+                        //
+                        
                         return db.collection('cron_transaction').add({
                             event:'cron', 
                             imei: doc.data().imei,
