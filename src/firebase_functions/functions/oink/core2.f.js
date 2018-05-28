@@ -55,7 +55,7 @@ exports = module.exports = functions.https
             console.log(tx_core_doc_id)
             console.log(amount_doc)
             console.log(userId_doc)
-            console.log(req.query.transaction_id,)
+            console.log(req.query.transaction_id)
             console.log(req.query.status)
             console.log(req.query.message)
 
