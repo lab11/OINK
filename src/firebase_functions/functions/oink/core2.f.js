@@ -90,8 +90,8 @@ exports = module.exports = functions.https
                 })
                 //Updating stimulus_transaction status
                 .then(() => {
-                    //TODO:return db.collection(`${type_doc}_transaction`).doc(stimulus_doc).update({status: 'complete'})
-                    return db.collection('firstOpen_transaction').doc(stimulus_doc).update({status: 'complete'})
+                    return db.collection(`${type_doc}_transaction`).doc(stimulus_doc).update({status: 'complete'})
+                    //return db.collection('firstOpen_transaction').doc(stimulus_doc).update({status: 'complete'})
                 })
                 //Updating tx_core status
                 .then(() => {
@@ -109,8 +109,8 @@ exports = module.exports = functions.https
                     reason:`Transaction No. ${req.query.transaction_id} for ${type_doc} failed. ${req.query.message}`,
                     tx_core_doc_id:tx_core_doc_id })
                 .then(() => {
-                    //TODO:return db.collection(`${type_doc}_transaction`).doc(stimulus_doc).update({status: 'failed'})
-                    return db.collection('firstOpen_transaction').doc(stimulus_doc).update({status: 'failed'})
+                    return db.collection(`${type_doc}_transaction`).doc(stimulus_doc).update({status: 'failed'})
+                    //return db.collection('firstOpen_transaction').doc(stimulus_doc).update({status: 'failed'})
                 })
                 .then(() => {
                     return db.collection('tx_core_payment').doc(tx_core_doc_id).update({status: 'failed', msgs:msgs_doc.push('transaction error')})
