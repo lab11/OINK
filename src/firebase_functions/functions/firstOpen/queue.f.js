@@ -20,7 +20,7 @@ exports = module.exports = functions.firestore
     .document('firstOpen_Queue/{docId}').onCreate((snap, context)=>{
         const docId = context.params.docId;
         const data = snap.data();
-        const costFirstOpen = 5
+        const costFirstOpen = 1
         const user_id = data.user_id
         const imei = data.imei
         const token = data.token
