@@ -126,6 +126,7 @@ exports = module.exports = functions.firestore
                 .then(doc => {
                     if (!doc.exists){
                         //TODO: Maybe trigger an alarm here.
+                        //
                         console.log('The user does not exist in the user_list collection!')
                         db.collection('alarms_db').add({timestamp: FieldValue.serverTimestamp(),user_id:data.user_id, reason:"User ID does not exist for processing in tx_core_payment collection.",tx_core_doc_id:docId });
                         return null;
