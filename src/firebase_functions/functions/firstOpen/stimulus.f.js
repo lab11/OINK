@@ -51,7 +51,7 @@ exports = module.exports = functions.firestore
                 msgs: [],
                 num_attempts: 0,
                 time: currentTimestamp,
-                type: 'GridWatch',
+                type: 'firstOpen',
                 stimulus_doc_id: docId,
                 status: 'pending',
                 reattempt: false
