@@ -21,7 +21,7 @@ var FieldValue = admin.firestore.FieldValue;
 //    * threshold: Max num_invites that an user can get paid for. 
 //    * costInvite: The value oer invite to be paid.
 //    * event: Event that triggered the function. In this case this is the new document created by the App. It has many parameter including the doc_id and the fields of each document.
-
+//
 exports = module.exports = functions.firestore
     .document('invite_transaction/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
