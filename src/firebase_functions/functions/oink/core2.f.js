@@ -31,6 +31,7 @@ exports = module.exports = functions.https
         var msgs_doc;
 
         console.log(util.inspect(req.query));
+        console.log(req.query.transaction_id)
         
         //Getting the document in tx_core that matches the transaction id and updating the variables.
         return db.collection('tx_core_payment').where('transaction_id','==', req.query.transaction_id).get()
