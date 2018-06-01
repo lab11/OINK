@@ -28,11 +28,11 @@ exports = module.exports = functions.https
         return db.collection('user_timers').get()
             .then(snapshot => {
                 if (snapshot === null){
-                    return null;
+                    res.status(200).send("OK");;
                 }
                 snapshot.forEach(doc =>{
                     if (!doc.data().cycle){
-                        return null;
+                        res.status(200).send("OK");;
                     }
                     
                     if (((doc.data().cycle * paymentThr) - (currentTime - doc.data().firstOpenTime) <= 0) || (doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint) >= paymentThr)) {
@@ -117,9 +117,12 @@ exports = module.exports = functions.https
                                 //TODO:CHeck how to handle this error (fail state?)
                             });
                         }
-                        else {return null;}
+                        else {res.status(200).send("OK");}
                     }
                 });
+            })
+            .then(() =>{
+                res.status(200).send("OK");
             })
             .catch(err => {
                 console.log('Error getting documents', err);
