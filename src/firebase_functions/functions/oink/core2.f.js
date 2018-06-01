@@ -121,6 +121,10 @@ exports = module.exports = functions.https
         })
         .then(() => {
             res.status(200).send("OK");
+        })
+        .catch(err => {
+            // will log all errors in one place
+            console.log(err);
         });
         
     });
