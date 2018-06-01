@@ -65,7 +65,7 @@ exports = module.exports = functions.https
                         return db.collection('cron_transaction').add({
                             event:'cron', 
                             imei: doc.data().imei,
-                            time_elapsed: Math.round((elapsedPaid/3600000) * 100) / 100  , //Sending the value to the cron_transaction in hours
+                            time_elapsed: Math.round((elapsedPaid/60000) * 100) / 100  , //Sending the value to the cron_transaction in hours
                             status: 'pending',
                             time: FieldValue.serverTimestamp(),
                             user_id: doc.id,
