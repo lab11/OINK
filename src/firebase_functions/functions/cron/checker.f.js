@@ -32,7 +32,7 @@ exports = module.exports = functions.https
                     return null;
                 }
                 snapshot.forEach(doc =>{
-                    if (!doc.data().cycle){
+                    if (doc.data().cycle===null){
                         return null;
                     }
                     
