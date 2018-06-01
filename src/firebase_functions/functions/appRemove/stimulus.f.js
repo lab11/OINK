@@ -40,7 +40,7 @@ exports = module.exports = functions.firestore
                 
             } else {
                 console.log('user does not exist...')
-                return
+                return null;
             }
         })
     })
