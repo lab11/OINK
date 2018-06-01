@@ -27,6 +27,9 @@ exports = module.exports = functions.https
 
         return db.collection('user_timers').get()
             .then(snapshot => {
+                if (snapshot === null){
+                    return null;
+                }
                 snapshot.forEach(doc =>{
                     if (!doc.data().cycle){
                         return null;
