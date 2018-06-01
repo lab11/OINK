@@ -28,11 +28,11 @@ exports = module.exports = functions.https
         return db.collection('user_timers').get()
             .then(snapshot => {
                 if (snapshot === null){
-                    res.status(200).send("OK");;
+                    return null;
                 }
                 snapshot.forEach(doc =>{
                     if (!doc.data().cycle){
-                        res.status(200).send("OK");;
+                        return null;
                     }
                     
                     if (((doc.data().cycle * paymentThr) - (currentTime - doc.data().firstOpenTime) <= 0) || (doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint) >= paymentThr)) {
@@ -109,15 +109,15 @@ exports = module.exports = functions.https
                                 lastCheckpoint: currentTime
                                 
                             })
-                            .then(() => {
-                                res.status(200).send("OK");
-                            })
+                            // .then(() => {
+                            //     res.status(200).send("OK");
+                            // })
                             .catch( err => {
                                 console.log(err);
                                 //TODO:CHeck how to handle this error (fail state?)
                             });
                         }
-                        else {res.status(200).send("OK");}
+                        else {return null;}
                     }
                 });
             })
