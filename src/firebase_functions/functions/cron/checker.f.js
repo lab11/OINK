@@ -28,6 +28,9 @@ exports = module.exports = functions.https
         return db.collection('user_timers').get()
             .then(snapshot => {
                 snapshot.forEach(doc =>{
+                    if (!doc.data().cycle){
+                        return null;
+                    }
                     
                     if (((doc.data().cycle * paymentThr) - (currentTime - doc.data().firstOpenTime) <= 0) || (doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint) >= paymentThr)) {
                         var elapsedPaid = 0;
@@ -114,6 +117,9 @@ exports = module.exports = functions.https
                         else {return null;}
                     }
                 });
+            })
+            .catch(err => {
+                console.log('Error getting documents', err);
             });
 
     });
