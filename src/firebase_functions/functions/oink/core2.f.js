@@ -90,12 +90,12 @@ exports = module.exports = functions.https
                 })
                 //Updating stimulus_transaction status
                 .then(() => {
-                    return db.collection(`${type_doc}_transaction`).doc(stimulus_doc).update({status: 'complete'})
+                    return db.collection(`${type_doc}_transaction`).doc(stimulus_doc).update({status: 'complete', time_completed: new Date().getTime() })
                     //return db.collection('firstOpen_transaction').doc(stimulus_doc).update({status: 'complete'})
                 })
                 //Updating tx_core status
                 .then(() => {
-                    return db.collection('tx_core_payment').doc(tx_core_doc_id).update({status: 'complete'})
+                    return db.collection('tx_core_payment').doc(tx_core_doc_id).update({status: 'complete', time_completed: new Date().getTime()})
                 })
                 
 
