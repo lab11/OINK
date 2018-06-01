@@ -27,6 +27,7 @@ exports = module.exports = functions.https
 
         return db.collection('user_timers').get()
             .then(snapshot => {
+                console.log(snapshot)
                 if (snapshot === null){
                     return null;
                 }
