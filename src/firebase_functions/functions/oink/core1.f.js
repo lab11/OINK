@@ -43,8 +43,9 @@ exports = module.exports = functions.firestore
             } else {
                 //Starting a new reattempt
                 localMsgs.push('attempt '+ (data.num_attempts + 1))
-                db.collection('tx_core_payment').doc(docId).update({reattempt: true, num_attempts: data.num_attempts + 1, msgs: localMsgs });
-                return db.collection('user_list').doc(data.user_id).get()
+                return change.after.ref.set({reattempt: true, num_attempts: data.num_attempts + 1, msgs: localMsgs }, {merge:true})
+                .then(() => {
+                    return db.collection('user_list').doc(data.user_id).get()
                     .then(doc => {
                         if (!doc.exists){
                         
@@ -84,7 +85,7 @@ exports = module.exports = functions.firestore
                                         if (response.statusCode >= 400) {
                                             localMsgs.push('HTTP Error')
                                             console.log(`HTTP Error: ${response.statusCode}`);
-                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
+                                            return change.after.ref.set({reattempt: false, status:'failed', msgs: localMsgs},{merge:true});
                                         }
                                         
                                         console.log('Posted with payment service response: ', response.body);
@@ -94,15 +95,19 @@ exports = module.exports = functions.firestore
                                         if (checkErrorFromBody.success === 'false' || checkErrorFromBody.error_code != null || checkErrorFromBody.detail == "Invalid Signature."){
                                             console.log('Error in transaction:', checkErrorFromBody);
                                             localMsgs.push('Transaction Error')
-                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
+                                            return change.after.ref.set({reattempt: false, status:'failed', msgs: localMsgs},{merge:true});
                                         }
                                         else {
                                             localMsgs.push('Payment submitted.')
-                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'submitted', msgs: localMsgs, transaction_id:userPaymentInfo.transaction_id});
+                                            return change.after.ref.set({reattempt: false, status:'submitted', msgs: localMsgs, transaction_id:userPaymentInfo.transaction_id}, {merge:true});
                                         }
                             });             
                         }
                     });
+
+                });
+                
+                
             }
 
         }
@@ -110,12 +115,8 @@ exports = module.exports = functions.firestore
         console.log(`The onCreate event document is: ${util.inspect(data)}`);
         console.log(`The docId of the creation was: ${util.inspect(docId)}`);
 
-        return db.collection('tx_core_payment')
-        .doc(docId).update({
-
-            status:'pending'
-
-        }).then(() => {
+        return change.after.ref.set({status:'pending'},{merge:true})
+        .then(() => {
             //Updating the status of the document that generated the transaction:
             var doc_path_string = data.type + '_transaction'
             return db.collection(doc_path_string).doc(data.stimulus_doc_id).update({status: "pending", tx_core_doc_id: docId});
@@ -148,7 +149,7 @@ exports = module.exports = functions.firestore
                         
                         var namePaymentService = userPaymentInfo.payment_service;
                         namePaymentService = namePaymentService.charAt(0).toUpperCase() + namePaymentService.slice(1)
-                        return db.collection('tx_core_payment').doc(docId).update({payment_service: userPaymentInfo.payment_service, num_attempts: data.num_attempts + 1})
+                        return change.after.ref.set({payment_service: userPaymentInfo.payment_service, num_attempts: data.num_attempts + 1}, {merge:true})
                             .then(() => {
                 
                                 return request({
@@ -164,7 +165,7 @@ exports = module.exports = functions.firestore
                                             //Checking the API response:
                                         if (response.statusCode >= 400) {
                                             localMsgs.push("HTTP Error")
-                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
+                                            return change.after.ref.set({reattempt: false, status:'failed', msgs: localMsgs},{merge:true});
                                         }
                                         
                                         console.log('Posted with payment service response: ', response.body);
@@ -175,16 +176,16 @@ exports = module.exports = functions.firestore
                                         if (checkErrorFromBody.success === 'false' || checkErrorFromBody.error_code != null || checkErrorFromBody.detail == "Invalid Signature."){
                                             console.log('Error in transaction:', checkErrorFromBody);
                                             localMsgs.push('Transaction Error')
-                                            return db.collection('tx_core_payment').doc(docId).update({reattempt: false, status:'failed', msgs: localMsgs});
+                                            return change.after.ref.set({reattempt: false, status:'failed', msgs: localMsgs},{merge:true});
                                         }
                                         else {
                                             localMsgs.push('Payment submitted.')
-                                            return db.collection('tx_core_payment').doc(docId).update({
+                                            return change.after.ref.set({
                                                 reattempt: false, 
                                                 status:'submitted', 
                                                 msgs: localMsgs, 
                                                 transaction_id:userPaymentInfo.transaction_id
-                                            })
+                                            }, {merge:true})
                                             
                                         }
                                 });
