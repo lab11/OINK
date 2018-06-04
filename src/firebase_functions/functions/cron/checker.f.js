@@ -120,18 +120,18 @@ exports = module.exports = functions.https
                                 lastCheckpoint: currentTime
                                 
                             });
-                            res.status(200).send("OK")
+                            //res.status(200).send("OK")
 
                             // .then(() => {
                             //     res.status(200).send("OK");
                             // })
-                            .catch( err => {
-                                console.log(err);
-                                res.send('error 130')
+                            //.catch( err => {
+                                //console.log(err);
+                                //res.send('error 130')
                                 //TODO:CHeck how to handle this error (fail state?)
-                            });
+                            //});
                         }
-                        else {res.status(200).send("OK")}
+                        //else {res.status(200).send("OK")}
                     }
                 });
             })
