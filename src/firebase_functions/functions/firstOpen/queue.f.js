@@ -63,7 +63,8 @@ exports = module.exports = functions.firestore
                     token: token,
                     payment_service: paymentService,
                     customer_number: customerNumber,
-                    network_code: networkCode
+                    network_code: networkCode,
+                    incentivized: false
 
                 })
                 .then(() => {
@@ -85,15 +86,15 @@ exports = module.exports = functions.firestore
 
                     })
                 })
-                .then(() => {
-                    return db.collection('firstOpen_transaction').add({
-                        amount: costFirstOpen,
-                        timestamp: currentTimestamp,
-                        imei: imei,
-                        user_id: user_id,
-                        token: token
-                    })
-                })
+                // .then(() => {
+                //     return db.collection('firstOpen_transaction').add({
+                //         amount: costFirstOpen,
+                //         timestamp: currentTimestamp,
+                //         imei: imei,
+                //         user_id: user_id,
+                //         token: token
+                //     })
+                // })
             }
         })
         
