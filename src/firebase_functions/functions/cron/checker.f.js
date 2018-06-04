@@ -27,17 +27,17 @@ exports = module.exports = functions.https
 
         return db.collection('user_timers').get()
             .then(snapshot => {
-                console.log(snapshot)
+                console.log(util.inspect(snapshot))
                 if (snapshot === null){
-                    return null;
+                    console.log(snapshot);
                 }
                 snapshot.forEach(doc =>{
 
                     console.log(doc.data().cycle)
                     if (doc===null){
-                        return null;
+                        console.log(util.inspect(doc));
                     }
-                    
+
                     if (doc.data().cycle===null){
                         
                         return null;
