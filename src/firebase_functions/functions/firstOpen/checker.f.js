@@ -46,7 +46,7 @@ exports = module.exports = functions.firestore
             if (!doc.exists) {
                 console.log('There is not first Open incentive log in firstOpen_transaction!');
               
-                return db.collection('firstOpen_transaction').add({
+                return db.collection('firstOpen_transaction').doc(docId).set({
                     amount: costFirstOpen,
                     timestamp: currentTimestamp,
                     imei: newValue.imei,
