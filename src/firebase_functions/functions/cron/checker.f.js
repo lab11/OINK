@@ -40,7 +40,7 @@ exports = module.exports = functions.https
 
                     if (doc.data().cycle===null){
                         
-                        console.log('');
+                        console.log('null doc');
                     }
                     
                     if (((doc.data().cycle * paymentThr) - (currentTime - doc.data().firstOpenTime) <= 0) || (doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint) >= paymentThr)) {
