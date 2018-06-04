@@ -26,6 +26,7 @@ exports = module.exports = functions.firestore
         var user = db.collection('user_list').doc(user_id)
 
         return user.get().then((doc) => {
+            console.log(`The doc of user_list is: ${util.inspect(doc)}`)
             if(doc.data().exists){
                 return db.collection('user_list').doc(user_id).update({
                     active: false
