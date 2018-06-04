@@ -25,23 +25,16 @@ exports = module.exports = functions.firestore
 
         var user = db.collection('user_list').doc(user_id)
 
-        return user.get().then((doc) => {
-            console.log(`The doc of user_list is: ${util.inspect(doc)}`)
-            if(doc.data().exists){
-                return db.collection('user_list').doc(user_id).update({
-                    active: false
-                })
-                .then(() => {
-                    return db.collection('user_activity').add({
-                        user_id: user_id,
-                        active: false,
-                        timestamp: currentTimestamp
-                    })
-                })
-                
-            } else {
-                console.log('user does not exist...')
-                return null;
-            }
+        return user.update({active:false})
+        .then(() => {
+            return db.collection('user_activity').add({
+                user_id: user_id,
+                active: false,
+                timestamp: currentTimestamp
+            })
         })
-    })
+        .catch(err => {
+            console.log('Error getting document', err);
+      });
+      
+    });
