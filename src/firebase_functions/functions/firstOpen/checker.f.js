@@ -59,7 +59,7 @@ exports = module.exports = functions.firestore
                 
             //If the document exists, the user was already paid and return nothing.
             } else {
-                console.log('Document data:', doc.data());
+                console.log('Document data already in firstOpen_transaction:', doc.data());
                 return null;
             }
           })
