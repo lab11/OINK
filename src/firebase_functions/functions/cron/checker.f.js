@@ -25,7 +25,7 @@ exports = module.exports = functions.https
 
         //TODO: set a minimum of payment per cycle.
 
-        return db.collection('user_timers').get()
+        db.collection('user_timers').get()
             .then(snapshot => {
                 console.log(util.inspect(snapshot))
                 if (snapshot === null){
@@ -40,7 +40,7 @@ exports = module.exports = functions.https
 
                     if (doc.data().cycle===null){
                         
-                        return null;
+                        console.log('');
                     }
                     
                     if (((doc.data().cycle * paymentThr) - (currentTime - doc.data().firstOpenTime) <= 0) || (doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint) >= paymentThr)) {
@@ -68,15 +68,16 @@ exports = module.exports = functions.https
                         }
                         //Adding an if for elapsedPaid < = minimum payment per cycle,
                          if  (elapsedPaid <  minPayment){
-                            return db.collection('user_timers').doc(doc.id).update({
+                             db.collection('user_timers').doc(doc.id).update({
                                     elapsedTime: elapsedPaid,
                                     lastCheckpoint: currentTime
 
                             });
+                            res.status(200).send("OK")
                         }
                         //
                         
-                        return db.collection('cron_transaction').add({
+                        db.collection('cron_transaction').add({
                             event:'cron', 
                             imei: doc.data().imei,
                             time_elapsed: Math.round((elapsedPaid/60000) * 100) / 100  , //Sending the value to the cron_transaction in hours
@@ -86,18 +87,20 @@ exports = module.exports = functions.https
                             tx_core_doc_id: 0
                         })
                         .then(() => {
-                            return db.collection('user_timers')
+                            db.collection('user_timers')
                             .doc(doc.id).update({
                                 elapsedTime: newElapsedTime, 
                                 timePaidArr: doc.data().timePaidArr.push(elapsedPaid), 
                                 cycle: doc.data().cycle + 1,
                                 lastCheckpoint: currentTime
                             });
+                            res.status(200).send("OK")
 
 
                         })
                         .catch( err => {
                             console.log(err);
+                            res.send("error 103")
                         });
                     }
 
@@ -112,20 +115,23 @@ exports = module.exports = functions.https
                                 newElapsedTime = doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint)
                             }
                             
-                            return db.collection('user_timers').doc(doc.id).update({
+                            db.collection('user_timers').doc(doc.id).update({
                                 elapsedTime: newElapsedTime,
                                 lastCheckpoint: currentTime
                                 
-                            })
+                            });
+                            res.status(200).send("OK")
+
                             // .then(() => {
                             //     res.status(200).send("OK");
                             // })
                             .catch( err => {
                                 console.log(err);
+                                res.send('error 130')
                                 //TODO:CHeck how to handle this error (fail state?)
                             });
                         }
-                        else {return null;}
+                        else {res.status(200).send("OK")}
                     }
                 });
             })
@@ -134,6 +140,7 @@ exports = module.exports = functions.https
             })
             .catch(err => {
                 console.log('Error getting documents', err);
+                res.send("error 143")
             });
 
     });
