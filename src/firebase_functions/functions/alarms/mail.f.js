@@ -34,7 +34,7 @@ exports = module.exports = functions.firestore
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = snap.data();
         const docId = context.params.docId;
-        const emails = ["scorreacardo@umass.edu"]
+        const emails = ["scorreacardo@umass.edu","ppannuto@berkeley.edu", "nklugman@berkeley.edu"]
         console.log("sending emails to " + emails.join())
         const mailOptions = {
             from: `"OINK" <${alarmEmail}>`,
