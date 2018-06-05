@@ -29,6 +29,9 @@ exports = module.exports = functions.firestore
                     var tempLastTimeActive = doc.data().lastTimeActive;
                     var tempElapsedTime = doc.data().elapsedTime;
                     var newElapsedTime = tempElapsedTime + (data.timestamp - tempLastTimeActive); 
+                    console.log(tempLastTimeActive)
+                    console.log(tempElapsedTime)
+                    console.log(newElapsedTime)
                 }
                 else {
                     console.log('No such document!');
