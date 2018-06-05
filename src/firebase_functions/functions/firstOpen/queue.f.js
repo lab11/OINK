@@ -14,13 +14,21 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
-//stimulus_firstOpen funtion:
+/*
+firstOpenQueue function:
+- Triggers on creation of a new document in firstOpen_Queue collection.
+- If the user_id of the document that triggered this function is not present in the user_list collection, 
+  add the user in the user_list, set the active flag to true and add the event in the user_activity collection.
+  Otherwise, do nothing.
+
+- Parameters:
+    * There are not specific parameters for this function.
+*/
 
 exports = module.exports = functions.firestore
     .document('firstOpen_Queue/{docId}').onCreate((snap, context)=>{
         const docId = context.params.docId;
         const data = snap.data();
-        const costFirstOpen = 1
         const user_id = data.user_id
         const imei = data.imei
         const token = data.token
@@ -38,7 +46,7 @@ exports = module.exports = functions.firestore
                 // Case 1.1 (edge coverage): Just in case of packet loss or double packet being sent and user was already set to active
                 if(doc.data().active){
                     console.log('The user was already active...')
-                    return
+                    return null;
                 } 
                 // Case 1.2: Update user to active & log user_activity
                 else {
@@ -84,21 +92,12 @@ exports = module.exports = functions.firestore
                         timePaidArr: [],
                         lastCheckpoint:0
 
-                    })
-                })
-                // .then(() => {
-                //     return db.collection('firstOpen_transaction').add({
-                //         amount: costFirstOpen,
-                //         timestamp: currentTimestamp,
-                //         imei: imei,
-                //         user_id: user_id,
-                //         token: token
-                //     })
-                // })
+                    });
+                });
+                
             }
         })
         
     })
 
-//https://us-central1-paymenttoy.cloudfunctions.net/generatorsFirstOpen
 
