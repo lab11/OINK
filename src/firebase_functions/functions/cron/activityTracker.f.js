@@ -20,15 +20,18 @@ exports = module.exports = functions.firestore
         const data = snap.data();
         const docId = context.params.docId;
         var docRef = db.collection('user_timers').doc(data.user_id);
+        var tempLastTimeActive;
+        var tempElapsedTime;
+        var newElapsedTime; 
 
         if (!data.active) {
 
             return docRef.get()
             .then(doc => {
                 if (doc.exists) {
-                    var tempLastTimeActive = doc.data().lastTimeActive;
-                    var tempElapsedTime = doc.data().elapsedTime;
-                    var newElapsedTime = tempElapsedTime + (data.timestamp - tempLastTimeActive); 
+                    tempLastTimeActive = doc.data().lastTimeActive;
+                    tempElapsedTime = doc.data().elapsedTime;
+                    newElapsedTime = tempElapsedTime + (data.timestamp - tempLastTimeActive); 
                     console.log(tempLastTimeActive)
                     console.log(tempElapsedTime)
                     console.log(newElapsedTime)
@@ -38,6 +41,10 @@ exports = module.exports = functions.firestore
                 }
             })
             .then(() => {
+                console.log(tempLastTimeActive)
+                console.log(tempElapsedTime)
+                console.log(newElapsedTime)
+
                 return docRef.update({
                     active: false,
                     elapsedTime: newElapsedTime,
