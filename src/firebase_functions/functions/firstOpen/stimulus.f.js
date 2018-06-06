@@ -14,6 +14,14 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
+/*
+firstOpenStimulus function:
+- Triggers on creation of a new document in ffirstOpen_transaction collection.
+- The function updates the amount and timestamp of the document and then writes a new document in tx_core_payment
+  to start the transaction using oinkCore1.
+- In addition, it notifies oink admins using alarmsMail function.
+
+*/
 
 exports = module.exports = functions.firestore
     .document('firstOpen_transaction/{docId}').onCreate((snap, context)=>{
