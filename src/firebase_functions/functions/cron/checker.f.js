@@ -22,6 +22,7 @@ exports = module.exports = functions.https
         var elapsedPaid = 0;
         var newElapsedTime = 0;
         var minPayment = 1 * 60 * 1000;
+        var elapsedPaid = 0;
 
         //TODO: set a minimum of payment per cycle.
 
@@ -45,7 +46,6 @@ exports = module.exports = functions.https
                     }
                     
                     if (((doc.data().cycle * paymentThr) - (currentTime - doc.data().firstOpenTime) <= 0) || (doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint) >= paymentThr)) {
-                        var elapsedPaid = 0;
 
                         if (doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint) >= paymentThr){
                             elapsedPaid = paymentThr;
