@@ -33,7 +33,8 @@ exports = module.exports = functions.https
                 }
                 snapshot.forEach(doc =>{
 
-                    console.log(doc.data().cycle)
+                    console.log(doc.data())
+
                     if (doc===null){
                         console.log(util.inspect(doc));
                     }
