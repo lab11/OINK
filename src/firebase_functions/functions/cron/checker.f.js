@@ -39,11 +39,13 @@ exports = module.exports = functions.https
 
                     if (doc===null){
                         console.log(util.inspect(doc));
+                        return null;
                     }
 
                     if (doc.data().cycle===null){
                         
                         console.log('null doc');
+                        return null;
                     }
                     
                     if (((doc.data().cycle * paymentThr) - (currentTime - doc.data().firstOpenTime) <= 0) || (doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint) >= paymentThr)) {
