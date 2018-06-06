@@ -81,7 +81,7 @@ exports = module.exports = functions.https
                         db.collection('cron_transaction').add({
                             event:'cron', 
                             //imei: doc.data().imei,
-                            time_elapsed: Math.round((elapsedPaid/60000) * 100) / 100  , //Sending the value to the cron_transaction in hours
+                            time_elapsed: Math.round((elapsedPaid/60000) * 100) / 100  , //Sending the value to the cron_transaction in minutes
                             status: 'pending',
                             time: FieldValue.serverTimestamp(),
                             user_id: doc.id,
@@ -101,7 +101,7 @@ exports = module.exports = functions.https
                         })
                         .catch( err => {
                             console.log(err);
-                            res.send("error 103")
+                            res.send(err)
                         });
                     }
 
@@ -120,19 +120,9 @@ exports = module.exports = functions.https
                                 elapsedTime: newElapsedTime,
                                 lastCheckpoint: currentTime
                                 
-                            });
-                            //res.status(200).send("OK")
+                            })
 
-                            // .then(() => {
-                            //     res.status(200).send("OK");
-                            // })
-                            //.catch( err => {
-                                //console.log(err);
-                                //res.send('error 130')
-                                //TODO:CHeck how to handle this error (fail state?)
-                            //});
                         }
-                        //else {res.status(200).send("OK")}
                     }
                 });
             })
@@ -141,7 +131,7 @@ exports = module.exports = functions.https
             })
             .catch(err => {
                 console.log('Error getting documents', err);
-                res.send("error 143")
+                res.send(err)
             });
 
     });
