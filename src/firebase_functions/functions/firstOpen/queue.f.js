@@ -89,7 +89,7 @@ exports = module.exports = functions.firestore
                         firstOpenTime: currentTimestamp,
                         lastTimeActive: currentTimestamp,
                         active: true,
-                        timePaidArr: [],
+                        timePaidArr: ['start'],
                         lastCheckpoint:0
 
                     });
