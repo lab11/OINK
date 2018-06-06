@@ -107,7 +107,7 @@ exports = module.exports = functions.https
                                 db.collection('user_timers').doc(doc.id).update({
 
                                     elapsedTime: newElapsedTime, 
-                                    timePaidArr: array.push(elapsedPaid), 
+                                    //timePaidArr: array.push(elapsedPaid), 
                                     cycle: doc.data().cycle + 1,
                                     lastCheckpoint: currentTime
                                 });
