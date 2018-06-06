@@ -87,7 +87,7 @@ exports = module.exports = functions.firestore
                         cycle: 1,
                         elapsedTime: 0,
                         firstOpenTime: currentTimestamp,
-                        lastTimeActive: 0,
+                        lastTimeActive: currentTimestamp,
                         active: true,
                         timePaidArr: [],
                         lastCheckpoint:0
