@@ -35,6 +35,7 @@ exports = module.exports = functions.https
                 snapshot.forEach(doc =>{
 
                     console.log(doc.data())
+                    console.log(doc.id)
 
                     if (doc===null){
                         console.log(util.inspect(doc));
@@ -53,8 +54,7 @@ exports = module.exports = functions.https
                         }
                         else {
                             if ( ! doc.data().active){
-                                elapsedPaid = doc.data().elapsedTime;
-                                
+                                elapsedPaid = doc.data().elapsedTime;   
                             }
                             else{
                                 if (doc.data().lastCheckpoint <= doc.data().lastTimeActive){
@@ -64,7 +64,7 @@ exports = module.exports = functions.https
                                     elapsedPaid = doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint)
                                 }  
                             }
-                        newElapsedTime = 0;
+                            newElapsedTime = 0;
                             
                         }
                         //Adding an if for elapsedPaid < = minimum payment per cycle,
