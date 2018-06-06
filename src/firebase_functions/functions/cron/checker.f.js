@@ -74,7 +74,7 @@ exports = module.exports = functions.https
                                     lastCheckpoint: currentTime
 
                             });
-                            res.status(200).send("OK")
+                            //res.status(200).send("OK")
                         }
                         //
                         
@@ -95,7 +95,7 @@ exports = module.exports = functions.https
                                 cycle: doc.data().cycle + 1,
                                 lastCheckpoint: currentTime
                             });
-                            res.status(200).send("OK")
+                            //res.status(200).send("OK")
 
 
                         })
