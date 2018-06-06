@@ -90,10 +90,13 @@ exports = module.exports = functions.https
                             tx_core_doc_id: 0
                         })
                         .then(() => {
+                            var array = doc.data().timePaidArr;
+                            console.log(`this is the array: ${array}`)
+
                             db.collection('user_timers')
                             .doc(doc.id).update({
                                 elapsedTime: newElapsedTime, 
-                                timePaidArr: doc.data().timePaidArr.push(elapsedPaid), 
+                                timePaidArr: array.push(elapsedPaid), 
                                 cycle: doc.data().cycle + 1,
                                 lastCheckpoint: currentTime
                             });
@@ -103,7 +106,7 @@ exports = module.exports = functions.https
                         })
                         .catch( err => {
                             console.log(err);
-                            res.send(err)
+                            res.send('error')
                         });
                     }
 
