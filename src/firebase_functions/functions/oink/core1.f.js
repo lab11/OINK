@@ -34,10 +34,6 @@ exports = module.exports = functions.firestore
         if (!change.after.exists){
             return null;
         }
-        //Check if the document doesn't have the correct format
-        if (!data.user_id.exists){
-            return null;
-        }
 
         //Check if the document is not new, if so check the status, num_attempts and reattempt flag (for avoiding infinite loops)
         if (change.before.exists){
