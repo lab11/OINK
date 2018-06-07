@@ -13,43 +13,31 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
+/*
+cronChecker function:
+    - HTTP Function that is called when we want to pay for the elapsed time of users using the app.
+    - Requires a third party mechanism to triger the function at specific hours of day or frequency e.g. https://cron-job.org
+    - Reads all the timers for each user in the user_timers collection and calculates the elapsed time to pay.
+    - Writes a new document in cron_transaction to submit the payment of the calculated time.
+*/
 
 exports = module.exports = functions.https
     .onRequest((req, res) => {
         const currentTime = new Date().getTime()
-        const paymentThr = 5 * 60 * 1000; //5 min of elapsed or registered time threshold
-        var elapsedPaid = 0;
         var newElapsedTime = 0;
-        var minPayment = 1 * 60 * 1000;
         var elapsedPaid = 0;
 
         //Getting all the timers for each user in the user_timers collection:
         db.collection('user_timers').get()
             .then(snapshot => {
-                console.log(util.inspect(snapshot))
-                if (snapshot === null){
-                    console.log(snapshot);
-                }
 
                 //checking each one of the documents in the collection to see which user needs to be paid:
                 snapshot.forEach(doc => {
-
-                    console.log(doc.data())
-                    console.log(doc.id)
 
                     if (doc===null){
                         console.log(util.inspect(doc));
                         return null;
                     }
-
-                    if (doc.data().cycle===null){
-                        
-                        console.log('null doc');
-                        return null;
-                    }
-                    console.log((doc.data().cycle * paymentThr) - (currentTime - doc.data().firstOpenTime))
-                    console.log((doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint)))
-
 
                     if (doc.data().active){
                         //If user is active, check if the last cron was before the last time active and pay the time between the last time active to the current
@@ -62,6 +50,7 @@ exports = module.exports = functions.https
                             elapsedPaid = doc.data().elapsedTime + (currentTime - doc.data().lastCheckpoint)
                         } 
 
+                        //Write a new document in cron_transaction to submit the payment of the calculated elapsed time
                         db.collection('cron_transaction').add({
 
                             event:'cron', 
@@ -73,6 +62,8 @@ exports = module.exports = functions.https
                         })
                     }
 
+                    //if the user is inactive (uninstalled the app), the elapsedPaid is the elapsed time in the user_timer doc.
+                    //then write the document in cron_transaction to start the transaction.
                     else {
                         elapsedPaid = doc.data().elapsedTime
                         db.collection('cron_transaction').add({
@@ -90,9 +81,7 @@ exports = module.exports = functions.https
                 
             })
             .then(()=>{
-
                 res.send("OK")
-
             });
 
         });
