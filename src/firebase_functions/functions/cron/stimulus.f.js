@@ -19,21 +19,28 @@ var FieldValue = admin.firestore.FieldValue;
 
 // - Parameters:
 //    * threshold: Max time_elapsed that an user can get paid for. 
-//    * costHourElapsed: The value per hour elapsed to  to be paid.
+//    * costHourElapsed: The value per unit of time elapsed to be paid.
 //    * event: Event that triggered the function. In this case this is the new document created by the App. It has many parameter including the doc_id and the fields of each document.
 
 exports = module.exports = functions.firestore
     .document('cron_transaction/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
+        const currentTime = new Date().getTime()
         const data = snap.data();
         const docId = context.params.docId;
-        const threshold = 1440000;// 24 hours, milisecs //TODO:For how much time in total do we want to run this incentive? 3,6 months, a year?
+        const threshold = 100;// minutes, TODO: Match units in cronChecker and here (cronStimulus) //TODO:For how much time in total do we want to run this incentive? 3,6 months, a year?
         var totalPaidDuration = 0; //Total elapsed time paid in the collection.
         var totalFailedDuration = 0; //total elapsed time to be paid that failed during the transaction.
-        const costHourElapsed = 1;
+        const costHourElapsed = 1;  //If cronChecker in minutes, this is in min as well. TODO: Change to the real units in both cronChecker and cronStimulus.
+        const minTimeElapsed = 1;  //In minutes, TODO: change to realistic deployment scenario.
+        const maxTimeElapsed = 10; //In minutes, TODO: change to realistic deployment scenario and add restriction in code.
 
         console.log(`The onCreate event document is: ${util.inspect(data)}`);
         console.log(`The docId of the creation was: ${util.inspect(docId)}`);
+
+        if (data.time_elapsed < minTimeElapsed){
+            return null;
+        }
 
         return db.collection('cron_transaction').where('user_id','==', data.user_id).get() //We need to sum over non-failed transaction.
                 .then(snapshot => {
@@ -52,13 +59,13 @@ exports = module.exports = functions.firestore
                             });
 
                 }).then(() => {
-                    //Calculating the number of invites available to redeem:
+                    //Calculating the number of elapsed time available to redeem:
                     console.log(`Total elapsed time before failed state: ${totalPaidDuration}`);
                     console.log(`Total elapsed time in fail state: ${totalFailedDuration}`);
                     totalPaidDuration = totalPaidDuration - totalFailedDuration;
                     console.log(`Total elapsed time paid: ${totalPaidDuration}`)
 
-                    //Verifying if the number of invites is less than threshold:
+                    //Verifying if the elapsed time is less than threshold:
                     if (totalPaidDuration <= threshold) {
                         return db.collection('cron_transaction')
                             .doc(docId).update({valid_time_elapsed: data.time_elapsed, status:'enqueued'})
@@ -81,13 +88,22 @@ exports = module.exports = functions.firestore
 
                             }).then(ref => {
                                 return console.log('Added document with ID: ', ref.id);
-                            }).catch(err => {
+                            })
+                            .then(() =>{
+                                return db.collection('user_timers').doc(data.user_id).update({
+                                    elapsedTime: 0,
+                                    lastCheckpoint: currentTime
+                                });
+                            })
+                            .catch(err => {
                                 console.log('Error getting docs in cron under threshold', err);
                                 return db.collection('cron_transaction').doc(docId).update({status:'failed'});
                             });
                                 
                     //if total elapsed time is bigger than threshold, calculate how many of them can be redeemed:
-                    } else{
+                    } 
+                    
+                    else {
                         var validElapsedTime = threshold - (totalPaidDuration - data.time_elapsed)
                         console.log(`valid time elapsed: ${validElapsedTime}`);
                         if (validElapsedTime <= 0){
@@ -122,7 +138,14 @@ exports = module.exports = functions.firestore
 
                             }).then(ref => {
                                 return console.log('Added document with ID: ', ref.id);
-                            }).catch(err => {
+                            })
+                            .then(() =>{
+                                return db.collection('user_timers').doc(data.user_id).update({
+                                    elapsedTime: 0,
+                                    lastCheckpoint: currentTime
+                                });
+                            })
+                            .catch(err => {
                                 console.log('Error getting docs in cron for exceeded quota > 0', err);
                                 return db.collection('cron_transaction').doc(docId).update({status:'failed'});
 
