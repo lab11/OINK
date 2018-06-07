@@ -12,6 +12,16 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
+/*
+stimulusAppRemove function:
+- Triggers on creation of a new document in app_remove collection.
+- If the user uninstalls the app, a document in app_remove collection should be created
+- This function simply updates the active flag in user_list to false and logs the event in the user_activity collection.
+
+- Parameters:
+    * There are not specific parameters for this function.
+*/
+
 exports = module.exports = functions.firestore
     .document('app_remove/{docId}').onCreate((snap, context)=>{
         const docId = context.params.docId
@@ -36,5 +46,5 @@ exports = module.exports = functions.firestore
         .catch(err => {
             console.log('Error getting document', err);
       });
-      
+
     });
