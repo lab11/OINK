@@ -90,7 +90,7 @@ exports = module.exports = functions.firestore
                         lastTimeActive: currentTimestamp,
                         active: true,
                         timePaidArr: ['start'],
-                        lastCheckpoint:0
+                        lastCheckpoint: 0
 
                     });
                 });
