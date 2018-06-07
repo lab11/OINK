@@ -84,12 +84,10 @@ exports = module.exports = functions.firestore
                 })
                 .then(() => {
                     return db.collection('user_timers').doc(user_id).set({
-                        cycle: 1,
                         elapsedTime: 0,
                         firstOpenTime: currentTimestamp,
                         lastTimeActive: currentTimestamp,
                         active: true,
-                        timePaidArr: ['start'],
                         lastCheckpoint: 0
 
                     });
