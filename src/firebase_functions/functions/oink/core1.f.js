@@ -12,7 +12,7 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
-//core1 function:
+//oinkCore1 function:
 // - Triggers on creation of tx_core_payment events. Checks the user information for payment in the user_list collection. 
 //   If so, start to structuring the body for the payment request and update invite_transaction,tx_core_payment status and 
 //   set the payment service of the user based on user_list information.
