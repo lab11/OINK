@@ -21,6 +21,8 @@ var FieldValue = admin.firestore.FieldValue;
 //    * threshold: Max time_elapsed that an user can get paid for. 
 //    * costHourElapsed: The value per unit of time elapsed to be paid.
 //    * event: Event that triggered the function. In this case this is the new document created by the App. It has many parameter including the doc_id and the fields of each document.
+//    * minTimeElapsed: minumum elapsed time to be paid in one cron cycle
+//    * maxTimeElapsed: maximum elapsed time to be paid in one cron cycle
 
 exports = module.exports = functions.firestore
     .document('cron_transaction/{docId}').onCreate((snap, context) =>{
