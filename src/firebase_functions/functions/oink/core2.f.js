@@ -12,7 +12,7 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
-//Core2 Function:
+//oinkCore2 Function:
 // - Triggers on a callback from Korba API which sends a get request to the URL of Core2. 
 //   The get request contains the transaction ID, status ("SUCCESS/FAILED") an a message about the transaction.
 // - Using the transaction ID, we are able to trace the transaction. This function logs on rx_core_payment
@@ -51,14 +51,6 @@ exports = module.exports = functions.https
         })
         //Logging on rx_core the result of the transaction
         .then(() => {
-            console.log(type_doc)
-            console.log(stimulus_doc)
-            console.log(tx_core_doc_id)
-            console.log(amount_doc)
-            console.log(userId_doc)
-            console.log(req.query.transaction_id)
-            console.log(req.query.status)
-            console.log(req.query.message)
 
             return db.collection('rx_core_payment').add({
                 timestamp: FieldValue.serverTimestamp(),
