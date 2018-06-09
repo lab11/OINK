@@ -32,7 +32,7 @@ exports = module.exports = functions.firestore
         // ...or the previous value before this update
         const previousValue = change.before.data();
 
-        const costFirstOpen = 2 //TODO: Value in cedis, change to required value.
+        const costFirstOpen = 5 //TODO: Value in cedis, change to required value.
         const currentTimestamp = new Date().getTime()
   
         // perform desired operations ...
