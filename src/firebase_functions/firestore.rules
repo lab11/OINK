@@ -3,6 +3,7 @@ service cloud.firestore {
     match /dumsorwatch_event/user_list {
       allow read: if false;
       allow create: if true;
+      allow update: if true;
     }
     match /dumsorwatch_event/invite_transaction {
       allow read: if false;
