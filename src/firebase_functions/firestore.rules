@@ -8,5 +8,9 @@ service cloud.firestore {
       allow read: if false;
       allow create: if true;
     }
+    match /dumsorwatch_event/dumsorwatch_event {
+      allow read: if false;
+      allow write: if true;
+    }
   }
 }
