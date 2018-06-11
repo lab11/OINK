@@ -16,7 +16,7 @@ exports = module.exports = functions.firestore
         const before = change.before.exists;
         const after = change.after.exists;
         if (before === true && after === false) {
-            return;
+            return null;
         }
 
         const newValue = change.after.data();
