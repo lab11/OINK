@@ -14,6 +14,11 @@ exports = module.exports = functions.firestore
         const newValue = change.after.data();
         const previousValue = change.before.data();
 
+        // Don't care about delete events
+        if (previousValue.exists() && !newValue.exists()) {
+            return;
+        }
+
         // Records coming from the app
         const customer_number = newValue.customer_number;
         const id = newValue.id;
