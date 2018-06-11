@@ -23,10 +23,10 @@ exports = module.exports = functions.https.onRequest((req, res) => {
     customer_number = customer_number.replace(/ /g,'');
     console.log('Space stripped: ' + customer_number);
     if (customer_number.slice(0,4) == '+233') {
-        customer_number = customer_number.slice(4,);
+        customer_number = customer_number.slice(4);
     }
     if ((customer_number.length > 9) && (customer_number.slice(0,3) == '233')) {
-        customer_number = customer_number.slice(3,);
+        customer_number = customer_number.slice(3);
     }
     if (customer_number.length < 9) {
         console.log('Phone number too short: ' + customer_number);
