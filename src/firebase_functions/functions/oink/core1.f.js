@@ -12,6 +12,10 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
+const REGION = functions.config().general.region;
+const PROJECT = functions.config().general.project;
+const INSTANCE_URI = 'https://'+REGION+'-'+PROJECT'.cloudfunctions.net
+
 //oinkCore1 function:
 // - Triggers on creation of tx_core_payment events. Checks the user information for payment in the user_list collection. 
 //   If so, start to structuring the body for the payment request and update invite_transaction,tx_core_payment status and 
@@ -73,7 +77,7 @@ exports = module.exports = functions.firestore
                             
                             //Sending payment request to Firebase function for Korba
                             return request({
-                                uri: 'https://us-central1-paymenttoy.cloudfunctions.net/payment'+namePaymentService,
+                                uri: INSTANCE_URI + '/payment' + namePaymentService,
                                 method: 'POST',
                                 headers:{
                                     'Content-Type':'application/json',
@@ -153,7 +157,7 @@ exports = module.exports = functions.firestore
                             .then(() => {
                 
                                 return request({
-                                    uri: 'https://us-central1-paymenttoy.cloudfunctions.net/payment'+namePaymentService,
+                                    uri: INSTANCE_URI + '/payment' + namePaymentService,
                                     method: 'POST',
                                     headers:{
                                         'Content-Type':'application/json',

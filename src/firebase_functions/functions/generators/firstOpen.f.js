@@ -21,5 +21,3 @@ exports = module.exports = functions.https
     res.status(200).send(reqBody);
 
 });
-
-//https://us-central1-paymenttoy.cloudfunctions.net/generatorsFirstOpen

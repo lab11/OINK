@@ -60,6 +60,3 @@ exports = module.exports = functions.firestore
             })
         })
     })
-
-//https://us-central1-paymenttoy.cloudfunctions.net/generatorsFirstOpen
-
