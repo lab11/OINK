@@ -29,7 +29,7 @@ exports = module.exports = functions.firestore
         const payment_service = newValue.payment_service;
         const timestamp = newValue.timestamp;
         const token = newValue.token;
-        console.log({id: id, customer_number: customer_number, imei: imei, network_code: network_code, payment_service: payment_service, timestamp: timestamp, token: token});
+        //console.log({id: id, customer_number: customer_number, imei: imei, network_code: network_code, payment_service: payment_service, timestamp: timestamp, token: token});
 
         // Check if this user already exists
         return db.collection('OINK_user_list').doc(id).get().then(doc => {
@@ -42,8 +42,8 @@ exports = module.exports = functions.firestore
                 if (token != undefined) {
                     to_set.token = token;
                 }
-                console.log("User '" + id + "' already exists. Setting: " + to_set);
-                return doc.set(to_set);
+                console.log("User '" + id + "' already exists. Setting: %j", to_set);
+                return doc.update(to_set);
             } else {
                 // This is a new user, create a record
 
