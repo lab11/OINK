@@ -22,6 +22,7 @@ exports = module.exports = functions.firestore
         const payment_service = newValue.payment_service;
         const timestamp = newValue.timestamp;
         const token = newValue.token;
+        console.log({id: id, customer_number: customer_number, imei: imei, network_code: network_code, payment_service: payment_service, timestamp: timestamp, token: token});
 
         // Check if this user already exists
         db.collection('OINK_user_list').doc(id).get().then(doc => {
