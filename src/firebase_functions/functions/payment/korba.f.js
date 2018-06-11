@@ -12,6 +12,9 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
+// Grab callback location from environment as it must point to this firebase instance
+const CALLBACK = functions.config().payment.korba.callback;
+
 //korba funtion:
 // - Module for for korba-specific users. It's triggered by core1 function using an HTTPS request.
 // - Structures the data to be sent to the Korba API proxy.
@@ -46,7 +49,7 @@ exports = module.exports = functions.https.onRequest((req, res) => {
         "amount": reqBody.amount,    
         "transaction_id": reqBody.transaction_id,
         "network_code": reqBody.network_code,
-        "callback_url": "https://us-central1-paymenttoy.cloudfunctions.net/oinkCore2",
+        "callback_url": CALLBACK,
         "description": reqBody.description,
         "client_id": 14
         }
