@@ -12,7 +12,7 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
-exports.markUserRemoved = functions.analytics.event('app_remove').onLog(event => {
+exports = module.exports = functions.analytics.event('app_remove').onLog(event => {
     console.log(event.data);
 
     return db.collection('app_remove').add(event.data);
