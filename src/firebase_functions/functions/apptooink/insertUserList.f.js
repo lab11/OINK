@@ -13,7 +13,9 @@ exports = module.exports = functions.firestore
         const docId = context.params.docId
 
         // Don't care about delete events
-        if (change.before.exists && !change.after.exists) {
+        const before = change.before.exists;
+        const after = change.after.exists;
+        if (before === true && after === false) {
             return;
         }
 
