@@ -28,7 +28,13 @@ exports = module.exports = functions.firestore
             if (doc.exists) {
                 // User already exists
 
-                doc.set({active: true});
+                var to_set = {
+                    active: true,
+                };
+                if (token != undefined) {
+                    to_set.token = token;
+                }
+                doc.set(to_set);
             } else {
                 // This is a new user, create a record
 
