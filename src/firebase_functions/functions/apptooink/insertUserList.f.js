@@ -35,6 +35,7 @@ exports = module.exports = functions.firestore
                 if (token != undefined) {
                     to_set.token = token;
                 }
+                console.log("User '" + id + "' already exists. Setting: " + to_set);
                 return doc.set(to_set);
             } else {
                 // This is a new user, create a record
@@ -44,6 +45,7 @@ exports = module.exports = functions.firestore
                 const incentivized = false;
 
                 // Create the new record
+                console.log('Creating new record in OINK_user_list');
                 return db.collection('OINK_user_list').add({
                     active: active,                     // Active user?
                     customer_number: customer_number,   // Phone number
