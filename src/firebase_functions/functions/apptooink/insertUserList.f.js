@@ -53,7 +53,7 @@ exports = module.exports = functions.firestore
 
                 // Create the new record
                 console.log('Creating new record in OINK_user_list');
-                return db.collection('OINK_user_list').add({
+                return db.collection('OINK_user_list').doc(id).set({
                     active: active,                     // Active user?
                     customer_number: customer_number,   // Phone number
                     id: id,                             // Phone number or IMEI, whichever the app could use
