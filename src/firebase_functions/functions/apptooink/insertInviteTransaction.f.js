@@ -12,7 +12,6 @@ exports = module.exports = functions.firestore
     .onCreate((change, context) => {
         const docId = context.params.docId
         const newValue = change.after.data();
-        const previousValue = change.before.data();
 
         // Records coming from the app
         const invite_ids = newValue.invite_ids;
@@ -26,13 +25,15 @@ exports = module.exports = functions.firestore
         // invites into a single record per invite. Do not re-create new
         // records for repeat invites.
         const ids_array = invite_ids.split(',');
+        var chain = null;
+        var chainEnd = null;
         for (var i=0; i < ids_array.length; i++) {
             // Strip whitespace
             ids_array[i] = ids_array[i].replace(/^\s*/, "").replace(/\s*$/, "");
 
             const id = ids_array[i];
             if (id.length > 0) {
-                db.collection('OINK_invite_transaction').doc(id).get().then(doc => {
+                var next = db.collection('OINK_invite_transaction').doc(id).get().then(doc => {
                     if (doc.exists) {
                         console.log('Repeat invite for ' + id);
                     } else {
@@ -48,6 +49,14 @@ exports = module.exports = functions.firestore
                         });
                     }
                 });
+
+                if (chain == null) {
+                    chain = next;
+                    chainEnd = chain;
+                } else {
+                    chainEnd = chainEnd.then(next);
+                }
             }
         }
+        return chain;
     });
