@@ -43,7 +43,7 @@ exports = module.exports = functions.firestore
                     to_set.token = token;
                 }
                 console.log("User '" + id + "' already exists. Setting: %j", to_set);
-                return doc.update(to_set);
+                return db.collection('OINK_user_list').doc(id).update(to_set);
             } else {
                 // This is a new user, create a record
 
