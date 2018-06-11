@@ -30,7 +30,7 @@ const APP_NAME = 'OINK';
 
 //Declaring and adding the function logic.
 exports = module.exports = functions.firestore
-    .document('alarms_db/{docId}').onCreate((snap, context) =>{
+    .document('OINK_alarms_db/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = snap.data();
         const docId = context.params.docId;

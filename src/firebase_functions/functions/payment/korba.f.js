@@ -30,7 +30,7 @@ exports = module.exports = functions.https.onRequest((req, res) => {
     }
     if (customer_number.length < 9) {
         console.log('Phone number too short: ' + customer_number);
-        return db.collection('alarms_db').add({
+        return db.collection('OINK_alarms_db').add({
             timestamp: new Date().getTime(),
             user_id: customer_number,
             reason: "Impossibly short phone number",

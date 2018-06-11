@@ -28,7 +28,7 @@ exports = module.exports = functions.https
         var elapsedPaid = 0;
 
         //Getting all the timers for each user in the user_timers collection:
-        db.collection('user_timers').get()
+        db.collection('OINK_user_timers').get()
             .then(snapshot => {
 
                 //checking each one of the documents in the collection to see which user needs to be paid:
@@ -51,7 +51,7 @@ exports = module.exports = functions.https
                         } 
 
                         //Write a new document in cron_transaction to submit the payment of the calculated elapsed time
-                        db.collection('cron_transaction').add({
+                        db.collection('OINK_cron_transaction').add({
 
                             event:'cron', 
                             time_elapsed: Math.round((elapsedPaid/60000) * 100) / 100  , //Sending the value to the cron_transaction in minutes
@@ -66,7 +66,7 @@ exports = module.exports = functions.https
                     //then write the document in cron_transaction to start the transaction.
                     else {
                         elapsedPaid = doc.data().elapsedTime
-                        db.collection('cron_transaction').add({
+                        db.collection('OINK_cron_transaction').add({
 
                             event:'cron', 
                             time_elapsed: Math.round((elapsedPaid/60000) * 100) / 100  , //Sending the value to the cron_transaction in minutes

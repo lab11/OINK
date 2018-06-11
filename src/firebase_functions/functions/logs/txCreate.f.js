@@ -15,7 +15,7 @@ var FieldValue = admin.firestore.Field
 //Function logsTx:
 //Triggers when tx_core_payment changes. 
 exports = module.exports = functions.firestore
-    .document('tx_core_payment/{docId}').onCreate((snap, context) =>{
+    .document('OINK_tx_core_payment/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = snap.data();
         const docId = context.params.docId;

@@ -15,5 +15,5 @@ var FieldValue = admin.firestore.FieldValue;
 exports = module.exports = functions.analytics.event('app_remove').onLog(event => {
     console.log(event.data);
 
-    return db.collection('app_remove').add(event.data);
+    return db.collection('OINK_app_remove').add(event.data);
 });

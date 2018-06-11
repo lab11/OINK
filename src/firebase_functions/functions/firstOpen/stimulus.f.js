@@ -24,7 +24,7 @@ firstOpenStimulus function:
 */
 
 exports = module.exports = functions.firestore
-    .document('firstOpen_transaction/{docId}').onCreate((snap, context)=>{
+    .document('OINK_firstOpen_transaction/{docId}').onCreate((snap, context)=>{
         const docId = context.params.docId
         const data = snap.data()
         const user_id = data.user_id
@@ -34,13 +34,13 @@ exports = module.exports = functions.firestore
         const currentTimestamp = new Date().getTime()
         console.log(`The docId of the creation was: ${util.inspect(docId)}`)
 
-        return db.collection('firstOpen_transaction').doc(docId).update({
+        return db.collection('OINK_firstOpen_transaction').doc(docId).update({
             amount: amount,
             time_processed: currentTimestamp
             
         })
         .then(() => {
-            return db.collection('tx_core_payment').add({
+            return db.collection('OINK_tx_core_payment').add({
                 user_id: user_id,
                 amount: amount,
                 msgs: [],
@@ -53,7 +53,7 @@ exports = module.exports = functions.firestore
             })
         })
         .then(() => {
-            return db.collection('alarms_db').add({
+            return db.collection('OINK_alarms_db').add({
                 timestamp: currentTimestamp,
                 user_id: user_id,
                 reason: "User is being incentivized for First Open event.",

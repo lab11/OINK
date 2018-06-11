@@ -23,7 +23,7 @@ firstOpenChecker function:
 
 */
 exports = module.exports = functions.firestore
-    .document('user_list/{docId}')
+    .document('OINK_user_list/{docId}')
     .onUpdate((change, context) => {
         // Get an object representing the document updated
         // e.g. {'name': 'Marie', 'age': 66}
@@ -40,13 +40,13 @@ exports = module.exports = functions.firestore
         if (newValue.incentivized == previousValue.incentivized || newValue.incentivized == false) return null;
 
         //Otherwise, check if there is a previous transaction for this user using firstOpen:
-        return db.collection('firstOpen_transaction').doc(docId).get()
+        return db.collection('OINK_firstOpen_transaction').doc(docId).get()
         .then(doc => {
             //if document doesn't exist, go ahead and write on firstOpen transaction to trigger the firstOpenStimulus function
             if (!doc.exists) {
                 console.log('There is not first Open incentive log in firstOpen_transaction!');
               
-                return db.collection('firstOpen_transaction').doc(docId).set({
+                return db.collection('OINK_firstOpen_transaction').doc(docId).set({
                     amount: costFirstOpen,
                     timestamp: currentTimestamp,
                     imei: newValue.imei,

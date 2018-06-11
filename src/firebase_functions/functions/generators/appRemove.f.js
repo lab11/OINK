@@ -17,7 +17,7 @@ exports = module.exports = functions.https
     const reqBody = req.body                                                
     reqBody['time'] = FieldValue.serverTimestamp()
     //reqBody['hello'] = FieldValue.serverTimestamp()
-    var dummyCron = db.collection('app_remove').add(reqBody);
+    var dummyCron = db.collection('OINK_app_remove').add(reqBody);
     res.status(200).send(reqBody);
 
 });

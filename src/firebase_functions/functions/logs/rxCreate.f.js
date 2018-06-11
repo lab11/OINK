@@ -16,7 +16,7 @@ var FieldValue = admin.firestore.Field
 //Triggers when a rx_core_payment document is created. 
 
 exports = module.exports = functions.firestore
-    .document('rx_core_payment/{docId}').onCreate((snap, context) =>{
+    .document('OINK_rx_core_payment/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = snap.data();
         const docId = context.params.docId;

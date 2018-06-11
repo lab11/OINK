@@ -16,7 +16,7 @@ exports = module.exports = functions.https
     .onRequest((req, res) => {
     const reqBody = req.body
     reqBody['time'] = FieldValue.serverTimestamp()
-    var dummyCron = db.collection('invite_transaction').add(reqBody);
+    var dummyCron = db.collection('OINK_invite_transaction').add(reqBody);
     res.status(200).send(reqBody);
 
 });

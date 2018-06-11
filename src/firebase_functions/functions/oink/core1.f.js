@@ -22,7 +22,7 @@ var FieldValue = admin.firestore.FieldValue;
 //    * There are not specific parameters for this function.
 
 exports = module.exports = functions.firestore
-    .document('tx_core_payment/{docId}').onWrite((change, context) =>{
+    .document('OINK_tx_core_payment/{docId}').onWrite((change, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = change.after.data();
         const previousData = change.before.data();
@@ -45,11 +45,11 @@ exports = module.exports = functions.firestore
                 localMsgs.push('attempt '+ (data.num_attempts + 1))
                 return change.after.ref.set({reattempt: true, num_attempts: data.num_attempts + 1, msgs: localMsgs }, {merge:true})
                 .then(() => {
-                    return db.collection('user_list').doc(data.user_id).get()
+                    return db.collection('OINK_user_list').doc(data.user_id).get()
                     .then(doc => {
                         if (!doc.exists){
                         
-                            db.collection('alarms_db').add({timestamp: FieldValue.serverTimestamp(),user_id:data.user_id, reason:"User ID does not exist.",tx_core_doc_id:docId });
+                            db.collection('OINK_alarms_db').add({timestamp: FieldValue.serverTimestamp(),user_id:data.user_id, reason:"User ID does not exist.",tx_core_doc_id:docId });
                             console.log("Invalid or unexisting User ID.");
                             // No reattempt since this should be trigger an alarm for possible fraud.
                             return null;
@@ -118,18 +118,18 @@ exports = module.exports = functions.firestore
         return change.after.ref.set({status:'pending'},{merge:true})
         .then(() => {
             //Updating the status of the document that generated the transaction:
-            var doc_path_string = data.type + '_transaction'
+            var doc_path_string = 'OINK_' + data.type + '_transaction'
             return db.collection(doc_path_string).doc(data.stimulus_doc_id).update({status: "pending", tx_core_doc_id: docId});
 
             //Getting the info from user_list to complete the API request
         }).then(() => {
-            return db.collection('user_list').doc(data.user_id).get()
+            return db.collection('OINK_user_list').doc(data.user_id).get()
                 .then(doc => {
                     if (!doc.exists){
                         //TODO: Maybe trigger an alarm here.
                         //
                         console.log('The user does not exist in the user_list collection!')
-                        db.collection('alarms_db').add({timestamp: FieldValue.serverTimestamp(),user_id:data.user_id, reason:"User ID does not exist for processing in tx_core_payment collection.",tx_core_doc_id:docId });
+                        db.collection('OINK_alarms_db').add({timestamp: FieldValue.serverTimestamp(),user_id:data.user_id, reason:"User ID does not exist for processing in tx_core_payment collection.",tx_core_doc_id:docId });
                         return null;
 
                     } else {

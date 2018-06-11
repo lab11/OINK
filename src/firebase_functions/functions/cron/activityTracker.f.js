@@ -25,12 +25,12 @@ cronActivityTracker function:
 */
 
 exports = module.exports = functions.firestore
-    .document('user_activity/{docId}').onCreate((snap, context) => {
+    .document('OINK_user_activity/{docId}').onCreate((snap, context) => {
         //Getting the data that was modified and initializing all the parameters.
         const data = snap.data();
         const docId = context.params.docId;
-        var docRef = db.collection('user_timers').doc(data.user_id);
-        
+        var docRef = db.collection('OINK_user_timers').doc(data.user_id);
+
         //declaring temporary variables to update in user_timers
         var tempLastTimeActive;
         var tempElapsedTime;

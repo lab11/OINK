@@ -25,7 +25,7 @@ var FieldValue = admin.firestore.FieldValue;
 //    * maxTimeElapsed: maximum elapsed time to be paid in one cron cycle
 
 exports = module.exports = functions.firestore
-    .document('cron_transaction/{docId}').onCreate((snap, context) =>{
+    .document('OINK_cron_transaction/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const currentTime = new Date().getTime()
         const data = snap.data();
@@ -44,7 +44,7 @@ exports = module.exports = functions.firestore
             return null;
         }
 
-        return db.collection('cron_transaction').where('user_id','==', data.user_id).get() //We need to sum over non-failed transaction.
+        return db.collection('OINK_cron_transaction').where('user_id','==', data.user_id).get() //We need to sum over non-failed transaction.
                 .then(snapshot => {
                         //Calculating the total elapsed time that the specific user has been using the app.
                         return snapshot.forEach(doc => {
@@ -53,7 +53,7 @@ exports = module.exports = functions.firestore
                     
                 }).then(() => {
                     //Calculating the total elapsed time in status "failed"
-                    return db.collection('cron_transaction').where('user_id','==', data.user_id).where('status','==','failed').get() // Calculating the num. of failed transactions.
+                    return db.collection('OINK_cron_transaction').where('user_id','==', data.user_id).where('status','==','failed').get() // Calculating the num. of failed transactions.
                             .then(snapshot => {
                                 return snapshot.forEach(doc => {
                                 totalFailedDuration += doc.data().time_elapsed;
@@ -69,13 +69,13 @@ exports = module.exports = functions.firestore
 
                     //Verifying if the elapsed time is less than threshold:
                     if (totalPaidDuration <= threshold) {
-                        return db.collection('cron_transaction')
+                        return db.collection('OINK_cron_transaction')
                             .doc(docId).update({valid_time_elapsed: data.time_elapsed, status:'enqueued'})
                             .then(() => {
                                 //Calculating the amount to pay and write on tx_core_payment collection
                                 var toPay = data.time_elapsed * costHourElapsed;
                                 toPay = Math.round(toPay * 100) / 100
-                                return db.collection('tx_core_payment').add({
+                                return db.collection('OINK_tx_core_payment').add({
                                     user_id: data.user_id,
                                     amount: toPay,
                                     msgs: [],
@@ -92,14 +92,14 @@ exports = module.exports = functions.firestore
                                 return console.log('Added document with ID: ', ref.id);
                             })
                             .then(() =>{
-                                return db.collection('user_timers').doc(data.user_id).update({
+                                return db.collection('OINK_user_timers').doc(data.user_id).update({
                                     elapsedTime: 0,
                                     lastCheckpoint: currentTime
                                 });
                             })
                             .catch(err => {
                                 console.log('Error getting docs in cron under threshold', err);
-                                return db.collection('cron_transaction').doc(docId).update({status:'failed'});
+                                return db.collection('OINK_cron_transaction').doc(docId).update({status:'failed'});
                             });
                                 
                     //if total elapsed time is bigger than threshold, calculate how many of them can be redeemed:
@@ -109,23 +109,23 @@ exports = module.exports = functions.firestore
                         var validElapsedTime = threshold - (totalPaidDuration - data.time_elapsed)
                         console.log(`valid time elapsed: ${validElapsedTime}`);
                         if (validElapsedTime <= 0){
-                            return db.collection('cron_transaction').doc(docId).update({valid_time_elapsed: 0, status:'restricted'})
+                            return db.collection('OINK_cron_transaction').doc(docId).update({valid_time_elapsed: 0, status:'restricted'})
                             .then(() => {
                                 return console.log(`User ${data.user_id} exceeded the quota of elapsed time.`);
                                 //TODO: we can also think of triggering an alarm here.
 
                             }).catch(err => {
                                 console.log('Error getting docs in cron for exceeded quota', err);
-                                return db.collection('cron_transaction').doc(docId).update({status:'failed'});
+                                return db.collection('OINK_cron_transaction').doc(docId).update({status:'failed'});
                             });
 
                         } else {
-                            return db.collection('cron_transaction')
+                            return db.collection('OINK_cron_transaction')
                             .doc(docId).update({valid_time_elapsed: validElapsedTime, status: 'enqueued'})
                             .then(() => {
                                 var toPay = validElapsedTime * costHourElapsed;
                                 toPay = Math.round(toPay * 100) / 100
-                                return db.collection('tx_core_payment').add({
+                                return db.collection('OINK_tx_core_payment').add({
                                     user_id: data.user_id,
                                     amount: toPay,
                                     msgs: [],
@@ -142,14 +142,14 @@ exports = module.exports = functions.firestore
                                 return console.log('Added document with ID: ', ref.id);
                             })
                             .then(() =>{
-                                return db.collection('user_timers').doc(data.user_id).update({
+                                return db.collection('OINK_user_timers').doc(data.user_id).update({
                                     elapsedTime: 0,
                                     lastCheckpoint: currentTime
                                 });
                             })
                             .catch(err => {
                                 console.log('Error getting docs in cron for exceeded quota > 0', err);
-                                return db.collection('cron_transaction').doc(docId).update({status:'failed'});
+                                return db.collection('OINK_cron_transaction').doc(docId).update({status:'failed'});
 
                             });
 
@@ -157,7 +157,7 @@ exports = module.exports = functions.firestore
                     }
                 }).catch(err => {
                     console.log('Error getting documents', err);
-                    return db.collection('cron_transaction').doc(docId).update({status:'failed'});
+                    return db.collection('OINK_cron_transaction').doc(docId).update({status:'failed'});
                     
                 });
                   

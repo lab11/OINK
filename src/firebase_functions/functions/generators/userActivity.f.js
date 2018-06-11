@@ -16,7 +16,7 @@ exports = module.exports = functions.https
     .onRequest((req, res) => {
     const reqBody = req.body
     reqBody['timestamp'] = new Date().getTime()
-    var dummyDoc = db.collection('user_activity').add(reqBody);
+    var dummyDoc = db.collection('OINK_user_activity').add(reqBody);
     res.status(200).send(reqBody);
 
 });

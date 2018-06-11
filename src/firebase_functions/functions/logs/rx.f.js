@@ -15,7 +15,7 @@ var FieldValue = admin.firestore.Field
 //Function logsRx:
 //Triggers when a rx_core_payment doc changes. 
 exports = module.exports = functions.firestore
-    .document('rx_core_payment/{docId}').onUpdate((change, context) =>{
+    .document('CORE_rx_core_payment/{docId}').onUpdate((change, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = change.after.data();
         const previousData = change.before.data();

@@ -23,7 +23,7 @@ var FieldValue = admin.firestore.FieldValue;
 //    * event: Event that triggered the function. In this case this is the new document created by the App. It has many parameter including the doc_id and the fields of each document.
 //
 exports = module.exports = functions.firestore
-    .document('invite_transaction/{docId}').onCreate((snap, context) =>{
+    .document('OINK_invite_transaction/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = snap.data();
         const docId = context.params.docId;
@@ -35,7 +35,7 @@ exports = module.exports = functions.firestore
         console.log(`The onCreate event document is: ${util.inspect(data)}`);
         console.log(`The docId of the creation was: ${util.inspect(docId)}`);
 
-        return db.collection('invite_transaction').where('user_id','==', data.user_id).get() //We need to sum over non-failed transaction.
+        return db.collection('OINK_invite_transaction').where('user_id','==', data.user_id).get() //We need to sum over non-failed transaction.
                 .then(snapshot => {
                         //Calculating the total num of invites that the specific user has sent.
                         return snapshot.forEach(doc => {
@@ -44,7 +44,7 @@ exports = module.exports = functions.firestore
                     
                 }).then(() => {
                     //Calculating the total number of invites in status "failed"
-                    return db.collection('invite_transaction').where('user_id','==', data.user_id).where('status','==','failed').get() // Calculating the num. of failed transactions.
+                    return db.collection('OINK_invite_transaction').where('user_id','==', data.user_id).where('status','==','failed').get() // Calculating the num. of failed transactions.
                             .then(snapshot => {
                                 return snapshot.forEach(doc => {
                                 totalNumFailedInv += doc.data().num_invites;
@@ -60,13 +60,13 @@ exports = module.exports = functions.firestore
 
                     //Verifying if the number of invites is less than threshold:
                     if (totalNumInv <= threshold) {
-                        return db.collection('invite_transaction')
+                        return db.collection('OINK_invite_transaction')
                             .doc(docId).update({valid_num_invites: data.num_invites, status:'enqueued'})
                             .then(() => {
                                 //Calculating the amount to pay and write on tx_core_payment collection
                                 var toPay = data.num_invites * costInvite;
                                 toPay = Math.round(toPay * 100) / 100
-                                return db.collection('tx_core_payment').add({
+                                return db.collection('OINK_tx_core_payment').add({
                                     user_id: data.user_id,
                                     amount: toPay,
                                     msgs: [],
@@ -83,7 +83,7 @@ exports = module.exports = functions.firestore
                                 return console.log('Added document with ID: ', ref.id);
                             }).catch(err => {
                                 console.log('Error getting docs in invites under threshold', err);
-                                return db.collection('invite_transaction')
+                                return db.collection('OINK_invite_transaction')
                                     .doc(docId).update({status:'failed'});
                             });
                                 
@@ -92,7 +92,7 @@ exports = module.exports = functions.firestore
                         var validNumEvents = threshold - (totalNumInv - data.num_invites)
                         console.log(`valid num events: ${validNumEvents}`);
                         if (validNumEvents <= 0){
-                            return db.collection('invite_transaction')
+                            return db.collection('OINK_invite_transaction')
                             .doc(docId).update({valid_num_invites: 0, status:'restricted'})
                             .then(() => {
                                 return console.log(`User ${data.user_id} exceeded the quota of Invites.`);
@@ -100,17 +100,17 @@ exports = module.exports = functions.firestore
 
                             }).catch(err => {
                                 console.log('Error getting docs in invites for exceeded quota', err);
-                                return db.collection('invite_transaction')
+                                return db.collection('OINK_invite_transaction')
                                     .doc(docId).update({status:'failed'});
                             });
 
                         } else {
-                            return db.collection('invite_transaction')
+                            return db.collection('OINK_invite_transaction')
                             .doc(docId).update({valid_num_invites: validNumEvents, status: 'enqueued'})
                             .then(() => {
                                 var toPay = validNumEvents * costInvite;
                                 toPay = Math.round(toPay * 100) / 100
-                                return db.collection('tx_core_payment').add({
+                                return db.collection('OINK_tx_core_payment').add({
                                     user_id: data.user_id,
                                     amount: toPay,
                                     msgs: [],
@@ -127,7 +127,7 @@ exports = module.exports = functions.firestore
                                 return console.log('Added document with ID: ', ref.id);
                             }).catch(err => {
                                 console.log('Error getting docs in invites for exceeded quota > 0', err);
-                                return db.collection('invite_transaction')
+                                return db.collection('OINK_invite_transaction')
                                     .doc(docId).update({status:'failed'});
 
                             });
@@ -138,7 +138,7 @@ exports = module.exports = functions.firestore
                     }
                 }).catch(err => {
                     console.log('Error getting documents', err);
-                    return db.collection('invite_transaction')
+                    return db.collection('OINK_invite_transaction')
                                     .doc(docId).update({status:'failed'});
                     
                 });

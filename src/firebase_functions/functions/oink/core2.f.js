@@ -34,7 +34,7 @@ exports = module.exports = functions.https
         console.log(req.query.transaction_id)
         
         //Getting the document in tx_core that matches the transaction id and updating the variables.
-        return db.collection('tx_core_payment').where('transaction_id','==', req.query.transaction_id).get()
+        return db.collection('OINK_tx_core_payment').where('transaction_id','==', req.query.transaction_id).get()
         .then(snapshot =>{
             
             snapshot.forEach(doc => {
@@ -52,7 +52,7 @@ exports = module.exports = functions.https
         //Logging on rx_core the result of the transaction
         .then(() => {
 
-            return db.collection('rx_core_payment').add({
+            return db.collection('OINK_rx_core_payment').add({
                 timestamp: FieldValue.serverTimestamp(),
                 type: type_doc,
                 stimulus_doc_id: stimulus_doc,
@@ -71,7 +71,7 @@ exports = module.exports = functions.https
             //If confirmation from Korba successful, write on notification_db that triggers function of
             //user notification.
             if (req.query.status == 'SUCCESS') {
-                return db.collection('notifications_db').add({
+                return db.collection('OINK_notifications_db').add({
                     amount: amount_doc,
                     type: type_doc,
                     status: 'success',
@@ -82,12 +82,12 @@ exports = module.exports = functions.https
                 })
                 //Updating stimulus_transaction status
                 .then(() => {
-                    return db.collection(`${type_doc}_transaction`).doc(stimulus_doc).update({status: 'complete', time_completed: new Date().getTime() })
-                    //return db.collection('firstOpen_transaction').doc(stimulus_doc).update({status: 'complete'})
+                    return db.collection(`OINK_${type_doc}_transaction`).doc(stimulus_doc).update({status: 'complete', time_completed: new Date().getTime() })
+                    //return db.collection('OINK_firstOpen_transaction').doc(stimulus_doc).update({status: 'complete'})
                 })
                 //Updating tx_core status
                 .then(() => {
-                    return db.collection('tx_core_payment').doc(tx_core_doc_id).update({status: 'complete', time_completed: new Date().getTime()})
+                    return db.collection('OINK_tx_core_payment').doc(tx_core_doc_id).update({status: 'complete', time_completed: new Date().getTime()})
                 })
                 
 
@@ -95,17 +95,17 @@ exports = module.exports = functions.https
             //If confirmation from Korba has fail status, write on alarms_db that triggers function to 
             //send alarm to system admin.
             else {
-                return db.collection('alarms_db').add({
+                return db.collection('OINK_alarms_db').add({
                     timestamp: FieldValue.serverTimestamp(),
                     user_id:userId_doc, 
                     reason:`Transaction No. ${req.query.transaction_id} for ${type_doc} failed. ${req.query.message}`,
                     tx_core_doc_id:tx_core_doc_id })
                 .then(() => {
-                    return db.collection(`${type_doc}_transaction`).doc(stimulus_doc).update({status: 'failed'})
-                    //return db.collection('firstOpen_transaction').doc(stimulus_doc).update({status: 'failed'})
+                    return db.collection(`OINK_${type_doc}_transaction`).doc(stimulus_doc).update({status: 'failed'})
+                    //return db.collection('OINK_firstOpen_transaction').doc(stimulus_doc).update({status: 'failed'})
                 })
                 .then(() => {
-                    return db.collection('tx_core_payment').doc(tx_core_doc_id).update({status: 'failed', msgs:msgs_doc.push('transaction error')})
+                    return db.collection('OINK_tx_core_payment').doc(tx_core_doc_id).update({status: 'failed', msgs:msgs_doc.push('transaction error')})
                 })
 
             }

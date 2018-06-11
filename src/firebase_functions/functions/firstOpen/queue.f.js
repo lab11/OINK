@@ -26,7 +26,7 @@ firstOpenQueue function:
 */
 
 exports = module.exports = functions.firestore
-    .document('firstOpen_Queue/{docId}').onCreate((snap, context)=>{
+    .document('OINK_firstOpen_Queue/{docId}').onCreate((snap, context)=>{
         const docId = context.params.docId;
         const data = snap.data();
         const user_id = data.user_id
@@ -38,7 +38,7 @@ exports = module.exports = functions.firestore
         const currentTimestamp = new Date().getTime()
         console.log(`The docId of the creation was: ${util.inspect(docId)}`)
         // Case 1.0: User is already present in user_list meaning they just reinstalled the app.
-        var user = db.collection('user_list').doc(user_id)
+        var user = db.collection('OINK_user_list').doc(user_id)
 
         return user.get()
         .then((doc) => {
@@ -50,11 +50,11 @@ exports = module.exports = functions.firestore
                 } 
                 // Case 1.2: Update user to active & log user_activity
                 else {
-                    return db.collection('user_list').doc(user_id).update({
+                    return db.collection('OINK_user_list').doc(user_id).update({
                         active: true
                     })
                     .then(() => {
-                        return db.collection('user_activity').add({
+                        return db.collection('OINK_user_activity').add({
                             user_id: user_id,
                             active: true,
                             timestamp: currentTimestamp
@@ -64,7 +64,7 @@ exports = module.exports = functions.firestore
             }
             // Case 2.0 User was not present in user_list meaning this is the first time they are ever opening the app
             else {
-                return db.collection('user_list').doc(user_id).set({
+                return db.collection('OINK_user_list').doc(user_id).set({
                     active: true,
                     imei: imei,
                     timestamp: currentTimestamp,
@@ -76,14 +76,14 @@ exports = module.exports = functions.firestore
 
                 })
                 .then(() => {
-                    return db.collection('user_activity').add({
+                    return db.collection('OINK_user_activity').add({
                         user_id: user_id,
                         active: true,
                         timestamp: currentTimestamp
                     })
                 })
                 .then(() => {
-                    return db.collection('user_timers').doc(user_id).set({
+                    return db.collection('OINK_user_timers').doc(user_id).set({
                         elapsedTime: 0,
                         firstOpenTime: currentTimestamp,
                         lastTimeActive: currentTimestamp,

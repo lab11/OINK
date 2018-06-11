@@ -14,14 +14,14 @@ var FieldValue = admin.firestore.FieldValue;
 // Requires unique token from user app.
 
 exports = module.exports = functions.firestore
-    .document('notifications_db/{docId}').onCreate((snap, context) =>{
+    .document('OINK_notifications_db/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = snap.data();
         const docId = context.params.docId;
 
     // This registration token comes from the client FCM SDKs.
     var registrationToken;
-    return db.collection('user_list').doc(data.user_id).get()
+    return db.collection('OINK_user_list').doc(data.user_id).get()
     .then(doc =>{
         registrationToken = doc.data().token
         console.log(registrationToken)
