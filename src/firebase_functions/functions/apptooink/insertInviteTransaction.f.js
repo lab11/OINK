@@ -8,7 +8,7 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.firestore
-    .document('user_list/{docId}')
+    .document('invite_transcation/{docId}')
     .onCreate((change, context) => {
         const docId = context.params.docId
         const newValue = change.after.data();
