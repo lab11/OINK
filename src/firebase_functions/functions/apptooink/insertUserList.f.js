@@ -25,7 +25,7 @@ exports = module.exports = functions.firestore
         console.log({id: id, customer_number: customer_number, imei: imei, network_code: network_code, payment_service: payment_service, timestamp: timestamp, token: token});
 
         // Check if this user already exists
-        db.collection('OINK_user_list').doc(id).get().then(doc => {
+        return db.collection('OINK_user_list').doc(id).get().then(doc => {
             if (doc.exists) {
                 // User already exists
 
@@ -35,7 +35,7 @@ exports = module.exports = functions.firestore
                 if (token != undefined) {
                     to_set.token = token;
                 }
-                doc.set(to_set);
+                return doc.set(to_set);
             } else {
                 // This is a new user, create a record
 
@@ -44,7 +44,7 @@ exports = module.exports = functions.firestore
                 const incentivized = false;
 
                 // Create the new record
-                db.collection('OINK_user_list').add({
+                return db.collection('OINK_user_list').add({
                     active: active,                     // Active user?
                     customer_number: customer_number,   // Phone number
                     id: id,                             // Phone number or IMEI, whichever the app could use
