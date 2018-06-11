@@ -11,13 +11,13 @@ exports = module.exports = functions.firestore
     .document('user_list/{docId}')
     .onWrite((change, context) => {
         const docId = context.params.docId
-        const newValue = change.after.data();
-        const previousValue = change.before.data();
 
         // Don't care about delete events
-        if (previousValue.exists() && !newValue.exists()) {
+        if (change.before.exists && !change.after.exists) {
             return;
         }
+
+        const newValue = change.after.data();
 
         // Records coming from the app
         const customer_number = newValue.customer_number;
