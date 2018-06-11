@@ -14,7 +14,7 @@ var FieldValue = admin.firestore.FieldValue;
 
 const REGION = functions.config().general.region;
 const PROJECT = functions.config().general.project;
-const INSTANCE_URI = 'https://'+REGION+'-'+PROJECT'.cloudfunctions.net
+const INSTANCE_URI = 'https://'+REGION+'-'+PROJECT+'.cloudfunctions.net';
 
 //oinkCore1 function:
 // - Triggers on creation of tx_core_payment events. Checks the user information for payment in the user_list collection. 
