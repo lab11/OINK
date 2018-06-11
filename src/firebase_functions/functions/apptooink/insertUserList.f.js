@@ -9,7 +9,7 @@ var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.firestore
     .document('user_list/{docId}')
-    .onUpdate((change, context) => {
+    .onWrite((change, context) => {
         const docId = context.params.docId
         const newValue = change.after.data();
         const previousValue = change.before.data();
