@@ -1,12 +1,6 @@
-//import { currentId } from 'async_hooks';
-
 const functions = require('firebase-functions');
-const curl = require('curlrequest');
 const admin = require('firebase-admin');
 const util = require('util');
-const request = require('request-promise');
-const crypto = require('crypto');
-const sortObj = require('sort-object');
 try {admin.initializeApp();} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
 
@@ -14,57 +8,52 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
-/*
-firstOpenChecker function:
-    - Function triggered on update of user_list document when the flag "incentivized" to true.
-    - Writes on firstOpen_transaction collection to start processing the incentive.
-    - Amount to be sent can be configured here.
+// Configuration
+INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
 
-
-*/
 exports = module.exports = functions.firestore
-    .document('OINK_user_list/{docId}')
+    .document('OINK_user_list/{user_id}')
     .onUpdate((change, context) => {
-        // Get an object representing the document updated
-        // e.g. {'name': 'Marie', 'age': 66}
-        const docId = context.params.docId
+        // Don't care about delete events
+        const before = change.before.exists;
+        const after = change.after.exists;
+        if (before === true && after === false) {
+            return null;
+        }
+
+        const user_id = context.params.user_id
         const newValue = change.after.data();
-        // ...or the previous value before this update
         const previousValue = change.before.data();
 
-        const costFirstOpen = 5 //TODO: Value in cedis, change to required value.
         const currentTimestamp = new Date().getTime()
-  
-        // perform desired operations ...
-        //if the update wasn't in the incentivized flag or it is set to false do nothing and return.
-        if (newValue.incentivized == previousValue.incentivized || newValue.incentivized == false) return null;
 
-        //Otherwise, check if there is a previous transaction for this user using firstOpen:
-        return db.collection('OINK_firstOpen_transaction').doc(docId).get()
-        .then(doc => {
-            //if document doesn't exist, go ahead and write on firstOpen transaction to trigger the firstOpenStimulus function
+        // If the record did not change to becomes incentivized, or it is not incentivized, return
+        if (newValue.incentivized == previousValue.incentivized || newValue.incentivized == false) {
+            return null;
+        }
+
+        // Otherwise, check if this user has been incentivized for firstOpen before
+        return db.collection('OINK_firstOpen_transaction').doc(user_id).get().then(doc => {
+            // User never incentivized, create a transaction to kick off payment
             if (!doc.exists) {
                 console.log('There is not first Open incentive log in firstOpen_transaction!');
-              
-                return db.collection('OINK_firstOpen_transaction').doc(docId).set({
-                    amount: costFirstOpen,
+
+                return db.collection('OINK_firstOpen_transaction').doc(user_id).set({
+                    amount: INCENTIVE_FIRSTOPEN_AMOUNT,
                     timestamp: currentTimestamp,
-                    imei: newValue.imei,
-                    user_id: docId,
-                    token: newValue.token
+                    user_id: user_id,
                 })
                 .catch(err => {
                     console.log('Error adding document to firstOpen_transaction', err);
                 });
-                
-            //If the document exists, the user was already paid and return nothing.
+
+            // If the document exists, the user was already paid so return nothing.
             } else {
                 console.log('Document data already in firstOpen_transaction:', doc.data());
                 return null;
             }
           })
           .catch(err => {
-                console.log('Error getting document', err);
+                console.error('Error looking up previous firstOpen for user.', err);
           });
-      
       });
