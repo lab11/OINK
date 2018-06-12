@@ -18,11 +18,5 @@ exports = module.exports = functions.database.ref('/dwapp/invite_transaction_cre
         // Blindly pass through the record. All documents have a unique,
         // auto-gen'd ID so no risk of updating accidentally. Invite de-duping
         // handled at the next layer.
-        return db.collection('OINK_alarms_db').add({
-            user_id: data.user_id,
-            timestamp: data.timestamp,
-            invite_ids: data.invite_ids,
-            phone_number: data.phone_number,
-            phone_carrier: data.phone_carrier,
-            phone_imei: data.phone_imei,
+        return db.collection('DWAPP_invite_transaction').add(data);
     });
