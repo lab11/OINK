@@ -45,7 +45,7 @@ exports = module.exports = functions.https.onRequest((req, res) => {
     console.log('Customer number passed to Korba: ' + customer_number);
 
     const jsonInfo = {
-        "customer_number": reqBody.customer_number,
+        "customer_number": customer_number,
         "amount": reqBody.amount,    
         "transaction_id": reqBody.transaction_id,
         "network_code": reqBody.network_code,
