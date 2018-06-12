@@ -27,9 +27,6 @@ exports = module.exports = functions.firestore
         const docId = context.params.docId
         const data = snap.data()
         const user_id = data.user_id
-        const amount = data.amount
-        const imei = data.imei
-        const token = data.token
         const currentTimestamp = new Date().getTime()
         console.log(`The docId of the creation was: ${util.inspect(docId)}`)
 

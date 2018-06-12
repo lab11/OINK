@@ -9,7 +9,13 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.analytics.event('app_remove').onLog(event => {
-    console.log(event.data);
+    console.log(util.inspect(event));
 
-    return db.collection('OINK_app_remove').add(event.data);
+    const s = util.inspect(event, {depth: null});
+    const user_id = event.user.userId;
+
+    return db.collection('OINK_app_remove').add({
+        user_id: user_id,
+        full_json: s,
+    });
 });
