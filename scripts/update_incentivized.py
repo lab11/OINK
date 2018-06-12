@@ -40,6 +40,7 @@ while True:
 		if d['incentivized']:
 			print("INFO: Skipping '{}', 'incentivized' already set to True.".format(cell))
 		else:
+			print("INCENTIVIZED '{}'".format(cell))
 			d['incentivized'] = True
 			doc_ref.set(d)
 	except google.cloud.exceptions.NotFound:
