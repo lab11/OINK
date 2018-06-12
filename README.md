@@ -1,3 +1,5 @@
+![Oink Logo Banner](media/banner.png)
+
 # OINK: The Open-INcentive-Kit
 
 The goal of Oink is to provide an easy-to-extend framework for simple, secure,
