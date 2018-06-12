@@ -19,7 +19,7 @@ except IndexError:
 
 # GCloud configuration
 db = firestore.Client()
-user_list_ref = db.collection('user_list')
+user_list_ref = db.collection('OINK_user_list')
 
 
 wb = openpyxl.load_workbook(wb_file)
