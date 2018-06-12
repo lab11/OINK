@@ -8,7 +8,7 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.firestore
-    .document('user_list/{docId}')
+    .document('DWAPP_user_list/{docId}')
     .onWrite((change, context) => {
         const docId = context.params.docId
 
