@@ -10,6 +10,7 @@
  */
 const glob = require("glob");
 const camelCase = require("camelcase");
+const normalizeGhanaNumbers = require("./dwapp/normalizeGhanaNumbers");
 const files = glob.sync('./**/*.f.js', { cwd: __dirname, ignore: './node_modules/**'});
 for(let f=0,fl=files.length; f<fl; f++){
   const file = files[f];
