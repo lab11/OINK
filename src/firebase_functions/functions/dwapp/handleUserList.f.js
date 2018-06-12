@@ -21,24 +21,40 @@ exports = module.exports = functions.firestore
 
         const newValue = change.after.data();
 
-        // Records coming from the app
-        const user_id = newValue.user_id;                   // Opaque, consistent id from all records from the phone
-        const timestamp = newValue.timestamp;               // Timestamp of this record on the phone
-        const payment_service = newValue.payment_service;   // The payment service requested by the user
-                                                            // In the future custom payments may change parameters
-        const phone_number = newValue.phone_number;         // The network phone number
-        const phone_imei = newValue.phone_imei;             // The IMEI of the phone if we can get it
-        const phone_carrier = newValue.phone_carrier;       // The carrier / network operator (e.g. MTN, Tigo)
-        const fcm_token = newValue.fcm_token;               // Firebase cloud messaging token
+        const user_id = newValue.user_id;
         //console.log({
-        //    user_id: user_id,
-        //    timestamp: timestamp,
-        //    payment_service: payment_service,
-        //    phone_number: phone_number,
-        //    phone_imei: phone_imei,
-        //    phone_carrier: phone_carrier,
-        //    fcm_token: fcm_token
+        //    user_id: newValue.user_id,
+        //    timestamp: newValue.timestamp,
+        //    payment_service: newValue.payment_service,
+        //    phone_number: newValue.phone_number,
+        //    phone_imei: newValue.phone_imei,
+        //    phone_carrier: newValue.phone_carrier,
+        //    fcm_token: newValue.fcm_token
         //});
+
+        // Normalize phone numbers
+        // TODO: This is very DumsorWatch-specific
+        var phone_number = newValue.phone_number;
+        console.log('Customer number before anything: ' + phone_number);
+        phone_number = phone_number.replace(/ /g,'');
+        console.log('Space stripped: ' + phone_number);
+        if (phone_number.slice(0,4) == '+233') {
+            phone_number = phone_number.slice(4);
+        }
+        if ((phone_number.length > 9) && (phone_number.slice(0,3) == '233')) {
+            phone_number = phone_number.slice(3);
+        }
+        if (phone_number.length < 9) {
+            console.log('Phone number too short: ' + phone_number);
+            return db.collection('OINK_alarms_db').add({
+                timestamp: new Date().getTime(),
+                reason: `'Impossibly short phone number: ${phone_number}'`,
+            });
+        }
+        if (phone_number.length == 9) {
+            phone_number = '0' + phone_number;
+        }
+        console.log(`'Phone number after normalization: ${phone_number}'`);
 
         // Check if this user already exists
         return db.collection('OINK_user_list').doc(user_id).get().then(doc => {
@@ -48,29 +64,25 @@ exports = module.exports = functions.firestore
                 var to_set = {
                     active: true,
                 };
-                if (fcm_token != undefined) {
-                    to_set.fcm_token = fcm_token;
+                if (newValue.fcm_token != undefined) {
+                    to_set.fcm_token = newValue.fcm_token;
                 }
                 console.log("User '" + user_id + "' already exists. Setting: %j", to_set);
                 return db.collection('OINK_user_list').doc(user_id).update(to_set);
             } else {
                 // This is a new user, create a record
 
-                // Add some fields that OINK wants in the user_list
-                const active = true;
-                const incentivized = false;
-
                 // Create the new record
                 console.log('Creating new record in OINK_user_list');
                 return db.collection('OINK_user_list').doc(user_id).set({
-                    active: active,
-                    incentivized: incentivized,
+                    active: true,
+                    incentivized: false,
                     user_id: user_id,
-                    timestamp: timestamp,
-                    payment_service: payment_service,
+                    timestamp: newValue.timestamp,
+                    payment_service: newValue.payment_service,
                     phone_number: phone_number,
-                    phone_imei: phone_imei,
-                    phone_carrier: phone_carrier,
+                    phone_imei: newValue.phone_imei,
+                    phone_carrier: newValue.phone_carrier,
                 });
             }
         });
