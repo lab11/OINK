@@ -15,7 +15,7 @@ var FieldValue = admin.firestore.FieldValue;
 // 2. https://accounts.google.com/DisplayUnlockCaptcha
 // For other types of transports such as Sendgrid see https://nodemailer.com/transports/
 // TODO: Configure the `notifications.email` and `notifications.pwd` Google Cloud environment variables.
-onst alarmEmail = functions.config().notifications.email;
+const alarmEmail = functions.config().notifications.email;
 const alarmPassword = functions.config().notifications.pwd;
 const mailTransport = nodemailer.createTransport({
   service: 'gmail',
