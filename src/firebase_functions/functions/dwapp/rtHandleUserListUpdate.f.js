@@ -12,7 +12,6 @@ exports = module.exports = functions.database.ref('/dwapp/user_list_update/{push
         // Grab the current value of what was written to the Realtime Database.
         const data = snapshot.val();
 
-        console.log(pushId);
         console.log(data);
 
         // Check if this user already exists

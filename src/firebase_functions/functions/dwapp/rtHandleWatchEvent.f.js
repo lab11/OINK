@@ -12,7 +12,6 @@ exports = module.exports = functions.database.ref('/dwapp/watch_event_create/{pu
         // Grab the current value of what was written to the Realtime Database.
         const data = snapshot.val();
 
-        console.log(pushId);
         console.log(data);
 
         // Blindly pass through the record. All documents have a unique,
