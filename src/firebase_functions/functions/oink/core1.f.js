@@ -22,7 +22,7 @@ const INSTANCE_URI = 'https://'+REGION+'-'+PROJECT+'.cloudfunctions.net';
 // - Parameters:
 //    * There are not specific parameters for this function.
 
-function do_payment(change, data) {
+function do_payment(change, context, data) {
     const docId = context.params.docId;
     console.log(`The docId of the creation was: ${util.inspect(docId)}`);
 
@@ -129,11 +129,11 @@ exports = module.exports = functions.firestore
                 return null;
             } else {
                 //Starting a new reattempt
-                return do_payment(change, data);
+                return do_payment(change, context, data);
             }
 
         }
 
         console.log(`The onCreate event document is: ${util.inspect(data)}`);
-        return do_payment(change, data);
+        return do_payment(change, context, data);
     });
