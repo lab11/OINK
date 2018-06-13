@@ -22,16 +22,16 @@ exports = module.exports = functions.https.onRequest((req, res) => {
     const reqBody = req.body
 
     // Korba API requires a leading 0
-    var customer_number = reqBody.customer_number;
-    if (customer_number.length == 9) {
-        customer_number = '0' + customer_number;
+    var phone_number = reqBody.phone_number;
+    if (phone_number.length == 9) {
+        phone_number = '0' + phone_number;
     }
 
     const jsonInfo = {
-        "customer_number": customer_number,
-        "amount": reqBody.amount,    
+        "customer_number": phone_number,
+        "amount": reqBody.amount,
         "transaction_id": reqBody.transaction_id,
-        "network_code": reqBody.network_code,
+        "network_code": reqBody.phone_carrier,
         "callback_url": CALLBACK,
         "description": reqBody.description,
         "client_id": 14
@@ -53,11 +53,11 @@ exports = module.exports = functions.https.onRequest((req, res) => {
                 throw new Error(`HTTP Error: ${response.statusCode}`);
                 res.status(response.statusCode).send(response.body)
                 }
-                
+
                 console.log('Posted with response from API: ', response.body);
                 console.log('Status from korba: ', response.statusCode);
                 res.status(response.statusCode).send(response.body)
-                
+
         }).catch((error) => { 
             console.log(`This is the error: ${error}`)
             res.send(error)
