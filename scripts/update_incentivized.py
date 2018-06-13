@@ -40,21 +40,20 @@ while True:
 	if cell is None:
 		break
 
-	#print(cell)
 	phone_number = normalize(cell)
 	query_ref = user_list_ref.where('phone_number', '==', phone_number)
 
 	try:
 		docs = query_ref.get()
 		for doc in docs:
-			#print('{}'.format(doc.to_dict()))
 			d = doc.to_dict()
 			if d['incentivized']:
 				print("INFO: Skipping '{}', 'incentivized' already set to True.".format(phone_number))
 			else:
 				print("INCENTIVIZED '{}'".format(phone_number))
-				d['incentivized'] = True
-				#user_list_ref..set(d)
+				to_update = {'incentivized': True}
+				doc.reference.update(to_update)
+			break
 		else:
 			print("No phone_number matching '{}'".format(phone_number))
 	except google.cloud.exceptions.NotFound:
