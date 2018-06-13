@@ -41,13 +41,12 @@ function do_payment(change, context, data) {
                 .then(doc => {
                     if (!doc.exists) {
                         console.log('The user does not exist in the user_list collection!')
-                        db.collection('OINK_alarms_db').add({
+                        return db.collection('OINK_alarms_db').add({
                             timestamp: FieldValue.serverTimestamp(),
                             user_id: data.user_id,
                             reason:"User ID does not exist for processing in tx_core_payment collection.",
                             tx_core_doc_id:docId
                         });
-                        return null;
                     }
 
                     // The user exists at this point
