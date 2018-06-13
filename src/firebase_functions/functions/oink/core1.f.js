@@ -88,21 +88,26 @@ function do_payment(change, context, data) {
                                 console.log('Payment service status: ', response.statusCode);
                                 var checkErrorFromBody = response.body;
 
-
-                                if (checkErrorFromBody.success === 'false' || checkErrorFromBody.error_code != null || checkErrorFromBody.detail == "Invalid Signature."){
-                                    console.log('Error in transaction:', checkErrorFromBody);
-                                    localMsgs.push('Transaction Error')
-                                    return change.after.ref.set({reattempt: false, status:'failed', msgs: localMsgs},{merge:true});
-                                }
-                                else {
+                                if (checkErrorFromBody.success === 'true' && checkErrorFromBody.error_code == null) {
                                     localMsgs.push('Payment submitted.')
                                     return change.after.ref.set({
-                                        reattempt: false, 
-                                        status:'submitted', 
-                                        msgs: localMsgs, 
+                                        reattempt: false,
+                                        status: 'submitted',
+                                        msgs: localMsgs,
                                         transaction_id:userPaymentInfo.transaction_id
-                                    }, {merge:true})
-
+                                    },
+                                        {merge:true}
+                                    );
+                                } else {
+                                    console.log('Error in transaction:', checkErrorFromBody);
+                                    localMsgs.push('Transaction Error')
+                                    return change.after.ref.set({
+                                        reattempt: false,
+                                        status: 'failed',
+                                        msgs: localMsgs
+                                    },
+                                        {merge:true}
+                                    );
                                 }
                             });
 
