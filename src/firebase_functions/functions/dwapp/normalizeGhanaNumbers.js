@@ -18,9 +18,6 @@ function normalize(number) {
             reason: `'Impossibly short phone number: ${phone_number}'`,
         });
     }
-    if (phone_number.length == 9) {
-        phone_number = '0' + phone_number;
-    }
     console.log(`'Phone number after normalization: ${phone_number}'`);
     return phone_number;
 }
