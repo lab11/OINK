@@ -1,19 +1,15 @@
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /user_list/{id} {
+    match /DWAPP_user_list/{id} {
       allow read: if false;
       allow create: if true;
       allow update: if true;
     }
-    match /invite_transaction/{id} {
+    match /DWAPP_invite_transaction/{id} {
       allow read: if false;
       allow create: if true;
     }
-    match /dumsorwatch_event/{id} {
-      allow read: if false;
-      allow write: if true;
-    }
-    match /fcm_token/{id} {
+    match /DWAPP_dumsorwatch_event/{id} {
       allow read: if false;
       allow write: if true;
     }
