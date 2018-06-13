@@ -51,6 +51,7 @@ function do_payment(change, context, data) {
                     } else {
                         var userPaymentData = doc.data()
                         //send all the common data among all APIs and trigger an HTTP function based on the user payment service.
+                        var userPaymentInfo = {}
                         userPaymentInfo['payment_service'] = userPaymentData.payment_service;
                         userPaymentInfo['phone_number'] = userPaymentData.phone_number;
                         userPaymentInfo['phone_carrier'] = userPaymentData.phone_carrier;
@@ -115,7 +116,6 @@ exports = module.exports = functions.firestore
     .document('OINK_tx_core_payment/{docId}').onWrite((change, context) =>{
         // Getting the data that was modified and initializing all the parameters for payment.
         const data = change.after.data();
-        var userPaymentInfo = {}
 
         // Check if the document was deleted, if so return null (for avoiding infinite loop)
         if (!change.after.exists){
