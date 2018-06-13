@@ -116,7 +116,16 @@ function do_payment(change, context, data) {
                                     msgs: localMsgs
                                 },
                                     {merge:true}
-                                );
+                                )
+                                .then(() => {
+                                    return db.collection('OINK_alarms_db').add({
+                                        timestamp: FieldValue.serverTimestamp(),
+                                        user_id: data.user_id,
+                                        type: 'error',
+                                        reason: "Failed to pay user. Messages: " + localMsgs.join('|'),
+                                        tx_core_doc_id: docId,
+                                    });
+                                });
                             }
                         });
 
