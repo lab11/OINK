@@ -1,10 +1,6 @@
 const functions = require('firebase-functions');
-const curl = require('curlrequest');
 const admin = require('firebase-admin');
 const util = require('util');
-const request = require('request-promise');
-const crypto = require('crypto');
-const sortObj = require('sort-object');
 try {admin.initializeApp();} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
 
@@ -21,8 +17,7 @@ var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.https
     .onRequest((req, res) => {
-        
-        //Declaring variables of the document in tx_core_payment that triggered the payment.
+        // Declaring variables of the document in tx_core_payment that triggered the payment.
         var tx_core_doc_id;
         var amount_doc;
         var type_doc;
@@ -32,11 +27,10 @@ exports = module.exports = functions.https
 
         console.log(util.inspect(req.query));
         console.log(req.query.transaction_id)
-        
-        //Getting the document in tx_core that matches the transaction id and updating the variables.
+
+        // Getting the document in tx_core that matches the transaction id and updating the variables.
         return db.collection('OINK_tx_core_payment').where('transaction_id','==', req.query.transaction_id).get()
         .then(snapshot =>{
-            
             snapshot.forEach(doc => {
                 tx_core_doc_id = doc.id;
                 amount_doc = doc.data().amount;
@@ -45,11 +39,9 @@ exports = module.exports = functions.https
                 stimulus_doc = doc.data().stimulus_doc_id;
                 msgs_doc = doc.data().msgs;
                 console.log(doc.id, " => ", doc.data());
-                    
             });
-                
         })
-        //Logging on rx_core the result of the transaction
+        // Logging on rx_core the result of the transaction
         .then(() => {
 
             return db.collection('OINK_rx_core_payment').add({
@@ -61,15 +53,12 @@ exports = module.exports = functions.https
                 user_id: userId_doc,
                 transaction_id: req.query.transaction_id,
                 status: req.query.status,
-                message: req.query.message
-
-            
+                message: req.query.message,
             });
         })
-        
         .then(() => {
-            //If confirmation from Korba successful, write on notification_db that triggers function of
-            //user notification.
+            // If confirmation from Korba successful, write on notification_db
+            // that triggers function of user notification.
             if (req.query.status == 'SUCCESS') {
                 return db.collection('OINK_notifications_db').add({
                     amount: amount_doc,
@@ -80,20 +69,18 @@ exports = module.exports = functions.https
                     title:"Transaction completed.",
                     user_id: userId_doc
                 })
-                //Updating stimulus_transaction status
+                // Updating stimulus_transaction status
                 .then(() => {
                     return db.collection(`OINK_${type_doc}_transaction`).doc(stimulus_doc).update({status: 'complete', time_completed: new Date().getTime() })
                     //return db.collection('OINK_firstOpen_transaction').doc(stimulus_doc).update({status: 'complete'})
                 })
-                //Updating tx_core status
+                // Updating tx_core status
                 .then(() => {
                     return db.collection('OINK_tx_core_payment').doc(tx_core_doc_id).update({status: 'complete', time_completed: new Date().getTime()})
                 })
-                
-
             }
-            //If confirmation from Korba has fail status, write on alarms_db that triggers function to 
-            //send alarm to system admin.
+            // If confirmation from Korba has fail status, write on alarms_db
+            // that triggers function to send alarm to system admin.
             else {
                 return db.collection('OINK_alarms_db').add({
                     timestamp: FieldValue.serverTimestamp(),
@@ -109,7 +96,6 @@ exports = module.exports = functions.https
                 })
 
             }
-            
         })
         .then(() => {
             res.status(200).send("OK");
@@ -118,7 +104,4 @@ exports = module.exports = functions.https
             // will log all errors in one place
             console.log(err);
         });
-        
     });
-
-        
