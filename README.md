@@ -28,13 +28,26 @@ be sure to follow the steps to log in to firebase too.
 private variables that are made available by the firebase environment, things
 such as passwords. Don't commit this file! (It's .gitignore'd).
 
-3. Some of the support scripts will need you to have the Python firestore
+3. Pop up a directory `src/firebase_functions` and create a file `.firebaserc`.
+This should be set to the canonical project name assigned to your project
+inside of firebase, as example:
+
+    ```bash
+    $ cat .firebaserc
+    {
+    "projects": {
+    "default": "oink-dumsorwatch"
+    }
+    }
+    ```
+
+4. Some of the support scripts will need you to have the Python firestore
 library installed: `pip install --upgrade google-cloud-firestore`
 
-4. You will also need the [Google Cloud SDK](https://cloud.google.com/sdk/),
+5. You will also need the [Google Cloud SDK](https://cloud.google.com/sdk/),
 be sure to get through `gcloud auth login` from their setup directions.
 
-5. The firebase cloud runs a pretty out of date version of node, so install
+6. The firebase cloud runs a pretty out of date version of node, so install
 the [Node Version Manager (nvm)](https://github.com/creationix/nvm). Once you
 have that set up, grab the current firebase node version, which as of this
 writing is `nvm install 6.11.5` (once) and `nvm use 6.11.5` (every terminal
