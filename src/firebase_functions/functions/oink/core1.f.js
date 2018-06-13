@@ -39,7 +39,7 @@ function do_payment(change, context, data) {
             // Get the info from user_list needed to complete the API request
             return db.collection('OINK_user_list').doc(data.user_id).get()
                 .then(doc => {
-                    if (!doc.exists){
+                    if (!doc.exists) {
                         console.log('The user does not exist in the user_list collection!')
                         db.collection('OINK_alarms_db').add({
                             timestamp: FieldValue.serverTimestamp(),
@@ -48,71 +48,80 @@ function do_payment(change, context, data) {
                             tx_core_doc_id:docId
                         });
                         return null;
-                    } else {
-                        var userPaymentData = doc.data()
-                        //send all the common data among all APIs and trigger an HTTP function based on the user payment service.
-                        var userPaymentInfo = {}
-                        userPaymentInfo['payment_service'] = userPaymentData.payment_service;
-                        userPaymentInfo['phone_number'] = userPaymentData.phone_number;
-                        userPaymentInfo['phone_carrier'] = userPaymentData.phone_carrier;
-                        userPaymentInfo['amount'] = data.amount;
-                        userPaymentInfo['type'] = data.type;
-                        userPaymentInfo['user_id'] = data.user_id;
-                        userPaymentInfo['transaction_id'] = data.user_id + Math.random().toString(36).substr(2, 9);
-                        userPaymentInfo['description'] = 'payment of '+ userPaymentInfo.type +' to user : '+ userPaymentInfo.user_id;
-
-                        console.log(`user payment info is: ${util.inspect(userPaymentInfo)}`);
-
-                        var namePaymentService = userPaymentInfo.payment_service;
-                        namePaymentService = namePaymentService.charAt(0).toUpperCase() + namePaymentService.slice(1)
-                        return change.after.ref.set({payment_service: userPaymentInfo.payment_service, num_attempts: data.num_attempts + 1}, {merge:true})
-                        .then(() => {
-
-                            return request({
-                                uri: INSTANCE_URI + '/payment' + namePaymentService,
-                                method: 'POST',
-                                headers:{
-                                    'Content-Type':'application/json',
-                                },
-                                json: true,
-                                body: userPaymentInfo,
-                                resolveWithFullResponse: true,
-                            }).then((response) => {
-                                //Checking the API response:
-                                if (response.statusCode >= 400) {
-                                    localMsgs.push("HTTP Error")
-                                    return change.after.ref.set({reattempt: false, status:'failed', msgs: localMsgs},{merge:true});
-                                }
-
-                                console.log('Posted with payment service response: ', response.body);
-                                console.log('Payment service status: ', response.statusCode);
-                                var checkErrorFromBody = response.body;
-
-                                if (checkErrorFromBody.success === 'true' && checkErrorFromBody.error_code == null) {
-                                    localMsgs.push('Payment submitted.')
-                                    return change.after.ref.set({
-                                        reattempt: false,
-                                        status: 'submitted',
-                                        msgs: localMsgs,
-                                        transaction_id:userPaymentInfo.transaction_id
-                                    },
-                                        {merge:true}
-                                    );
-                                } else {
-                                    console.log('Error in transaction:', checkErrorFromBody);
-                                    localMsgs.push('Transaction Error')
-                                    return change.after.ref.set({
-                                        reattempt: false,
-                                        status: 'failed',
-                                        msgs: localMsgs
-                                    },
-                                        {merge:true}
-                                    );
-                                }
-                            });
-
-                        });
                     }
+
+                    // The user exists at this point
+                    var userPaymentData = doc.data()
+
+                    // Send all the common data among all APIs and trigger an
+                    // HTTP function based on the user payment service.
+                    var userPaymentInfo = {}
+                    userPaymentInfo['payment_service'] = userPaymentData.payment_service;
+                    userPaymentInfo['phone_number'] = userPaymentData.phone_number;
+                    userPaymentInfo['phone_carrier'] = userPaymentData.phone_carrier;
+                    userPaymentInfo['amount'] = data.amount;
+                    userPaymentInfo['type'] = data.type;
+                    userPaymentInfo['user_id'] = data.user_id;
+                    userPaymentInfo['transaction_id'] = data.user_id + Math.random().toString(36).substr(2, 9);
+                    userPaymentInfo['description'] = 'payment of '+ userPaymentInfo.type +' to user : '+ userPaymentInfo.user_id;
+                    console.log(`user payment info is: ${util.inspect(userPaymentInfo)}`);
+
+                    var namePaymentService = userPaymentInfo.payment_service;
+                    namePaymentService = namePaymentService.charAt(0).toUpperCase() + namePaymentService.slice(1)
+                    return change.after.ref.set({
+                        payment_service: userPaymentInfo.payment_service,
+                        num_attempts: data.num_attempts + 1
+                    },
+                        {merge:true}
+                    )
+                    .then(() => {
+                        // TODO: This should probably mux at some point based
+                        // on the payment_service, not every service will be
+                        // triggered by a POST to Oink.
+                        return request({
+                            uri: INSTANCE_URI + '/payment' + namePaymentService,
+                            method: 'POST',
+                            headers: {
+                                'Content-Type':'application/json',
+                            },
+                            json: true,
+                            body: userPaymentInfo,
+                            resolveWithFullResponse: true,
+                        }).then((response) => {
+                            //Checking the API response:
+                            if (response.statusCode >= 400) {
+                                localMsgs.push("HTTP Error")
+                                return change.after.ref.set({reattempt: false, status:'failed', msgs: localMsgs},{merge:true});
+                            }
+
+                            console.log('Posted with payment service response: ', response.body);
+                            console.log('Payment service status: ', response.statusCode);
+                            var checkErrorFromBody = response.body;
+
+                            if (checkErrorFromBody.success === 'true' && checkErrorFromBody.error_code == null) {
+                                localMsgs.push('Payment submitted.')
+                                return change.after.ref.set({
+                                    reattempt: false,
+                                    status: 'submitted',
+                                    msgs: localMsgs,
+                                    transaction_id:userPaymentInfo.transaction_id
+                                },
+                                    {merge:true}
+                                );
+                            } else {
+                                console.log('Error in transaction:', checkErrorFromBody);
+                                localMsgs.push('Transaction Error')
+                                return change.after.ref.set({
+                                    reattempt: false,
+                                    status: 'failed',
+                                    msgs: localMsgs
+                                },
+                                    {merge:true}
+                                );
+                            }
+                        });
+
+                    });
                 });
         });
 }
