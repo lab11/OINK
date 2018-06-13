@@ -55,12 +55,12 @@ function do_payment(change, context, data) {
                     // Send all the common data among all APIs and trigger an
                     // HTTP function based on the user payment service.
                     var userPaymentInfo = {}
+                    userPaymentInfo['user_id'] = data.user_id;
+                    userPaymentInfo['type'] = data.type;
                     userPaymentInfo['payment_service'] = userPaymentData.payment_service;
                     userPaymentInfo['phone_number'] = userPaymentData.phone_number;
                     userPaymentInfo['phone_carrier'] = userPaymentData.phone_carrier;
                     userPaymentInfo['amount'] = data.amount;
-                    userPaymentInfo['type'] = data.type;
-                    userPaymentInfo['user_id'] = data.user_id;
                     userPaymentInfo['transaction_id'] = data.user_id + Math.random().toString(36).substr(2, 9);
                     userPaymentInfo['description'] = 'payment of '+ userPaymentInfo.type +' to user : '+ userPaymentInfo.user_id;
                     console.log(`user payment info is: ${util.inspect(userPaymentInfo)}`);
