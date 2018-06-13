@@ -21,6 +21,16 @@ except IndexError:
 db = firestore.Client()
 user_list_ref = db.collection('OINK_user_list')
 
+def normalize(number):
+	ret = str(number)
+	ret = ret.replace(' ', '')
+	if ret[:4] == '+233':
+		ret = ret[4:]
+	if ret[:3] == '233':
+		ret = ret[3:]
+	if len(ret) != 9:
+		print('WARNING: Number not 9 digits, it probably will not work: {}'.format(ret))
+	return ret
 
 wb = openpyxl.load_workbook(wb_file)
 ws = wb.active
@@ -31,19 +41,23 @@ while True:
 		break
 
 	#print(cell)
-	doc_ref = user_list_ref.document(str(cell))
+	phone_number = normalize(cell)
+	query_ref = user_list_ref.where('phone_number', '==', phone_number)
 
 	try:
-		doc = doc_ref.get()
-		#print('{}'.format(doc.to_dict()))
-		d = doc.to_dict()
-		if d['incentivized']:
-			print("INFO: Skipping '{}', 'incentivized' already set to True.".format(cell))
+		docs = query_ref.get()
+		for doc in docs:
+			#print('{}'.format(doc.to_dict()))
+			d = doc.to_dict()
+			if d['incentivized']:
+				print("INFO: Skipping '{}', 'incentivized' already set to True.".format(phone_number))
+			else:
+				print("INCENTIVIZED '{}'".format(phone_number))
+				d['incentivized'] = True
+				#user_list_ref..set(d)
 		else:
-			print("INCENTIVIZED '{}'".format(cell))
-			d['incentivized'] = True
-			doc_ref.set(d)
+			print("No phone_number matching '{}'".format(phone_number))
 	except google.cloud.exceptions.NotFound:
-		print("WARNING: The number '{}' was not found in firestore".format(cell))
+		print("WARNING: The number '{}' was not found in firestore".format(phone_number))
 
 	idx += 1
