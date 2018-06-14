@@ -27,6 +27,22 @@ exports = module.exports = functions.https.onRequest((req, res) => {
         phone_number = '0' + phone_number;
     }
 
+    // Korba API has specific "codes" it expects
+    var network_code = reqBody.phone_carrier;
+    if (network_code.toLowerCase() == 'airtel') {
+        network_code = 'AIR';
+    } else if (network_code.toLowerCase() == 'mtn') {
+        network_code = 'MTN';
+    } else if (network_code.toLowerCase() == 'tigo') {
+        network_code = 'TIG';
+    } else if (network_code.toLowerCase() == 'glo') {
+        network_code = 'GLO';
+    } else if (network_code.toLowerCase() == 'vodafone') {
+        network_code = 'VOD';
+    } else {
+        console.error(`'Unknown network_code "${network_code}" will almost certainly fail at Korba'`);
+    }
+
     const jsonInfo = {
         "customer_number": phone_number,
         "amount": reqBody.amount,
