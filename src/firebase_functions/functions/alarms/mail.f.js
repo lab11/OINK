@@ -59,9 +59,10 @@ exports = module.exports = functions.firestore
         if (data.reason) {
             body += `<p><b>Reason: </b> ${data.reason}<br>`;
         }
-        if (data.user_id) {
-            body += `<b>User id: </b> ${data.user_id}<br>`;
-        }
+        //TODO: Think about this more.
+        //if (data.user_id) {
+        //    body += `<b>User id: </b> ${data.user_id}<br>`;
+        //}
         if (data.tx_core_doc_id) {
             body += `<b>Document that triggered the alarm: </b> ${data.tx_core_doc_id}</p>`;
         }
