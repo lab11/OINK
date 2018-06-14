@@ -93,9 +93,8 @@ function do_payment(change, docId, data) {
 
                             console.log('Posted with payment service response: ', response.body);
                             console.log('Payment service status: ', response.statusCode);
-                            var checkErrorFromBody = response.body;
 
-                            if (checkErrorFromBody.success === 'true' && checkErrorFromBody.error_code == null) {
+                            if (response.body.success === true && response.body.error_code == null) {
                                 localMsgs.push('Payment submitted.')
                                 return change.after.ref.update({
                                     status: 'submitted',
@@ -103,7 +102,7 @@ function do_payment(change, docId, data) {
                                     transaction_id: userPaymentInfo.transaction_id
                                 });
                             } else {
-                                console.log('Error in transaction:', checkErrorFromBody);
+                                console.error('Error in transaction:', response.body);
                                 localMsgs.push('Transaction Error')
                                 return change.after.ref.update({
                                     status: 'error',
@@ -206,6 +205,12 @@ exports = module.exports = functions.firestore
                     tx_core_doc_id: docId
                 });
             });
+        }
+
+        // This is the final state, triggered when the payment processor has
+        // responded back indicating that payment is finished
+        if (data.status == 'complete') {
+            return null;
         }
 
         // Shouldn't ever get here.. :/
