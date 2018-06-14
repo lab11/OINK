@@ -37,14 +37,9 @@ exports = module.exports = functions.firestore
                 if (doc.exists) {
                     return db.collection('OINK_tx_core_payment').add({
                         user_id: user_id,
-                        amount: amount,
-                        msgs: [],
-                        num_attempts: 0,
-                        time: currentTimestamp,
-                        type: 'firstOpen',
                         stimulus_doc_id: docId,
-                        status: 'pending',
-                        reattempt: false
+                        type: 'firstOpen',
+                        amount: amount,
                     })
                     .then(() => {
                         return db.collection('OINK_alarms_db').add({

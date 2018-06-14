@@ -19,9 +19,9 @@ core1
 ### `onWrite(OINK_tx_core_payment)`
 
 This record holds the state of the current transaction. Other services create
-payment documents (in the pending state) to kick off transactions. Oink expects
-payment APIs to be asynchronous, and will mark a payment as successful in the
-tx layer once it has been handed off the payment procesor.
+payment documents to kick off transactions.  Oink expects payment APIs to be
+asynchronous, and will mark a payment as successful in the tx layer once it has
+been handed off to the payment procesor.
 
 Expects
 
@@ -31,7 +31,13 @@ Expects
                         // collection must exist. The `status` record of the document
                         // with the `stimulus_doc_id` in that collection will be updated.
     amount              // The amount to pay as incentive.
-    status              // Should be set to 'pending' <- TODO: Shouldn't require creators to handle this
-    num_attempts        // Should be initialized to 0 <- TODO: Shouldn't require creators to handle this
-    reattempt           // Should be set up as false  <- TODO: Shouldn't require creators to handle this
-    msgs                // Should be set up as []     <- TODO: Shouldn't require creators to handle thisyyy
+
+Optional
+
+    status              // Callers may set this field to `'starting'` to immediately trigger payment.
+
+Internal
+
+    status              // The current status of this payment initialization record.
+    num_attempts        // The number of attempts for this payment.
+    msgs                // A collection of diagnostic messages over the life of this record.
