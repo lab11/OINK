@@ -23,7 +23,7 @@ source_group.add_argument('--number', type=str,
 
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('--incentivize', action='store_true')
-group.add_argument('--plugwatch', action='store_true')
+group.add_argument('--powerwatch', action='store_true')
 group.add_argument('--wit', action='store_true')
 
 args = parser.parse_args()
@@ -82,8 +82,8 @@ user_list_ref = db.collection('OINK_user_list')
 
 if args.incentivize:
 	key = 'incentivized'
-elif args.plugwatch:
-	key = 'plugwatch'
+elif args.powerwatch:
+	key = 'powerwatch'
 elif args.wit:
 	key = 'wit'
 else:
