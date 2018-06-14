@@ -10,7 +10,7 @@ var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.pubsub.topic('tick-payment').onPublish((event) => {
     // Query the OINK_tx_core_payment table for any records of `status: 'waiting'`
-    db.collection('OINK_tx_core_payment').where('status', '==', 'waiting').get()
+    return db.collection('OINK_tx_core_payment').where('status', '==', 'waiting').get()
     .then(snapshot => {
         // Have to collect an array of asynchronous writes to wait for
         var writes = [];
