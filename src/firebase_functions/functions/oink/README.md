@@ -40,4 +40,4 @@ Internal
 
     status              // The current status of this payment initialization record.
     num_attempts        // The number of attempts for this payment.
-    msgs                // A collection of diagnostic messages over the life of this record.
+    messages            // A collection of diagnostic messages over the life of this record.
