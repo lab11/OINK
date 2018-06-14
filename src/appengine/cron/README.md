@@ -36,8 +36,11 @@ $ gcloud config set project <your-project-id>
 ```
 
 2. Install the Python dependencies
+
+**NOTICE: MUST MUST MUST MUST MUST pip2 here**
+
 ```
-$ pip install -t lib -r requirements.txt
+$ pip2 install -t lib -r requirements.txt
 ```
 
 3. Create an App Engine App
