@@ -1,10 +1,6 @@
 const functions = require('firebase-functions');
-const curl = require('curlrequest');
 const admin = require('firebase-admin');
 const util = require('util');
-const request = require('request-promise');
-const crypto = require('crypto');
-const sortObj = require('sort-object');
 try {admin.initializeApp();} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
 
@@ -14,10 +10,9 @@ var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.https
     .onRequest((req, res) => {
-    const reqBody = req.body                                                
+    const reqBody = req.body
     reqBody['time'] = FieldValue.serverTimestamp()
     //reqBody['hello'] = FieldValue.serverTimestamp()
     var dummyCron = db.collection('OINK_firstOpen_Queue').add(reqBody);
     res.status(200).send(reqBody);
-
 });
