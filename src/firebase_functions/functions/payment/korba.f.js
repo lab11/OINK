@@ -47,7 +47,7 @@ exports = module.exports = functions.https.onRequest((req, res) => {
         "customer_number": phone_number,
         "amount": reqBody.amount,
         "transaction_id": reqBody.transaction_id,
-        "network_code": reqBody.phone_carrier,
+        "network_code": network_code,
         "callback_url": CALLBACK,
         "description": reqBody.description,
         "client_id": 14
