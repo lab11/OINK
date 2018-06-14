@@ -207,6 +207,12 @@ exports = module.exports = functions.firestore
             });
         }
 
+        // This is the final state, triggered when the payment processor has
+        // responded back indicating that payment is finished
+        if (data.status == 'complete') {
+            return null;
+        }
+
         // Shouldn't ever get here.. :/
         console.error(`'Impossible status: ${data.status}'`);
         return db.collection('OINK_alarms_db').add({
