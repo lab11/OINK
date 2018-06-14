@@ -193,7 +193,7 @@ exports = module.exports = functions.firestore
                 timestamp: FieldValue.serverTimestamp(),
                 user_id: data.user_id,
                 type: 'error',
-                reason: "Failed to pay user. Messages: " + localMsgs.join('|'),
+                reason: "Failed to pay user. Messages: " + data.msgs.join('|'),
                 tx_core_doc_id: docId,
             })
             .then(() => {
