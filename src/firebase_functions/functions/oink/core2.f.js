@@ -8,22 +8,14 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
-//oinkCore2 Function:
-// - Triggers on a callback from Korba API which sends a get request to the URL of Core2. 
-//   The get request contains the transaction ID, status ("SUCCESS/FAILED") an a message about the transaction.
-// - Using the transaction ID, we are able to trace the transaction. This function logs on rx_core_payment
-//   the result of the transaction, if successful sends notification to user, otherwise sends an alarm to the
-//   system admin. This function also updates the stimulus_transaction and tx_core_payment status.
-
 exports = module.exports = functions.https
     .onRequest((req, res) => {
         // Declaring variables of the document in tx_core_payment that triggered the payment.
+        var user_id;
+        var amount;
+        var stimulus_collection;
+        var stimulus_doc_id;
         var tx_core_doc_id;
-        var amount_doc;
-        var type_doc;
-        var userId_doc;
-        var stimulus_doc;
-        var msgs_doc;
 
         console.log(util.inspect(req.query));
         console.log(req.query.transaction_id)
@@ -32,69 +24,81 @@ exports = module.exports = functions.https
         return db.collection('OINK_tx_core_payment').where('transaction_id','==', req.query.transaction_id).get()
         .then(snapshot =>{
             snapshot.forEach(doc => {
+                user_id = doc.data().user_id;
+                amount = doc.data().amount;
+                stimulus_collection = doc.data().stimulus_collection;
+                stimulus_doc_id = doc.data().stimulus_doc_id;
                 tx_core_doc_id = doc.id;
-                amount_doc = doc.data().amount;
-                type_doc = doc.data().type;
-                userId_doc = doc.data().user_id;
-                stimulus_doc = doc.data().stimulus_doc_id;
-                msgs_doc = doc.data().msgs;
                 console.log(doc.id, " => ", doc.data());
             });
         })
         // Logging on rx_core the result of the transaction
         .then(() => {
-
             return db.collection('OINK_rx_core_payment').add({
-                timestamp: FieldValue.serverTimestamp(),
-                type: type_doc,
-                stimulus_doc_id: stimulus_doc,
-                tx_core_doc_id:tx_core_doc_id,
-                amount: amount_doc,
-                user_id: userId_doc,
+                user_id: user_id,
+                amount: amount,
+                stimulus_collection: stimulus_collection,
+                stimulus_doc_id: stimulus_doc_id,
+                tx_core_doc_id: tx_core_doc_id,
                 transaction_id: req.query.transaction_id,
                 status: req.query.status,
                 message: req.query.message,
+                timestamp: FieldValue.serverTimestamp(),
             });
         })
         .then(() => {
             // If confirmation from Korba successful, write on notification_db
             // that triggers function of user notification.
             if (req.query.status == 'SUCCESS') {
+                var todo = [];
+
+                /* TODO: Disabled for a bit till notificiations path is tested
                 return db.collection('OINK_notifications_db').add({
-                    amount: amount_doc,
-                    type: type_doc,
+                    amount: amount,
                     status: 'success',
                     timestamp: FieldValue.serverTimestamp(),
-                    body: `Your ${type_doc} transaction has been submitted for ${amount_doc} CHD. Thank you!`,
+                    body: `Your ${type_doc} transaction has been submitted for ${amount} CHD. Thank you!`,
                     title:"Transaction completed.",
-                    user_id: userId_doc
+                    user_id: user_id
                 })
-                // Updating stimulus_transaction status
-                .then(() => {
-                    return db.collection(`OINK_${type_doc}_transaction`).doc(stimulus_doc).update({status: 'complete', time_completed: new Date().getTime() })
-                    //return db.collection('OINK_firstOpen_transaction').doc(stimulus_doc).update({status: 'complete'})
-                })
-                // Updating tx_core status
-                .then(() => {
-                    return db.collection('OINK_tx_core_payment').doc(tx_core_doc_id).update({status: 'complete', time_completed: new Date().getTime()})
-                })
+                */
+
+                // Update the status of the original stimulus record
+                // TODO: I actually think the notification to user should come from the stimulus record update anyway.
+                todo.push(db.collection(stimulus_collection).doc(stimulus_doc_id).update({
+                    status: 'complete',
+                    time_completed: FieldValue.serverTimestamp(),
+                }));
+
+                // Update the status of the tx core side from submitted to complete
+                todo.push(db.collection('OINK_tx_core_payment').doc(tx_core_doc_id).update({
+                    status: 'complete',
+                    time_completed: FieldValue.serverTimestamp(),
+                }));
+
+                return Promise.all(todo);
             }
             // If confirmation from Korba has fail status, write on alarms_db
             // that triggers function to send alarm to system admin.
             else {
-                return db.collection('OINK_alarms_db').add({
-                    timestamp: FieldValue.serverTimestamp(),
-                    user_id:userId_doc, 
-                    reason:`Transaction No. ${req.query.transaction_id} for ${type_doc} failed. ${req.query.message}`,
-                    tx_core_doc_id:tx_core_doc_id })
-                .then(() => {
-                    return db.collection(`OINK_${type_doc}_transaction`).doc(stimulus_doc).update({status: 'failed'})
-                    //return db.collection('OINK_firstOpen_transaction').doc(stimulus_doc).update({status: 'failed'})
-                })
-                .then(() => {
-                    return db.collection('OINK_tx_core_payment').doc(tx_core_doc_id).update({status: 'failed', msgs:msgs_doc.push('transaction error')})
-                })
+                var todo = [];
 
+                todo.push(db.collection('OINK_alarms_db').add({
+                    timestamp: FieldValue.serverTimestamp(),
+                    user_id: user_id,
+                    reason:`Transaction No. ${req.query.transaction_id} for ${type_doc} failed. ${req.query.message}`,
+                    tx_core_doc_id:tx_core_doc_id,
+                }));
+                todo.push(db.collection(stimulus_collection).doc(stimulus_doc_id).update({
+                    status: 'failed',
+                    time_completed: FieldValue.serverTimestamp(),
+                }));
+                todo.push(db.collection('OINK_tx_core_payment').doc(tx_core_doc_id).update({
+                    status: 'failed',
+                    time_completed: FieldValue.serverTimestamp(),
+                }));
+
+                return Promise.all(todo);
             }
         })
         .then(() => {
@@ -102,6 +106,6 @@ exports = module.exports = functions.https
         })
         .catch(err => {
             // will log all errors in one place
-            console.log(err);
+            console.error(err);
         });
     });

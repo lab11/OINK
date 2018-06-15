@@ -13,22 +13,15 @@ const REGION = functions.config().general.region;
 const PROJECT = functions.config().general.project;
 const INSTANCE_URI = 'https://'+REGION+'-'+PROJECT+'.cloudfunctions.net';
 
-//oinkCore1 function:
-// - Triggers on creation of tx_core_payment events. Checks the user information for payment in the user_list collection. 
-//   If so, start to structuring the body for the payment request and update invite_transaction,tx_core_payment status and 
-//   set the payment service of the user based on user_list information.
-// - Send payment request to the specific payment service module. In this case core1 triggers a https function (korba).
-
-// - Parameters:
-//    * There are not specific parameters for this function.
-
 function do_payment(change, docId, data) {
     var localMsgs = data.messages;
     localMsgs.push('attempt '+ (data.num_attempts + 1))
 
     // Update the status of the document that generated the transaction.
-    var doc_path_string = 'OINK_' + data.type + '_transaction'
-    return db.collection(doc_path_string).doc(data.stimulus_doc_id).update({status: 'pending', tx_core_doc_id: docId})
+    return db.collection(data.stimulus_collection).doc(data.stimulus_doc_id).update({
+        status: 'pending',
+        tx_core_doc_id: docId,
+    })
         .then(() => {
 
             // Get the info from user_list needed to complete the API request
@@ -199,8 +192,7 @@ exports = module.exports = functions.firestore
             .then(() => {
 
                 // Update the requester that things have failed.
-                var doc_path_string = 'OINK_' + data.type + '_transaction'
-                return db.collection(doc_path_string).doc(data.stimulus_doc_id).update({
+                return db.collection(data.stimulus_collection).doc(data.stimulus_doc_id).update({
                     status: 'failed',
                     tx_core_doc_id: docId
                 });
