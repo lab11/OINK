@@ -65,7 +65,39 @@ function onCreate(incentive, docId, data) {
 }
 
 function onUpdate(incentive, docId, change) {
-    return null;
+    var todo = [];
+
+    if (change.after.notify == true) {
+        if ((change.after.status == 'complete') && (change.before.status != 'complete')) {
+
+            // TODO: This is a bit brittle and breaks abstractions
+            var message;
+            const amount = change.after.amount;
+            var verb;
+            if (amount == 1) {
+                verb = 'has';
+            } else {
+                verb = 'have';
+            }
+            if (incentive == 'firstOpen') {
+                message = `Thanks for installing the app. ¢${amount} ${verb} been deposited to your account.`;
+            } else if (incentive == 'firstPowerwatch') {
+                message = `Thanks for installing a PowerWatch device. ¢${amount} ${verb} been deposited to your account.`;
+            } else {
+                console.error(`Unknown incentive type: ${incentive}`);
+                return null;
+            }
+
+            todo.push(db.collection('OINK_notifications_fcm').add({
+                user_id: user_id
+                title: 'Thank You!',
+                message: message,
+                timestamp: FieldValue.serverTimestamp(),
+            }));
+        }
+    }
+
+    return Promise.all(todo);
 }
 
 module.exports.onCreate = onCreate;
