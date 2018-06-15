@@ -13,22 +13,15 @@ const REGION = functions.config().general.region;
 const PROJECT = functions.config().general.project;
 const INSTANCE_URI = 'https://'+REGION+'-'+PROJECT+'.cloudfunctions.net';
 
-//oinkCore1 function:
-// - Triggers on creation of tx_core_payment events. Checks the user information for payment in the user_list collection. 
-//   If so, start to structuring the body for the payment request and update invite_transaction,tx_core_payment status and 
-//   set the payment service of the user based on user_list information.
-// - Send payment request to the specific payment service module. In this case core1 triggers a https function (korba).
-
-// - Parameters:
-//    * There are not specific parameters for this function.
-
 function do_payment(change, docId, data) {
-    var localMsgs = data.msgs;
+    var localMsgs = data.messages;
     localMsgs.push('attempt '+ (data.num_attempts + 1))
 
     // Update the status of the document that generated the transaction.
-    var doc_path_string = 'OINK_' + data.type + '_transaction'
-    return db.collection(doc_path_string).doc(data.stimulus_doc_id).update({status: 'pending', tx_core_doc_id: docId})
+    return db.collection(data.stimulus_collection).doc(data.stimulus_doc_id).update({
+        status: 'pending',
+        tx_core_doc_id: docId,
+    })
         .then(() => {
 
             // Get the info from user_list needed to complete the API request
@@ -87,7 +80,7 @@ function do_payment(change, docId, data) {
                                 localMsgs.push("HTTP Error")
                                 return change.after.ref.update({
                                     status:'error',
-                                    msgs: localMsgs,
+                                    messages: localMsgs,
                                 });
                             }
 
@@ -98,7 +91,7 @@ function do_payment(change, docId, data) {
                                 localMsgs.push('Payment submitted.')
                                 return change.after.ref.update({
                                     status: 'submitted',
-                                    msgs: localMsgs,
+                                    messages: localMsgs,
                                     transaction_id: userPaymentInfo.transaction_id
                                 });
                             } else {
@@ -106,7 +99,7 @@ function do_payment(change, docId, data) {
                                 localMsgs.push('Transaction Error')
                                 return change.after.ref.update({
                                     status: 'error',
-                                    msgs: localMsgs
+                                    messages: localMsgs
                                 });
                             }
                         });
@@ -136,7 +129,7 @@ exports = module.exports = functions.firestore
                 to_update.status = 'waiting';
             }
             to_update.num_attempts = 0;
-            to_update.msgs = [];
+            to_update.messages = [];
 
             // On creation update internal record-keeping. An update call will
             // trigger right after this, which will trigger the actual payment
@@ -172,11 +165,11 @@ exports = module.exports = functions.firestore
         if (data.status == 'error') {
             // TODO: Parameterize limit. Maybe think more about other options here.
             if (data.num_attempts >= 5) {
-                var msgs = data.msgs;
-                msgs.push('Payment attempt limit exceeded.');
+                var messages = data.messages;
+                messages.push('Payment attempt limit exceeded.');
                 return db.collection('OINK_tx_core_payment').doc(docId).update({
                     status: 'failed',
-                    msgs: msgs,
+                    messages: messages,
                 });
             } else {
                 // Try again next payment tick.
@@ -193,14 +186,13 @@ exports = module.exports = functions.firestore
                 timestamp: FieldValue.serverTimestamp(),
                 user_id: data.user_id,
                 type: 'error',
-                reason: "Failed to pay user. Messages: " + localMsgs.join('|'),
+                reason: "Failed to pay user. Messages: " + data.messages.join('|'),
                 tx_core_doc_id: docId,
             })
             .then(() => {
 
                 // Update the requester that things have failed.
-                var doc_path_string = 'OINK_' + data.type + '_transaction'
-                return db.collection(doc_path_string).doc(data.stimulus_doc_id).update({
+                return db.collection(data.stimulus_collection).doc(data.stimulus_doc_id).update({
                     status: 'failed',
                     tx_core_doc_id: docId
                 });

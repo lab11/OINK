@@ -26,11 +26,9 @@ been handed off to the payment procesor.
 Expects
 
     user_id             // Opaque user_id handle.
-    stimulus_doc_id     // The `id` of the document that triggered this transaction.
-    type                // What initiated this payment. A `OINK_${type}_transaction`
-                        // collection must exist. The `status` record of the document
-                        // with the `stimulus_doc_id` in that collection will be updated.
     amount              // The amount to pay as incentive.
+    stimulus_collection // The collection name of the stimulus that initiated this transaction.
+    stimulus_doc_id     // The `id` of the document that triggered this transaction.
 
 Optional
 
@@ -40,4 +38,22 @@ Internal
 
     status              // The current status of this payment initialization record.
     num_attempts        // The number of attempts for this payment.
-    msgs                // A collection of diagnostic messages over the life of this record.
+    messages            // A collection of diagnostic messages over the life of this record.
+
+
+core2
+-----
+
+TODO: This part of the infrastructure is perhaps too Korba-specific right now.
+There should probably be a generic listener frontend that's payment-specific
+that writes a `rx_core_payment` record that then triggers core2 to run.
+
+### `https listener`
+
+TODO: Old text:
+
+ - Triggers on a callback from Korba API which sends a get request to the URL of Core2.
+ - The get request contains the transaction ID, status ("SUCCESS/FAILED") an a message about the transaction.
+ - Using the transaction ID, we are able to trace the transaction. This function logs on `rx_core_payment`
+   the result of the transaction, if successful sends notification to user, otherwise sends an alarm to the
+   system admin. This function also updates the `stimulus_transaction` and `tx_core_payment` status.
