@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import csv
 import os
 import sys
@@ -9,31 +10,33 @@ import openpyxl
 import google
 from google.cloud import firestore
 
-# "Argument parsing"
-try:
-	project = sys.argv[1]
-except IndexError:
-	print("Missing required argument: The project to incentivize")
-	print()
-	sys.exit(1)
+parser = argparse.ArgumentParser(description='Update firestore records.')
+parser.add_argument('--project', type=str, required=True,
+                    help='the canonical firestore project name')
+parser.add_argument('--dry-run', '-n', action='store_true')
+
+source_group = parser.add_mutually_exclusive_group(required=True)
+source_group.add_argument('--file', type=str,
+                          help='the file to read numbers from')
+source_group.add_argument('--number', type=str,
+                          help='one specific number to run for')
+
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('--incentivize', action='store_true')
+group.add_argument('--powerwatch', action='store_true')
+group.add_argument('--wit', action='store_true')
+
+args = parser.parse_args()
 
 # Hacky sanity check
-if project not in ('paymenttoy', 'crafty-shade-837'):
+if args.project not in ('paymenttoy', 'crafty-shade-837'):
 	print("Unknown project? That's probably not right.")
-	print()
-	sys.exit(1)
-
-try:
-	numbers_file = sys.argv[2]
-except IndexError:
-	print("Missing required argument: The excel file to read numbers from.")
-	print("The file should have one column of just phone numbers.")
 	print()
 	sys.exit(1)
 
 
 # GCloud configuration
-os.environ['GCLOUD_PROJECT'] = project
+os.environ['GCLOUD_PROJECT'] = args.project
 db = firestore.Client()
 
 # Helper method that normalizes phone numbers to match
@@ -51,36 +54,53 @@ def normalize(number):
 # Read all phone numbers from file
 numbers = []
 
-if '.xlsx' in numbers_file:
-	wb = openpyxl.load_workbook(numbers_file)
-	ws = wb.active
-	idx = 1
+if args.file:
+	if '.xlsx' in args.file:
+		wb = openpyxl.load_workbook(args.file)
+		ws = wb.active
+		idx = 1
 
-	while True:
-		cell = ws['A{}'.format(idx)].value
-		if cell is None:
-			break
+		while True:
+			cell = ws['A{}'.format(idx)].value
+			if cell is None:
+				break
 
-		numbers.append(normalize(cell))
-		idx += 1
-elif '.csv' in numbers_file:
-	with open(numbers_file) as csvfile:
-		reader = csv.reader(csvfile)
-		for row in reader:
-			numbers.append(normalize(row[0]))
+			numbers.append(normalize(cell))
+			idx += 1
+	elif '.csv' in args.file:
+		with open(args.file) as csvfile:
+			reader = csv.reader(csvfile)
+			for row in reader:
+				numbers.append(normalize(row[0]))
+	else:
+		raise NotImplementedError('Unknown file type')
 else:
-	raise NotImplementedError('Unknown file type')
+	numbers.append(args.number)
 
 user_list_ref = db.collection('OINK_user_list')
 
 
+if args.incentivize:
+	key = 'incentivized'
+elif args.powerwatch:
+	key = 'powerwatch'
+elif args.wit:
+	key = 'wit'
+else:
+	raise NotImplementedError
+
 def got_doc(doc):
 	d = doc.to_dict()
-	if d['incentivized']:
-		print("INFO: Skipping '{}', 'incentivized' already set to True.".format(phone_number))
-	else:
-		print("INCENTIVIZED '{}'".format(phone_number))
-		to_update = {'incentivized': True}
+	try:
+		if d[key]:
+			print("INFO: Skipping '{}', {} already set to True.".format(phone_number, key))
+			return
+	except KeyError:
+		pass
+
+	print("{} '{}'".format(key.upper(), phone_number))
+	to_update = {key: True}
+	if not args.dry_run:
 		doc.reference.update(to_update)
 
 for phone_number in numbers:

@@ -10,6 +10,42 @@ var FieldValue = admin.firestore.FieldValue;
 
 // Configuration
 INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
+INCENTIVE_FIRSTPOWERWATCH_AMOUNT = functions.config().incentives.firstpowerwatch.amount;
+
+
+// Handle the logic of creating a specific incentive, including de-dup checking
+//
+// Returns a promise chain to run
+function incentivize(user_id, incentive, amount) {
+    console.log(`'user_id ${user_id} just marked as eligible for ${incentive}'`);
+
+    const stimulus_collection = 'OINK_stimulus_' + incentive;
+
+    // Check if this user has been incentivized for this before
+    return db.collection(stimulus_collection).doc(user_id).get().then(doc => {
+        if (!doc.exists) {
+            console.log(`'No ${stimulus_collection} for ${user_id}. Incentivizing.'`);
+
+            return db.collection(stimulus_collection).doc(user_id).set({
+                user_id: user_id,
+                amount: amount,
+                timestamp: new Date().getTime(),
+            })
+                .catch(err => {
+                    console.error(`'Error adding document to ${stimulus_collection}'`, err);
+                });
+
+        } else {
+            // If the document exists, the user was already paid so return nothing.
+            console.log(`'user_id ${user_id} already in ${stimulus_collection}:'`, doc.data());
+            return null;
+        }
+    })
+        .catch(err => {
+            console.error(`'Error looking up previous ${incentive} for user.'`, err);
+        })
+}
+
 
 exports = module.exports = functions.firestore
     .document('OINK_user_list/{user_id}')
@@ -25,35 +61,18 @@ exports = module.exports = functions.firestore
         const newValue = change.after.data();
         const previousValue = change.before.data();
 
-        const currentTimestamp = new Date().getTime()
+        // Collection of things to do
+        var todo = []
 
-        // If the record did not change to becomes incentivized, or it is not incentivized, return
-        if (newValue.incentivized == previousValue.incentivized || newValue.incentivized == false) {
-            return null;
+        // Check if this is a newly incentivized user
+        if ((newValue.incentivized != previousValue.incentivized) && (newValue.incentivized == true)) {
+            todo.push(incentivize(user_id, 'firstOpen', INCENTIVE_FIRSTOPEN_AMOUNT));
         }
 
-        // Otherwise, check if this user has been incentivized for firstOpen before
-        return db.collection('OINK_firstOpen_transaction').doc(user_id).get().then(doc => {
-            // User never incentivized, create a transaction to kick off payment
-            if (!doc.exists) {
-                console.log('There is not first Open incentive log in firstOpen_transaction!');
+        // Check if this is a newly powerwatch'd user
+        if ((newValue.powerwatch != previousValue.powerwatch) && (newValue.powerwatch == true)) {
+            todo.push(incentivize(user_id, 'firstPowerwatch', INCENTIVE_FIRSTPOWERWATCH_AMOUNT));
+        }
 
-                return db.collection('OINK_firstOpen_transaction').doc(user_id).set({
-                    amount: INCENTIVE_FIRSTOPEN_AMOUNT,
-                    timestamp: currentTimestamp,
-                    user_id: user_id,
-                })
-                .catch(err => {
-                    console.log('Error adding document to firstOpen_transaction', err);
-                });
-
-            // If the document exists, the user was already paid so return nothing.
-            } else {
-                console.log('Document data already in firstOpen_transaction:', doc.data());
-                return null;
-            }
-          })
-          .catch(err => {
-                console.error('Error looking up previous firstOpen for user.', err);
-          });
-      });
+        return Promise.all(todo);
+    });
