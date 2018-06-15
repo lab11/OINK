@@ -61,11 +61,6 @@ exports = module.exports = functions.firestore
         const newValue = change.after.data();
         const previousValue = change.before.data();
 
-        // If the record did not change to becomes incentivized, or it is not incentivized, return
-        if (newValue.incentivized == previousValue.incentivized || newValue.incentivized == false) {
-            return null;
-        }
-
         // Collection of things to do
         var todo = []
 
