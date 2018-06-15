@@ -41,7 +41,7 @@ for doc in docs:
 	if args.dry_run:
 		print('Would write {}/{} = {}'.format('OINK_stimulus_firstOpen', doc.id, doc.to_dict()))
 	else:
-		db.collection('OINK_stimulus_firstOpen').doc(doc.id).set(doc.to_dict())
+		db.collection('OINK_stimulus_firstOpen').document(doc.id).set(doc.to_dict())
 
 	if args.dry_run:
 		print('Would delete {}/{}'.format('OINK_firstOpen_transaction', doc.id))
