@@ -67,12 +67,15 @@ function onCreate(incentive, docId, data) {
 function onUpdate(incentive, docId, change) {
     var todo = [];
 
-    if (change.after.notify == true) {
-        if ((change.after.status == 'complete') && (change.before.status != 'complete')) {
+    const before = change.before.data();
+    const after = change.after.data();
+
+    if (after.notify == true) {
+        if ((after.status == 'complete') && (before.status != 'complete')) {
 
             // TODO: This is a bit brittle and breaks abstractions
             var message;
-            const amount = change.after.amount;
+            const amount = after.amount;
             var verb;
             if (amount == 1) {
                 verb = 'has';
