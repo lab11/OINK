@@ -5,10 +5,9 @@ const stimulus = require('./stimulus');
 const incentive = 'firstOpen';
 
 exports = module.exports = functions.firestore
-    .document('OINK_stimulus_firstOpen/{docId}').onUpdate((snapshot, context) => {
+    .document('OINK_stimulus_firstOpen/{docId}').onUpdate((change, context) => {
         const docId = context.params.docId;
-        const data = snapshot.data()
 
-        return stimulus.onUpdate(incentive, docId, data);
+        return stimulus.onUpdate(incentive, docId, change);
     })
 

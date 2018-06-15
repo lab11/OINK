@@ -64,7 +64,7 @@ function onCreate(incentive, docId, data) {
     });
 }
 
-function onUpdate(incentive, docId, data) {
+function onUpdate(incentive, docId, change) {
     return null;
 }
 
