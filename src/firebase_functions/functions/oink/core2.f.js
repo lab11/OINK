@@ -52,17 +52,6 @@ exports = module.exports = functions.https
             if (req.query.status == 'SUCCESS') {
                 var todo = [];
 
-                /* TODO: Disabled for a bit till notificiations path is tested
-                return db.collection('OINK_notifications_db').add({
-                    amount: amount,
-                    status: 'success',
-                    timestamp: FieldValue.serverTimestamp(),
-                    body: `Your ${type_doc} transaction has been submitted for ${amount} CHD. Thank you!`,
-                    title:"Transaction completed.",
-                    user_id: user_id
-                })
-                */
-
                 // Update the status of the original stimulus record
                 // TODO: I actually think the notification to user should come from the stimulus record update anyway.
                 todo.push(db.collection(stimulus_collection).doc(stimulus_doc_id).update({

@@ -1,0 +1,22 @@
+{
+  "name": "korba_proxy",
+  "version": "1.0.0",
+  "description": "Proxy for Korba Exchange API",
+  "main": "korba_proxy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "korba",
+    "proxy"
+  ],
+  "author": "GridWatch Team",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "request": "^2.87.0",
+    "sort-object": "^3.0.2",
+    "sudo-block": "^2.0.0"
+  }
+}

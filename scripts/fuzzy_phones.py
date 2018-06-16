@@ -5,26 +5,23 @@ import csv
 import os
 import sys
 
+# n.b. can't do `import fuzzywuzzy.process` :(
+from fuzzywuzzy import process
 import openpyxl
 
 import google
 from google.cloud import firestore
 
-parser = argparse.ArgumentParser(description='Update firestore records.')
+parser = argparse.ArgumentParser(description='Fuzzy match for phones.')
 parser.add_argument('--project', type=str, required=True,
                     help='the canonical firestore project name')
-parser.add_argument('--dry-run', '-n', action='store_true')
+#parser.add_argument('--dry-run', '-n', action='store_true')
 
 source_group = parser.add_mutually_exclusive_group(required=True)
 source_group.add_argument('--file', type=str,
                           help='the file to read numbers from')
 source_group.add_argument('--number', type=str, action='append',
                           help='one specific number to run for')
-
-group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('--incentivize', action='store_true')
-group.add_argument('--powerwatch', action='store_true')
-group.add_argument('--wit', action='store_true')
 
 args = parser.parse_args()
 
@@ -77,49 +74,24 @@ if args.file:
 else:
 	numbers = list(args.number)
 
+
 user_list_ref = db.collection('OINK_user_list')
 
+user_numbers = []
 
-if args.incentivize:
-	key = 'incentivized'
-elif args.powerwatch:
-	key = 'powerwatch'
-elif args.wit:
-	key = 'wit'
-else:
-	raise NotImplementedError
+print("Downloading user phone number list...")
+docs = db.collection('OINK_user_list').get()
+for doc in docs:
+	user_numbers.append(doc.to_dict()['phone_number'])
 
-def got_doc(doc):
-	d = doc.to_dict()
-	try:
-		if d[key]:
-			print("INFO: Skipping '{}', {} already set to True.".format(phone_number, key))
-			return
-	except KeyError:
-		pass
 
-	print("{} '{}'".format(key.upper(), phone_number))
-	to_update = {key: True}
-	if not args.dry_run:
-		doc.reference.update(to_update)
+print("For each supplied phone number, printing top three closest matches")
+print()
 
-for phone_number in numbers:
-	query_ref = user_list_ref.where('phone_number', '==', phone_number)
-
-	try:
-		docs = query_ref.get()
-		for doc in docs:
-			got_doc(doc)
-			break
-		else:
-			# Try again with leading 0
-			q2_ref = user_list_ref.where('phone_number', '==', '0' + phone_number)
-			docs = q2_ref.get()
-			for doc in docs:
-				got_doc(doc)
-				break
-			else:
-				print("WARNING: No phone_number matching '{}'".format(phone_number))
-	except google.cloud.exceptions.NotFound:
-		print("ERROR: Failed to run query?")
-
+# Fuzzy match
+for number in numbers:
+	matches = process.extract(number, user_numbers, limit=3)
+	print('For {}'.format(number))
+	for match in matches:
+		print('\t{} is a {}% match'.format(match[0], match[1]))
+	print()
