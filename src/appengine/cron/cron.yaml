@@ -2,3 +2,6 @@ cron:
 - description: Push a "tick" onto pubsub every five minutes
   url: /publish/tick-payment
   schedule: every 5 minutes
+- description: Daily trigger for any daily tasks
+  url: /publish/tick-daily
+  schedule: every day 00:00
