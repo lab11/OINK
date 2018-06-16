@@ -14,7 +14,7 @@ exports = module.exports = functions.firestore
         // This registration token comes from the client FCM SDKs.
         return db.collection('OINK_user_list').doc(data.user_id).get()
         .then(doc =>{
-            const fcm_token: doc.data().fcm_token;
+            const fcm_token = doc.data().fcm_token;
 
             if (fcm_token == undefined) {
                 console.error("Cannot notify user who has not sync'd FCM token");
