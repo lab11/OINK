@@ -9,19 +9,17 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
-function onCreate(incentive, docId, data) {
-    const user_id = data.user_id;
-    const amount = data.amount;
+function doStimulus(incentive, user_id, amount) {
     const currentTimestamp = FieldValue.serverTimestamp();
 
     if (user_id != docId) {
-        console.error("Consistency error: firstOpen_transaction docId != user_id");
+        console.error("Consistency error: stimulus docId != user_id");
         console.error(docId);
         console.error(user_id);
         return db.collection('OINK_alarms_db').add({
             timestamp: currentTimestamp,
             type: "error",
-            reason: "Consistency error: firstOpen_transaction docId != user_id",
+            reason: "Consistency error: stimulus docId != user_id",
         });
     }
 
@@ -38,20 +36,23 @@ function onCreate(incentive, docId, data) {
     // Start by sanity checking that the user exists
     return db.collection('OINK_user_list').doc(user_id).get().then(doc => {
         if (doc.exists) {
-            return db.collection('OINK_tx_core_payment').add({
+            var todo = [];
+
+            todo.push(db.collection('OINK_tx_core_payment').add({
                 user_id: user_id,
                 stimulus_doc_id: docId,
                 stimulus_collection: 'OINK_stimulus_' + incentive,
                 amount: amount,
-            })
-            .then(() => {
-                return db.collection('OINK_alarms_db').add({
-                    timestamp: currentTimestamp,
-                    type: "notification",
-                    user_id: user_id,
-                    reason: `'User is being incentivized for ${incentive}.'`,
-                })
-            });
+            }));
+
+            todo.push(db.collection('OINK_alarms_db').add({
+                timestamp: currentTimestamp,
+                type: "notification",
+                user_id: user_id,
+                reason: `'User is being incentivized for ${incentive}.'`,
+            }));
+
+            return Promise.all(todo);
         }
         else {
             console.error("firstOpen_transaction for user_id not in OINK_user_list", user_id);
@@ -64,11 +65,26 @@ function onCreate(incentive, docId, data) {
     });
 }
 
+function onCreate(incentive, docId, data) {
+    const user_id = data.user_id;
+    const amount = data.amount;
+
+    return doStimulus(incentive, user_id, amount);
+}
+
 function onUpdate(incentive, docId, change) {
     var todo = [];
 
     const before = change.before.data();
     const after = change.after.data();
+
+    if ((after.restimulate == true) && (before.restimulate != true)) {
+        todo.push(change.after.ref.set({
+            restimulate: false,
+        }));
+
+        todo.push(doStimulus(incentive, after.user_id, after.amount));
+    }
 
     if (after.notify == true) {
         if ((after.status == 'complete') && (before.status != 'complete')) {
