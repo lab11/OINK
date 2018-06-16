@@ -92,7 +92,7 @@ function onUpdate(incentive, docId, change) {
             }
 
             todo.push(db.collection('OINK_notifications_fcm').add({
-                user_id: user_id
+                user_id: user_id,
                 title: 'Thank You!',
                 message: message,
                 timestamp: FieldValue.serverTimestamp(),
