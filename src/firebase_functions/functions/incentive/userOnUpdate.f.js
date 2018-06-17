@@ -13,8 +13,8 @@ INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
 INCENTIVE_FIRSTPOWERWATCH_AMOUNT = functions.config().incentives.firstpowerwatch.amount;
 INCENTIVE_COMPLIANCEAPP_AMOUNT = functions.config().incentives.complianceapp.amount;
 INCENTIVE_COMPLIANCEAPP_INTERVAL = functions.config().incentives.complianceapp.interval;
-INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT = functions.config().incentives.compiancepowerwatch.amount;
-INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL = functions.config().incentives.compiancepowerwatch.interval;
+INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT = functions.config().incentives.compliancepowerwatch.amount;
+INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL = functions.config().incentives.compliancepowerwatch.interval;
 
 
 // Handle the logic of creating a specific incentive, including de-dup checking
