@@ -9,7 +9,7 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
-function doStimulus(incentive, user_id, amount) {
+function doStimulus(incentive, docId, user_id, amount) {
     const currentTimestamp = FieldValue.serverTimestamp();
 
     if (user_id != docId) {
@@ -69,7 +69,7 @@ function onCreate(incentive, docId, data) {
     const user_id = data.user_id;
     const amount = data.amount;
 
-    return doStimulus(incentive, user_id, amount);
+    return doStimulus(incentive, docId, user_id, amount);
 }
 
 function onUpdate(incentive, docId, change) {
@@ -83,7 +83,7 @@ function onUpdate(incentive, docId, change) {
             restimulate: false,
         }));
 
-        todo.push(doStimulus(incentive, after.user_id, after.amount));
+        todo.push(doStimulus(incentive, docId, after.user_id, after.amount));
     }
 
     if (after.notify == true) {
