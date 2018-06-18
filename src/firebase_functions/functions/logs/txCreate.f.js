@@ -15,22 +15,21 @@ var FieldValue = admin.firestore.Field
 //Function logsTx:
 //Triggers when tx_core_payment changes. 
 exports = module.exports = functions.firestore
-    .document('OINK_tx_core_payment/{docId}').onCreate((snap, context) =>{
+    .document('OINK_payment_tx/{docId}').onCreate((snap, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = snap.data();
         const docId = context.params.docId;
-        
+
         //send the request to server to log the change
         return request({
             uri: 'http://graphs.grid.watch:3245',
-     
             method: 'POST',
             headers:{
                 'Content-Type':'application/json',
             },
             json: true,
             body: {
-                    collection: 'tx_core_payment',
+                    collection: 'OINK_payment_tx',
                     transaction_id: 'null', 
                     type: data.type,
                     timestamp: new Date().getTime()
@@ -46,5 +45,4 @@ exports = module.exports = functions.firestore
         .catch(err =>{
             console.log(err);
         })
-        
 });

@@ -66,7 +66,7 @@ exports = module.exports = functions.firestore
                                 //Calculating the amount to pay and write on tx_core_payment collection
                                 var toPay = data.num_invites * costInvite;
                                 toPay = Math.round(toPay * 100) / 100
-                                return db.collection('OINK_tx_core_payment').add({
+                                return db.collection('OINK_payment_tx').add({
                                     user_id: data.user_id,
                                     amount: toPay,
                                     msgs: [],
@@ -110,7 +110,7 @@ exports = module.exports = functions.firestore
                             .then(() => {
                                 var toPay = validNumEvents * costInvite;
                                 toPay = Math.round(toPay * 100) / 100
-                                return db.collection('OINK_tx_core_payment').add({
+                                return db.collection('OINK_payment_tx').add({
                                     user_id: data.user_id,
                                     amount: toPay,
                                     msgs: [],

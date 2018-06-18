@@ -31,7 +31,7 @@ function doStimulus(incentive, ref, user_id, amount) {
                 status: 'pending',
             }));
 
-            todo.push(db.collection('OINK_tx_core_payment').add({
+            todo.push(db.collection('OINK_payment_tx').add({
                 user_id: user_id,
                 stimulus_doc_id: ref.id,
                 stimulus_collection: 'OINK_stimulus_' + incentive,

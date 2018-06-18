@@ -32,51 +32,81 @@ os.environ['GCLOUD_PROJECT'] = args.project
 db = firestore.Client()
 
 
-# First up:
-# Blind rename OINK_firstOpen_transaction -> OINK_stimulus_firstOpen
+# # First up:
+# # Blind rename OINK_firstOpen_transaction -> OINK_stimulus_firstOpen
+# 
+# docs = db.collection('OINK_firstOpen_transaction').get()
+# for doc in docs:
+# 	# id = doc.id; data = doc.to_dict()
+# 	if args.dry_run:
+# 		print('Would write {}/{} = {}'.format('OINK_stimulus_firstOpen', doc.id, doc.to_dict()))
+# 	else:
+# 		db.collection('OINK_stimulus_firstOpen').document(doc.id).set(doc.to_dict())
+# 
+# 	if args.dry_run:
+# 		print('Would delete {}/{}'.format('OINK_firstOpen_transaction', doc.id))
+# 	else:
+# 		doc.reference.delete()
+# 
+# # Next up:
+# # In each OINK_tx_core_payment record
+# #   - delete 'type'
+# #   - add 'stimulus_collection'
+# # In each OINK_rx_core_payment record
+# #   - the same
+# 
+# docs = db.collection('OINK_tx_core_payment').get()
+# for doc in docs:
+# 	data = doc.to_dict()
+# 	if data['type'] != 'firstOpen':
+# 		raise NotImplementedError(data['type'])
+# 	if args.dry_run:
+# 		print('Would delete type and set stimulus_collection for {}'.format(doc.id))
+# 	else:
+# 		doc.reference.update({
+# 			'type': firestore.DELETE_FIELD,
+# 			'stimulus_collection': 'OINK_stimulus_firstOpen',
+# 			})
+# 
+# docs = db.collection('OINK_rx_core_payment').get()
+# for doc in docs:
+# 	data = doc.to_dict()
+# 	if data['type'] != 'firstOpen':
+# 		raise NotImplementedError(data['type'])
+# 	if args.dry_run:
+# 		print('Would delete type and set stimulus_collection for {}'.format(doc.id))
+# 	else:
+# 		doc.reference.update({
+# 			'type': firestore.DELETE_FIELD,
+# 			'stimulus_collection': 'OINK_stimulus_firstOpen',
+# 			})
 
-docs = db.collection('OINK_firstOpen_transaction').get()
+# Rename `OINK_tx_core_payment` to `OINK_payment_tx`
+docs = db.collection('OINK_tx_core_payment').get()
 for doc in docs:
+	print('Processing OINK_payment_tx/{}'.format(doc.id))
 	# id = doc.id; data = doc.to_dict()
 	if args.dry_run:
-		print('Would write {}/{} = {}'.format('OINK_stimulus_firstOpen', doc.id, doc.to_dict()))
+		print('Would write {}/{} = {}'.format('OINK_payment_tx', doc.id, doc.to_dict()))
 	else:
-		db.collection('OINK_stimulus_firstOpen').document(doc.id).set(doc.to_dict())
+		db.collection('OINK_payment_tx').document(doc.id).set(doc.to_dict())
 
 	if args.dry_run:
-		print('Would delete {}/{}'.format('OINK_firstOpen_transaction', doc.id))
+		print('Would delete {}/{}'.format('OINK_tx_core_payment', doc.id))
 	else:
 		doc.reference.delete()
 
-# Next up:
-# In each OINK_tx_core_payment record
-#   - delete 'type'
-#   - add 'stimulus_collection'
-# In each OINK_rx_core_payment record
-#   - the same
-
-docs = db.collection('OINK_tx_core_payment').get()
-for doc in docs:
-	data = doc.to_dict()
-	if data['type'] != 'firstOpen':
-		raise NotImplementedError(data['type'])
-	if args.dry_run:
-		print('Would delete type and set stimulus_collection for {}'.format(doc.id))
-	else:
-		doc.reference.update({
-			'type': firestore.DELETE_FIELD,
-			'stimulus_collection': 'OINK_stimulus_firstOpen',
-			})
-
+# Rename `OINK_rx_core_payment` to `OINK_payment_rx`
 docs = db.collection('OINK_rx_core_payment').get()
 for doc in docs:
-	data = doc.to_dict()
-	if data['type'] != 'firstOpen':
-		raise NotImplementedError(data['type'])
+	print('Processing OINK_payment_rx/{}'.format(doc.id))
+	# id = doc.id; data = doc.to_dict()
 	if args.dry_run:
-		print('Would delete type and set stimulus_collection for {}'.format(doc.id))
+		print('Would write {}/{} = {}'.format('OINK_payment_rx', doc.id, doc.to_dict()))
 	else:
-		doc.reference.update({
-			'type': firestore.DELETE_FIELD,
-			'stimulus_collection': 'OINK_stimulus_firstOpen',
-			})
+		db.collection('OINK_payment_rx').document(doc.id).set(doc.to_dict())
+
+	if args.dry_run:
+		print('Would delete {}/{}'.format('OINK_rx_core_payment', doc.id))
+	else:
+		doc.reference.delete()
