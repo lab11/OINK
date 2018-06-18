@@ -84,6 +84,7 @@ docs = db.collection('OINK_user_list').get()
 for doc in docs:
 	user_numbers.append(doc.to_dict()['phone_number'])
 
+print("There are {} user numbers in the database".format(len(user_numbers)))
 
 print("For each supplied phone number, printing top three closest matches")
 print()
