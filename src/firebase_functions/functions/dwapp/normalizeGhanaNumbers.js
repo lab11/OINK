@@ -18,6 +18,11 @@ function normalize(number) {
             reason: `'Impossibly short phone number: ${phone_number}'`,
         });
     }
+    if (phone_number.length == 9) {
+        // Many people don't include the leading 0 when reporting their number,
+        // but a complete number is 10 digits long.
+        phone_number = '0' + phone_number;
+    }
     console.log(`'Phone number after normalization: ${phone_number}'`);
     return phone_number;
 }
