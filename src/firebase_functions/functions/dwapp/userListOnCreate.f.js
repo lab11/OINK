@@ -52,3 +52,4 @@ exports = module.exports = functions.firestore
                 });
             }
         });
+    });
