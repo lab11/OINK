@@ -21,7 +21,7 @@ exports = module.exports = functions.https
         console.log(req.query.transaction_id)
 
         // Getting the document in tx_core that matches the transaction id and updating the variables.
-        return db.collection('OINK_tx_core_payment').where('transaction_id','==', req.query.transaction_id).get()
+        return db.collection('OINK_payment_tx').where('transaction_id','==', req.query.transaction_id).get()
         .then(snapshot =>{
             snapshot.forEach(doc => {
                 user_id = doc.data().user_id;
@@ -34,7 +34,7 @@ exports = module.exports = functions.https
         })
         // Logging on rx_core the result of the transaction
         .then(() => {
-            return db.collection('OINK_rx_core_payment').add({
+            return db.collection('OINK_payment_rx').add({
                 user_id: user_id,
                 amount: amount,
                 stimulus_collection: stimulus_collection,
@@ -60,7 +60,7 @@ exports = module.exports = functions.https
                 }));
 
                 // Update the status of the tx core side from submitted to complete
-                todo.push(db.collection('OINK_tx_core_payment').doc(tx_core_doc_id).update({
+                todo.push(db.collection('OINK_payment_tx').doc(tx_core_doc_id).update({
                     status: 'complete',
                     time_completed: FieldValue.serverTimestamp(),
                 }));
@@ -82,7 +82,7 @@ exports = module.exports = functions.https
                     status: 'failed',
                     time_completed: FieldValue.serverTimestamp(),
                 }));
-                todo.push(db.collection('OINK_tx_core_payment').doc(tx_core_doc_id).update({
+                todo.push(db.collection('OINK_payment_tx').doc(tx_core_doc_id).update({
                     status: 'failed',
                     time_completed: FieldValue.serverTimestamp(),
                 }));

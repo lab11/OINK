@@ -11,7 +11,7 @@ file here that is triggered.
 tick-payment
 ------------
 
-This task is responsible for scanning the `OINK_tx_core_payment` table and
+This task is responsible for scanning the `OINK_payment_tx` table and
 converting any entries with `status: 'waiting'` to `status: 'starting'`, which
 will cause the core to attempt to initiate a payment.
 

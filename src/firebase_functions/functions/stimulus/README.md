@@ -21,7 +21,7 @@ onCreate
 
   - Validates inputs, then
      - Updates the current record to `status: 'pending'`
-     - Creates a `OINK_tx_core_payment` record for this transaction
+     - Creates a `OINK_payment_tx` record for this transaction
      - Triggers an alarm to indicate that a stimulus is occuring
 
 

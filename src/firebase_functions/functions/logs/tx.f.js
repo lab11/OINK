@@ -16,23 +16,22 @@ var FieldValue = admin.firestore.Field
 //Triggers when a tx_core_payment doc changes. 
 
 exports = module.exports = functions.firestore
-    .document('OINK_tx_core_payment/{docId}').onUpdate((change, context) =>{
+    .document('OINK_payment_tx/{docId}').onUpdate((change, context) =>{
         //Getting the data that was modified and initializing all the parameters for payment.
         const data = change.after.data();
         const previousData = change.before.data();
         const docId = context.params.docId;
-        
+
         //send the request to server to log the change
         return request({
             uri: 'http://graphs.grid.watch:3245',
-     
             method: 'POST',
             headers:{
                 'Content-Type':'application/json',
             },
             json: true,
             body: {
-                    collection: 'tx_core_payment',
+                    collection: 'OINK_payment_tx',
                     transaction_id: data.transaction_id, 
                     type: data.type,
                     timestamp: new Date().getTime()
@@ -48,5 +47,4 @@ exports = module.exports = functions.firestore
         .catch(err =>{
             console.log(err);
         })
-        
 });
