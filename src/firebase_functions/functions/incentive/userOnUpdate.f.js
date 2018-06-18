@@ -85,28 +85,27 @@ exports = module.exports = functions.firestore
         if (newValue.incentivized_days != previousValue.incentivized_days) {
             if (newValue.incentivized_days >= INCENTIVE_COMPLIANCEAPP_INTERVAL) {
                 // Look up any prior compliance stimuli
-                todo.push(db.collection('OINK_stimulus_complianceApp').doc(user_id).get().then(doc => {
-                    if (doc.exists) {
-                        // We've been over 30 days before, see if we're 30 days
-                        // past the last time
-                        if ((newValue.incentivized_days - doc.data().last_day) >= INCENTIVE_COMPLIANCEAPP_INTERVAL) {
-                            return doc.ref.update({
-                                restimulate: true,
-                                amount: INCENTIVE_COMPLIANCEAPP_AMOUNT,
-                                last_day: newValue.incentivized_days,
-                                day_list: doc.data().day_list.push(last_day),
-                                timestamp_list: doc.data().timestamp_list.push(timestamp),
-                            });
+                todo.push(db.collection('OINK_stimulus_complianceApp').where('user_id', '==', user_id).get().then(docs => {
+                    // n.b. cannot `orderBy` time or day because already filtering on 'user_id'
+                    // so instead, we'll iterate all the records, there won't be that many.
+                    var last_day_count = 0;
+
+                    docs.forEach(doc => {
+                        const data = doc.data();
+
+                        if (data.day_count > last_day_count) {
+                            last_day_count = data.day_count;
                         }
-                    } else {
-                        // First time over 30 days, so create the initial stimulus doc
-                        return db.collection('OINK_stimulus_complianceApp').doc(user_id).set({
+                    });
+
+                    if ((newValue.incentivized_days - last_day_count) >= INCENTIVE_COMPLIANCEAPP_INTERVAL) {
+                        const doc_name = user_id + '-' + newValue.incentivized_days;
+
+                        return db.collection('OINK_stimulus_complianceApp').doc(doc_name).add({
                             user_id: user_id,
                             amount: INCENTIVE_COMPLIANCEAPP_AMOUNT,
                             timestamp: timestamp,
-                            last_day: newValue.incentivized_days,
-                            day_list: [newValue.incentivized_days],
-                            timestamp_list: [timestamp],
+                            day_count: newValue.incentivized_days,
                         });
                     }
                 }));

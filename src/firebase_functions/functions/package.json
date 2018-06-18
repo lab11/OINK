@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "camelcase": "^5.0.0",
-    "crypto": "^1.0.1",
     "curlrequest": "^1.0.1",
     "firebase-admin": "^5.12.1",
     "firebase-functions": "^1.0.4",

@@ -9,19 +9,8 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
-function doStimulus(incentive, docId, user_id, amount) {
+function doStimulus(incentive, ref, user_id, amount) {
     const currentTimestamp = FieldValue.serverTimestamp();
-
-    if (user_id != docId) {
-        console.error("Consistency error: stimulus docId != user_id");
-        console.error(docId);
-        console.error(user_id);
-        return db.collection('OINK_alarms_db').add({
-            timestamp: currentTimestamp,
-            type: "error",
-            reason: "Consistency error: stimulus docId != user_id",
-        });
-    }
 
     // TODO: This should be more robust, but is sufficient for DumsorWatch
     if ((amount == undefined) || (amount < 1) || (amount > 50)) {
@@ -38,9 +27,13 @@ function doStimulus(incentive, docId, user_id, amount) {
         if (doc.exists) {
             var todo = [];
 
+            todo.push(ref.update({
+                status: 'pending',
+            }));
+
             todo.push(db.collection('OINK_tx_core_payment').add({
                 user_id: user_id,
-                stimulus_doc_id: docId,
+                stimulus_doc_id: ref.id,
                 stimulus_collection: 'OINK_stimulus_' + incentive,
                 amount: amount,
             }));
@@ -65,29 +58,22 @@ function doStimulus(incentive, docId, user_id, amount) {
     });
 }
 
-function onCreate(incentive, docId, data) {
+function onCreate(incentive, snapshot, context) {
+    const data = snapshot.data()
     const user_id = data.user_id;
     const amount = data.amount;
 
-    return doStimulus(incentive, docId, user_id, amount);
+    return doStimulus(incentive, snapshot.ref, user_id, amount);
 }
 
-function onUpdate(incentive, docId, change) {
+function onUpdate(incentive, change, context) {
     var todo = [];
 
     const before = change.before.data();
     const after = change.after.data();
 
-    if ((after.restimulate == true) && (before.restimulate != true)) {
-        todo.push(change.after.ref.set({
-            restimulate: false,
-        }));
-
-        todo.push(doStimulus(incentive, docId, after.user_id, after.amount));
-    }
-
-    if (after.notify == true) {
-        if ((after.status == 'complete') && (before.status != 'complete')) {
+    if ((after.status == 'complete') && (before.status != 'complete')) {
+        if (after.notify == true) {
 
             // TODO: This is a bit brittle and breaks abstractions
             var message;
@@ -114,6 +100,15 @@ function onUpdate(incentive, docId, change) {
                 timestamp: FieldValue.serverTimestamp(),
             }));
         }
+    }
+
+    if ((after.status == 'failed') && (before.status != 'failed')) {
+        todo.push(db.collection('OINK_alarms_db').add({
+            timestamp: currentTimestamp,
+            type: "error",
+            user_id: user_id,
+            reason: `Failed to incentive user for ${incentive}`,
+        }));
     }
 
     return Promise.all(todo);
