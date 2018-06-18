@@ -41,17 +41,17 @@ exports = module.exports = functions.firestore
 
         // Check if this is a newly incentivized user
         if ((newValue.incentivized != previousValue.incentivized) && (newValue.incentivized == true)) {
-            todo.push(incentivize_once(user_id, timestamp, 'firstOpen', INCENTIVE_FIRSTOPEN_AMOUNT));
+            todo.push(incentive.incentivize_once(user_id, timestamp, 'firstOpen', INCENTIVE_FIRSTOPEN_AMOUNT));
         }
 
         // Check if this is a newly powerwatch'd user
         if ((newValue.powerwatch != previousValue.powerwatch) && (newValue.powerwatch == true)) {
-            todo.push(incentivize_once(user_id, timestamp, 'firstPowerwatch', INCENTIVE_FIRSTPOWERWATCH_AMOUNT));
+            todo.push(incentive.incentivize_once(user_id, timestamp, 'firstPowerwatch', INCENTIVE_FIRSTPOWERWATCH_AMOUNT));
         }
 
         // Check if this is a newly surveyed user
         if ((newValue.firstSurvey != previousValue.firstSurvey) && (newValue.firstSurvey == true)) {
-            todo.push(incentivize_once(user_id, timestamp, 'firstSurvey', INCENTIVE_FIRSTSURVEY_AMOUNT));
+            todo.push(incentive.incentivize_once(user_id, timestamp, 'firstSurvey', INCENTIVE_FIRSTSURVEY_AMOUNT));
         }
 
         // Check if this incentived user is due for a compliance incentive
