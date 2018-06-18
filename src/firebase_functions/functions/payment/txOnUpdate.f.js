@@ -30,12 +30,12 @@ function do_payment(change, docId, data) {
 
                     // Sanity check: Bail if the user somehow doesn't exist.
                     if (!doc.exists) {
-                        console.log('The user does not exist in the user_list collection!')
+                        console.log('The user does not exist in the OINK_user_list collection!')
                         return db.collection('OINK_alarms_db').add({
                             timestamp: FieldValue.serverTimestamp(),
                             user_id: data.user_id,
-                            reason:"User ID does not exist for processing in tx_core_payment collection.",
-                            tx_core_doc_id:docId
+                            reason:"User ID does not exist for processing in OINK_payment_tx collection.",
+                            tx_core_doc_id: docId
                         });
                     }
 
@@ -66,7 +66,7 @@ function do_payment(change, docId, data) {
                         // on the payment_service, not every service will be
                         // triggered by a POST to Oink.
                         return request({
-                            uri: INSTANCE_URI + '/payment' + namePaymentService,
+                            uri: INSTANCE_URI + '/apis' + namePaymentService,
                             method: 'POST',
                             headers: {
                                 'Content-Type':'application/json',
@@ -109,33 +109,9 @@ function do_payment(change, docId, data) {
 }
 
 exports = module.exports = functions.firestore
-    .document('OINK_tx_core_payment/{docId}').onWrite((change, context) =>{
-        // Getting the data that was modified and initializing all the parameters for payment.
+    .document('OINK_payment_tx/{docId}').onUpdate((change, context) =>{
         const data = change.after.data();
         const docId = context.params.docId;
-
-        // Check if the document was deleted, if so return null (for avoiding infinite loop)
-        if (!change.after.exists) {
-            return null;
-        }
-
-        // This is a create, handle some housekeeping on this pass
-        if (!change.before.exists) {
-            to_update = {}
-            // The only valid status for an external caller to set is
-            // 'starting', to immediately trigger a payment. In most cases,
-            // this will likely be `undefined`.
-            if (data.status != 'starting') {
-                to_update.status = 'waiting';
-            }
-            to_update.num_attempts = 0;
-            to_update.messages = [];
-
-            // On creation update internal record-keeping. An update call will
-            // trigger right after this, which will trigger the actual payment
-            // if we're starting immediately.
-            return db.collection('OINK_tx_core_payment').doc(docId).update(to_update);
-        }
 
         // Many payments trigger alerts on user phones, so we want to be
         // mindful of when we try to pay people. By default, payments start in
@@ -167,13 +143,13 @@ exports = module.exports = functions.firestore
             if (data.num_attempts >= 5) {
                 var messages = data.messages;
                 messages.push('Payment attempt limit exceeded.');
-                return db.collection('OINK_tx_core_payment').doc(docId).update({
+                return change.after.ref.update({
                     status: 'failed',
                     messages: messages,
                 });
             } else {
                 // Try again next payment tick.
-                return db.collection('OINK_tx_core_payment').doc(docId).update({
+                return change.after.ref.update({
                     status: 'waiting',
                 });
             }
@@ -189,14 +165,13 @@ exports = module.exports = functions.firestore
                 reason: "Failed to pay user. Messages: " + data.messages.join('|'),
                 tx_core_doc_id: docId,
             })
-            .then(() => {
-
-                // Update the requester that things have failed.
-                return db.collection(data.stimulus_collection).doc(data.stimulus_doc_id).update({
-                    status: 'failed',
-                    tx_core_doc_id: docId
+                .then(() => {
+                    // Update the requester that things have failed.
+                    return db.collection(data.stimulus_collection).doc(data.stimulus_doc_id).update({
+                        status: 'failed',
+                        tx_core_doc_id: docId
+                    });
                 });
-            });
         }
 
         // This is the final state, triggered when the payment processor has

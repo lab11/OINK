@@ -1,13 +1,22 @@
-Oink
-====
+Payment
+=======
 
-The heart of Oink, these are responsible for accepting incentivication
-requests, disbursing them to appropriate payment services, monitoring that they
-eventually success (or alerting failure), and propogating success back.
+Payment processing in Oink. These records correspond directly to actual
+payments. They are responsible for monitoring the creation and eventual success
+of payments via third party services and propogating back success or failure of
+payments.
+
+The architecture assumes asynchronous payment APIs. The `tx` component
+initiates payments, and the `rx` records replies from payment APIs.
 
 
-core1
------
+tx
+--
+
+This record holds the state of the current transaction. Other services create
+payment documents to kick off transactions.  Oink expects payment APIs to be
+asynchronous, and will mark a payment as successful in the tx layer once it has
+been handed off to the payment procesor.
 
 ### Configuration
 
@@ -16,12 +25,10 @@ core1
                         weird-ish string beneath the project name (though you
                         can rename it in firebase to something recognizable))
 
-### `onWrite(OINK_tx_core_payment)`
+### `onCreate(OINK_payment_tx)`
 
-This record holds the state of the current transaction. Other services create
-payment documents to kick off transactions.  Oink expects payment APIs to be
-asynchronous, and will mark a payment as successful in the tx layer once it has
-been handed off to the payment procesor.
+This method validates inputs and add additional information to the record for
+internal state tracking. Creation is the public-facing API of payments.
 
 Expects
 
@@ -34,6 +41,13 @@ Optional
 
     status              // Callers may set this field to `'starting'` to immediately trigger payment.
 
+
+### `onUpdate(OINK_payment_tx)`
+
+This method handles the work of payments as a state machine. Its operation is
+opaque. External services should generally not update payment records, except
+to possibly retry a `status == 'failed'` transaction.
+
 Internal
 
     status              // The current status of this payment initialization record.
@@ -41,8 +55,8 @@ Internal
     messages            // A collection of diagnostic messages over the life of this record.
 
 
-core2
------
+rx
+--
 
 TODO: This part of the infrastructure is perhaps too Korba-specific right now.
 There should probably be a generic listener frontend that's payment-specific
