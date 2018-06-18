@@ -43,7 +43,11 @@ exports = module.exports = functions.firestore
         if (data.type == 'error') {
             subject += ": Error!";
         } else if (data.type == 'notification') {
-            subject += ": Notification";
+            subject += ": Notification.";
+        }
+
+        if (data.title != undefined) {
+            subject += ' ' + data.title;
         }
 
         var body = '<img src="cid:oinklogo"/>' +
