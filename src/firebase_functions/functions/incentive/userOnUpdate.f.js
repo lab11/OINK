@@ -10,6 +10,7 @@ var db = admin.firestore();
 // Configuration
 INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
 INCENTIVE_FIRSTPOWERWATCH_AMOUNT = functions.config().incentives.firstpowerwatch.amount;
+INCENTIVE_FIRSTSURVEY_AMOUNT = functions.config().incentives.firstsurvey.amount;
 INCENTIVE_COMPLIANCEAPP_AMOUNT = functions.config().incentives.complianceapp.amount;
 INCENTIVE_COMPLIANCEAPP_INTERVAL = functions.config().incentives.complianceapp.interval;
 INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT = functions.config().incentives.compliancepowerwatch.amount;
@@ -46,6 +47,11 @@ exports = module.exports = functions.firestore
         // Check if this is a newly powerwatch'd user
         if ((newValue.powerwatch != previousValue.powerwatch) && (newValue.powerwatch == true)) {
             todo.push(incentivize_once(user_id, timestamp, 'firstPowerwatch', INCENTIVE_FIRSTPOWERWATCH_AMOUNT));
+        }
+
+        // Check if this is a newly surveyed user
+        if ((newValue.firstSurvey != previousValue.firstSurvey) && (newValue.firstSurvey == true)) {
+            todo.push(incentivize_once(user_id, timestamp, 'firstSurvey', INCENTIVE_FIRSTSURVEY_AMOUNT));
         }
 
         // Check if this incentived user is due for a compliance incentive
