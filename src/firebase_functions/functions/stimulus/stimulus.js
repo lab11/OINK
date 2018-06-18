@@ -48,11 +48,12 @@ function doStimulus(incentive, ref, user_id, amount) {
             return Promise.all(todo);
         }
         else {
-            console.error("firstOpen_transaction for user_id not in OINK_user_list", user_id);
+            console.error(`Stimulus for ${incentive} for user_id not in OINK_user_list`, user_id);
             return db.collection('OINK_alarms_db').add({
                 timestamp: currentTimestamp,
                 type: "error",
-                reason: "firstOpen_transaction for user_id not in OINK_user_list",
+                user_id: user_id,
+                reason: `Stimulus for ${incentive} for user_id not in OINK_user_list`,
             })
         }
     });
