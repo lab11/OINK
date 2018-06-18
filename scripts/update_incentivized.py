@@ -3,7 +3,9 @@
 import argparse
 import csv
 import os
+import pprint
 import sys
+import time
 
 import openpyxl
 
@@ -25,6 +27,7 @@ group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('--incentivize', action='store_true')
 group.add_argument('--powerwatch', action='store_true')
 group.add_argument('--wit', action='store_true')
+group.add_argument('--firstsurvey', action='store_true')
 
 args = parser.parse_args()
 
@@ -86,6 +89,8 @@ elif args.powerwatch:
 	key = 'powerwatch'
 elif args.wit:
 	key = 'wit'
+elif args.firstsurvey:
+	key = 'firstSurvey'
 else:
 	raise NotImplementedError
 
@@ -102,6 +107,35 @@ def got_doc(doc):
 	to_update = {key: True}
 	if not args.dry_run:
 		doc.reference.update(to_update)
+
+def create_doc(phone_number):
+	# Thinking we prefer leading 0 numbers given user evidence
+	if len(phone_number) == 9:
+		phone_number = '0' + phone_number
+	to_create = {}
+	to_create['user_id'] = phone_number
+	to_create['phone_number'] = phone_number
+	to_create['payment_service'] = 'korba'
+	to_create['phone_carrier'] = input("Phone Carrier: [Airtel/MTN/Glo/Tigo/Vodafone]: ")
+	print("  !!HACK If your local clock isn't in UTC, you need to do something else here")
+	to_create['timestamp'] = int(time.time())*1000 + int(1000*(time.time() % 1))
+	print("")
+	print("Will create new record:")
+	pprint.pprint(to_create)
+	r = input("Create record? [Y/n] ")
+	if len(r) and r.lower()[0] == 'n':
+		return
+
+	if args.dry_run:
+		print("Would create that doc, then query for it and update it")
+		return
+	else:
+		user_list_ref.document(phone_number).set(to_create)
+
+	# Need to split the incentivization as triggers only monitor updates
+	# (perhaps a TODO there..)
+	doc = user_list_ref.document(phone_number).get()
+	got_doc(doc)
 
 for phone_number in numbers:
 	query_ref = user_list_ref.where('phone_number', '==', phone_number)
@@ -120,6 +154,9 @@ for phone_number in numbers:
 				break
 			else:
 				print("WARNING: No phone_number matching '{}'".format(phone_number))
+				r = input("Create user for this number? [y/n] ")
+				if len(r) and r.lower()[0] == 'y':
+					create_doc(phone_number)
 	except google.cloud.exceptions.NotFound:
 		print("ERROR: Failed to run query?")
 
