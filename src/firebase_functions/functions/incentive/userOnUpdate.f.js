@@ -15,40 +15,7 @@ INCENTIVE_COMPLIANCEAPP_INTERVAL = functions.config().incentives.complianceapp.i
 INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT = functions.config().incentives.compliancepowerwatch.amount;
 INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL = functions.config().incentives.compliancepowerwatch.interval;
 
-
-// Handle the logic of creating a specific incentive, including de-dup checking
-//
-// Returns a promise chain to run
-function incentivize_once(user_id, timestamp, incentive, amount) {
-    console.log(`'user_id ${user_id} just marked as eligible for ${incentive}'`);
-
-    const stimulus_collection = 'OINK_stimulus_' + incentive;
-
-    // Check if this user has been incentivized for this before
-    return db.collection(stimulus_collection).doc(user_id).get().then(doc => {
-        if (!doc.exists) {
-            console.log(`'No ${stimulus_collection} for ${user_id}. Incentivizing.'`);
-
-            return db.collection(stimulus_collection).doc(user_id).set({
-                user_id: user_id,
-                amount: amount,
-                timestamp: timestamp,
-            })
-                .catch(err => {
-                    console.error(`'Error adding document to ${stimulus_collection}'`, err);
-                });
-
-        } else {
-            // If the document exists, the user was already paid so return nothing.
-            console.log(`'user_id ${user_id} already in ${stimulus_collection}:'`, doc.data());
-            return null;
-        }
-    })
-        .catch(err => {
-            console.error(`'Error looking up previous ${incentive} for user.'`, err);
-        })
-}
-
+const incentive = require('./incentive');
 
 exports = module.exports = functions.firestore
     .document('OINK_user_list/{user_id}')
@@ -101,6 +68,7 @@ exports = module.exports = functions.firestore
                     if ((newValue.incentivized_days - last_day_count) >= INCENTIVE_COMPLIANCEAPP_INTERVAL) {
                         const doc_name = user_id + '-' + newValue.incentivized_days;
 
+                        // TODO: should call incentivize_once here
                         return db.collection('OINK_stimulus_complianceApp').doc(doc_name).set({
                             user_id: user_id,
                             amount: INCENTIVE_COMPLIANCEAPP_AMOUNT,
