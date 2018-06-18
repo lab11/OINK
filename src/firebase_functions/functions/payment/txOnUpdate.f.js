@@ -189,3 +189,4 @@ exports = module.exports = functions.firestore
             reason: `'Internal consistency error, impossible status: ${data.status}'`,
             tx_core_doc_id: docId,
         });
+    });
