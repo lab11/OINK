@@ -101,7 +101,7 @@ exports = module.exports = functions.firestore
                     if ((newValue.incentivized_days - last_day_count) >= INCENTIVE_COMPLIANCEAPP_INTERVAL) {
                         const doc_name = user_id + '-' + newValue.incentivized_days;
 
-                        return db.collection('OINK_stimulus_complianceApp').doc(doc_name).add({
+                        return db.collection('OINK_stimulus_complianceApp').doc(doc_name).set({
                             user_id: user_id,
                             amount: INCENTIVE_COMPLIANCEAPP_AMOUNT,
                             timestamp: timestamp,
