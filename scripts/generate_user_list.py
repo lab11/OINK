@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import os
 import sys
 import time
@@ -8,23 +9,21 @@ import uuid
 import google
 from google.cloud import firestore
 
-# "Argument parsing"
-try:
-	project = sys.argv[1]
-except IndexError:
-	print("Missing required argument: The project to write to")
-	print()
-	sys.exit(1)
+parser = argparse.ArgumentParser(description='Update firestore records.')
+parser.add_argument('--project', type=str, required=True,
+                    help='the canonical firestore project name')
+
+args = parser.parse_args()
 
 # Hacky sanity check
-if project not in ('paymenttoy', 'crafty-shade-837'):
+if args.project not in ('paymenttoy', 'crafty-shade-837'):
 	print("Unknown project? That's probably not right.")
 	print()
 	sys.exit(1)
 
 
 # GCloud configuration
-os.environ['GCLOUD_PROJECT'] = project
+os.environ['GCLOUD_PROJECT'] = args.project
 db = firestore.Client()
 
 
