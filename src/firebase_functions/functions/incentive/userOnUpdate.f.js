@@ -41,11 +41,23 @@ exports = module.exports = functions.firestore
 
         // Check if this is a newly incentivized user
         if ((newValue.incentivized != previousValue.incentivized) && (newValue.incentivized == true)) {
+            if (newValue.dwapp_install_time != undefined) {
+                todo.push(incentive.incentivize_once(user_id, timestamp, 'firstOpen', INCENTIVE_FIRSTOPEN_AMOUNT));
+            }
+        }
+        // Or if this is a user previously marked to incentivize who just installed the app
+        else if ((newValue.dwapp_install_time != previousValue.dwapp_install_time) && (newValue.incentived == true)) {
             todo.push(incentive.incentivize_once(user_id, timestamp, 'firstOpen', INCENTIVE_FIRSTOPEN_AMOUNT));
         }
 
         // Check if this is a newly powerwatch'd user
         if ((newValue.powerwatch != previousValue.powerwatch) && (newValue.powerwatch == true)) {
+            if (newValue.dwapp_install_time != undefined) {
+                todo.push(incentive.incentivize_once(user_id, timestamp, 'firstPowerwatch', INCENTIVE_FIRSTPOWERWATCH_AMOUNT));
+            }
+        }
+        // Or if this is a user previously marked with a powerwatch who just installed the app
+        else if ((newValue.dwapp_install_time != previousValue.dwapp_install_time) && (newValue.powerwatch == true)) {
             todo.push(incentive.incentivize_once(user_id, timestamp, 'firstPowerwatch', INCENTIVE_FIRSTPOWERWATCH_AMOUNT));
         }
 
