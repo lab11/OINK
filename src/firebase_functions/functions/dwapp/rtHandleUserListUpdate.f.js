@@ -17,14 +17,11 @@ exports = module.exports = functions.database.ref('/dwapp/user_list_update/{push
         // Check if this user already exists
         return db.collection('DWAPP_user_list').doc(data.user_id).get().then(doc => {
             if (doc.exists) {
-                // User already exists
-
-                return db.collection('DWAPP_user_list').doc(data.user_id).update({
-                    fcm_token: data.fcm_token,
-                });
+                // Update all the fields DWAPP_user_list, the update handler
+                // will validate that nothing meaningful changed
+                return db.collection('DWAPP_user_list').doc(data.user_id).update(data);
             } else {
-                // User doesn't exist??
-                console.error('Attempt to update a user that does not exist!', data.user_id);
+                console.error(`Attempt to update a user_id ${data.user_id}, but user does not exist!`);
 
                 return db.collection('OINK_alarms_db').add({
                     type: "error",

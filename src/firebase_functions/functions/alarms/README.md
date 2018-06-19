@@ -29,3 +29,12 @@ fields are included they will be added to the email:
   - `reason` - General string appended to the email
   - `user_id` - If there's a specific user associated with this alert
   - `tx_core_doc_id` - If there's a record from the transaction core
+
+
+manual
+------
+
+This collection is intended to act as a todo list. It's very free-form and
+serves as a catch-all for problems that are not programmatically addressed.
+Records added will automatically trigger an email. Users should clear records
+from this table as they are resolved.

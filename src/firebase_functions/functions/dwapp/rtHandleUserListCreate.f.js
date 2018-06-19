@@ -18,22 +18,11 @@ exports = module.exports = functions.database.ref('/dwapp/user_list_create/{push
         return db.collection('DWAPP_user_list').doc(data.user_id).get().then(doc => {
             if (doc.exists) {
                 // User already exists
-                console.error('Duplicate user creation!');
+                console.warn(`Create record for user_id ${data.user_id}, which already exists`);
 
-                // This is pretty unexpected, let's kick out an email
-                return db.collection('OINK_alarms_db').add({
-                    type: "error",
-                    user_id: data.user_id,
-                    reason: "Attempt to create a user that already exists (user reinstall?)",
-                }).then(() => {
-                    // Best guess is to mark them as active I suppose.
-                    // This should be a no-op of a write, but will trigger the
-                    // firestore function to update and ultimately mark the
-                    // user as active.
-                    return db.collection('DWAPP_user_list').doc(data.user_id).update({
-                        user_id: data.user_id,
-                    });
-                });
+                // Update all the fields DWAPP_user_list, the update handler
+                // will validate that nothing meaningful changed
+                return db.collection('DWAPP_user_list').doc(data.user_id).update(data);
             } else {
                 // New user
                 return db.collection('DWAPP_user_list').doc(data.user_id).set({
