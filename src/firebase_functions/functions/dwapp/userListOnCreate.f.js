@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const util = require('util');
 try {admin.initializeApp();} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
 
@@ -42,6 +43,7 @@ exports = module.exports = functions.firestore
                             phone_carrier: data.phone_carrier,
                         });
                     } else {
+                        console.log(util.inspect(docs, {depth: 0}));
                         var ids = [];
                         docs.forEach(doc => {
                             ids.push(doc.id);
