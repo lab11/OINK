@@ -16,5 +16,10 @@ exports = module.exports = functions.firestore
             type: 'error',
             title: `Manual Intervention Required: ${docId}`,
             reason: 'An error has occurred that requires manual intervention',
+        })
+        .then(() => {
+            return snapshot.ref.update({
+                record_timestamp: FieldValue.serverTimestamp(),
+            });
         });
     });
