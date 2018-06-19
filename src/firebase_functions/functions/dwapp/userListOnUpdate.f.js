@@ -15,5 +15,5 @@ exports = module.exports = functions.firestore
         const before = change.before.data();
         const after = change.after.data();
 
-        dwapp.onUpdate(before, after);
+        return dwapp.onUpdate(before, after);
     });
