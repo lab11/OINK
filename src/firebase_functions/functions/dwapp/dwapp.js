@@ -85,12 +85,14 @@ function onUpdate(before, after) {
         if (before.phone_imei != after.phone_imei) {
             return update_error('phone_imei', before, afterCopy, after);
         }
+        delete after.phone_imei;
     }
 
     if (after.phone_number != undefined) {
         if (before.phone_number != after.phone_number) {
             return update_error('phone_number', before, afterCopy, after);
         }
+        delete after.phone_number;
     }
 
     if (after.timestamp != undefined) {
@@ -102,6 +104,7 @@ function onUpdate(before, after) {
         if (before.user_id != after.user_id) {
             return update_error('user_id', before, afterCopy, after);
         }
+        delete after.user_id;
     }
 
     // Now verify there's nothing left that's changed
