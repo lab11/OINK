@@ -29,7 +29,7 @@ exports = module.exports = functions.firestore
             } else {
                 // Check whether a user with this phone number exists
                 return db.collection('OINK_user_list').where('phone_number', '==', data.phone_number).get().then(docs => {
-                    if (docs.length == 0) {
+                    if (docs.size == 0) {
                         // The normal case, create a new record
                         console.log(`Creating new record in OINK_user_list for ${user_id}`);
                         return db.collection('OINK_user_list').doc(user_id).set({
