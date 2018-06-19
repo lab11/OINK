@@ -7,9 +7,17 @@ import time
 import uuid
 
 import google
-from google.cloud import firestore
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
 
-parser = argparse.ArgumentParser(description='Update firestore records.')
+# FIRESTORE APPROACH
+#from google.cloud import firestore
+#os.environ['GCLOUD_PROJECT'] = args.project
+#db = firestore.Client()
+#user_list_ref = db.collection('DWAPP_user_list')
+
+parser = argparse.ArgumentParser(description='Create firebase realtime db records.')
 parser.add_argument('--project', type=str, required=True,
                     help='the canonical firestore project name')
 
@@ -22,9 +30,13 @@ if args.project not in ('paymenttoy', 'crafty-shade-837'):
 	sys.exit(1)
 
 
-# GCloud configuration
-os.environ['GCLOUD_PROJECT'] = args.project
-db = firestore.Client()
+# Authenticate to the firebase realtime db
+# https://firebase.google.com/docs/database/admin/start
+cred = credentials.Certificate('keys/{}.json'.format(args.project))
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://{}.firebaseio.com'.format(args.project),
+})
+
 
 
 # Copied from tockloader
@@ -88,7 +100,6 @@ def prompt(prompt, default=None):
 doing = menu(('Create', 'Update'), return_type='value')
 
 
-user_list_ref = db.collection('DWAPP_user_list')
 to_write = {}
 if doing == 'Create':
 	to_write['user_id'] = prompt('user_id', '111122223')
@@ -97,11 +108,11 @@ if doing == 'Create':
 	to_write['phone_number'] = prompt('phone_number', '111122223')
 	to_write['phone_imei'] = prompt('phone_imei', '24ffaabbccddee8')
 	to_write['phone_carrier'] = prompt('phone_carrier', 'MTN')
-	user_list_ref.document(to_write['user_id']).set(to_write)
+	new_ref = db.reference('/dwapp/user_list_create').push(to_write)
 elif doing == 'Update':
 	to_write['user_id'] = prompt('user_id', '111122223')
 	to_write['fcm_token'] = prompt('fcm_token', str(uuid.uuid4()))
-	user_list_ref.document(to_write['user_id']).update(to_write)
+	new_ref = db.reference('/dwapp/user_list_update').push(to_write)
 else:
 	raise NotImplementedError
 

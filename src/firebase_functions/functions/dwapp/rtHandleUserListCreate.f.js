@@ -18,7 +18,7 @@ exports = module.exports = functions.database.ref('/dwapp/user_list_create/{push
         return db.collection('DWAPP_user_list').doc(data.user_id).get().then(doc => {
             if (doc.exists) {
                 // User already exists
-                console.warn(`Create record for user_id ${user_id}, which already exists`);
+                console.warn(`Create record for user_id ${data.user_id}, which already exists`);
 
                 // Update all the fields DWAPP_user_list, the update handler
                 // will validate that nothing meaningful changed
