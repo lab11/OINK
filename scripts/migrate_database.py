@@ -7,6 +7,7 @@ import argparse
 import csv
 import os
 import sys
+import time
 
 import openpyxl
 
@@ -81,32 +82,55 @@ db = firestore.Client()
 # 			'stimulus_collection': 'OINK_stimulus_firstOpen',
 # 			})
 
-# Rename `OINK_tx_core_payment` to `OINK_payment_tx`
-docs = db.collection('OINK_tx_core_payment').get()
+# # Rename `OINK_tx_core_payment` to `OINK_payment_tx`
+# docs = db.collection('OINK_tx_core_payment').get()
+# for doc in docs:
+# 	print('Processing OINK_payment_tx/{}'.format(doc.id))
+# 	# id = doc.id; data = doc.to_dict()
+# 	if args.dry_run:
+# 		print('Would write {}/{} = {}'.format('OINK_payment_tx', doc.id, doc.to_dict()))
+# 	else:
+# 		db.collection('OINK_payment_tx').document(doc.id).set(doc.to_dict())
+# 
+# 	if args.dry_run:
+# 		print('Would delete {}/{}'.format('OINK_tx_core_payment', doc.id))
+# 	else:
+# 		doc.reference.delete()
+# 
+# # Rename `OINK_rx_core_payment` to `OINK_payment_rx`
+# docs = db.collection('OINK_rx_core_payment').get()
+# for doc in docs:
+# 	print('Processing OINK_payment_rx/{}'.format(doc.id))
+# 	# id = doc.id; data = doc.to_dict()
+# 	if args.dry_run:
+# 		print('Would write {}/{} = {}'.format('OINK_payment_rx', doc.id, doc.to_dict()))
+# 	else:
+# 		db.collection('OINK_payment_rx').document(doc.id).set(doc.to_dict())
+# 
+# 	if args.dry_run:
+# 		print('Would delete {}/{}'.format('OINK_rx_core_payment', doc.id))
+# 	else:
+# 		doc.reference.delete()
+
+# Add a 'dwapp_install_time' to `OINK_user_list`
+#
+# At this point in history, the only thing that could have created a 'timestamp'
+# entry was an app install. That will no longer be true after this migration.
+docs = db.collection('OINK_user_list').get()
+count = 0
+skips = 0
 for doc in docs:
-	print('Processing OINK_payment_tx/{}'.format(doc.id))
-	# id = doc.id; data = doc.to_dict()
+	data = doc.to_dict()
+	if 'dwapp_install_time' in data:
+		print('Skipping {} which already has dwapp_install_time'.format(doc.id))
+		skips += 1
+		continue
 	if args.dry_run:
-		print('Would write {}/{} = {}'.format('OINK_payment_tx', doc.id, doc.to_dict()))
+		print('Would add OINK_user_list/{} dwapp_install_time: {}'.format(doc.id, data['timestamp']))
 	else:
-		db.collection('OINK_payment_tx').document(doc.id).set(doc.to_dict())
-
-	if args.dry_run:
-		print('Would delete {}/{}'.format('OINK_tx_core_payment', doc.id))
-	else:
-		doc.reference.delete()
-
-# Rename `OINK_rx_core_payment` to `OINK_payment_rx`
-docs = db.collection('OINK_rx_core_payment').get()
-for doc in docs:
-	print('Processing OINK_payment_rx/{}'.format(doc.id))
-	# id = doc.id; data = doc.to_dict()
-	if args.dry_run:
-		print('Would write {}/{} = {}'.format('OINK_payment_rx', doc.id, doc.to_dict()))
-	else:
-		db.collection('OINK_payment_rx').document(doc.id).set(doc.to_dict())
-
-	if args.dry_run:
-		print('Would delete {}/{}'.format('OINK_rx_core_payment', doc.id))
-	else:
-		doc.reference.delete()
+		print('Updating {}'.format(doc.id))
+		doc.reference.update({'dwapp_install_time': data['timestamp']})
+	count += 1
+print('\nUpdated {}'.format(count))
+print('Skipped {}'.format(skips))
+print('Total   {}'.format(count+skips))

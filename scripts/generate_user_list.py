@@ -103,7 +103,7 @@ doing = menu(('Create', 'Update'), return_type='value')
 to_write = {}
 if doing == 'Create':
 	to_write['user_id'] = prompt('user_id', '111122223')
-	to_write['timestamp'] = prompt('timestamp', int(time.time()))
+	to_write['timestamp'] = prompt('timestamp', int(time.time()*1000))
 	to_write['payment_service'] = prompt('payment_service', 'korba')
 	to_write['phone_number'] = prompt('phone_number', '111122223')
 	to_write['phone_imei'] = prompt('phone_imei', '24ffaabbccddee8')

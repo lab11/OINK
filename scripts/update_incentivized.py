@@ -15,7 +15,10 @@ from google.cloud import firestore
 parser = argparse.ArgumentParser(description='Update firestore records.')
 parser.add_argument('--project', type=str, required=True,
                     help='the canonical firestore project name')
-parser.add_argument('--dry-run', '-n', action='store_true')
+parser.add_argument('--dry-run', '-n', action='store_true',
+                    help='do not actually write any records')
+parser.add_argument('--ignore-active', action='store_true',
+                    help='do not check whether user is active')
 
 source_group = parser.add_mutually_exclusive_group(required=True)
 source_group.add_argument('--file', type=str,
@@ -102,6 +105,10 @@ def got_doc(doc):
 			return
 	except KeyError:
 		pass
+
+	if not args.ignore_active:
+		if 'active' not in d or d['active'] != True:
+			raise NotImplementedError('Inactive user!')
 
 	print("{} '{}'".format(key.upper(), phone_number))
 	to_update = {key: True}

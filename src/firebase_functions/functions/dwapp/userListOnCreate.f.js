@@ -36,6 +36,7 @@ exports = module.exports = functions.firestore
                             active: true,
                             incentivized: false,
                             user_id: user_id,
+                            dwapp_install_time: FieldValue.serverTimestamp(),
                             timestamp: data.timestamp,
                             payment_service: data.payment_service,
                             phone_number: phone_number,
@@ -50,6 +51,7 @@ exports = module.exports = functions.firestore
                         });
                         return db.collection('OINK_alarms_manual').doc().set({
                             reason: 'App install for existing phone number but mismatched user_id',
+                            timestamp: FieldValue.serverTimestamp(),
                             user_id_created: user_id,
                             phone_number: phone_number,
                             found_docs: ids,
