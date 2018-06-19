@@ -1,3 +1,11 @@
+const admin = require('firebase-admin');
+const util = require('util');
+try {admin.initializeApp();} catch(e) {}
+ // You do that because the admin SDK can only be initialized once.
+
+//Creating a firebase object to navigate it:
+var db = admin.firestore();
+
 function normalize(number) {
     // Normalize phone numbers
     // TODO: This is very DumsorWatch-specific
@@ -28,7 +36,9 @@ function normalize(number) {
 }
 
 function update_error(why, before, after) {
-    console.error(`Attempt to update an illegal key. ${before} -> ${after}`);
+    const b = util.inspect(before);
+    const a = util.inspect(after);
+    console.error(`Attempt to update an illegal key. ${b} -> ${a}`);
     return db.collection('OINK_alarms_manual').doc().set({
         reason: `Attempt to update an illegal key. First differing key: ${why}`,
         before: before,
