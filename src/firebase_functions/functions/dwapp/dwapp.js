@@ -21,10 +21,10 @@ function normalize(number) {
         phone_number = phone_number.slice(3);
     }
     if (phone_number.length < 9) {
-        console.log('Phone number too short: ' + phone_number);
+        console.error('Phone number too short: ' + phone_number);
         return db.collection('OINK_alarms_db').add({
             timestamp: new Date().getTime(),
-            reason: `'Impossibly short phone number: ${phone_number}'`,
+            reason: `Impossibly short phone number: "${phone_number}"`,
         });
     }
     if (phone_number.length == 9) {
