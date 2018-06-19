@@ -37,10 +37,11 @@ function normalize(number) {
 
 function update_error(why, before, afterCopy, after) {
     const b = util.inspect(before);
-    const a = util.inspect(after);
+    const a = util.inspect(afterCopy);
     console.error(`Attempt to update an illegal key. ${b} -> ${a}`);
     return db.collection('OINK_alarms_manual').doc().set({
         reason: `Attempt to update an illegal key. First differing key: ${why}`,
+        timestamp: FieldValue.serverTimestamp(),
         before: before,
         afterCopy: afterCopy,
         after: after,
@@ -114,6 +115,11 @@ function onUpdate(before, after) {
     // https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object
     if (! (Object.keys(after).length === 0 && after.constructor === Object) ) {
         return update_error('Leftover Keys!', before, afterCopy, after);
+    }
+
+    // If we've never seen anything from the app before, mark this as the install time
+    if (before.dwapp_install_time == undefined) {
+        for_oink.dwapp_install_time = FieldValue.serverTimestamp();
     }
 
     // Good to go, let's update the real record.
