@@ -82,7 +82,10 @@ function onUpdate(before, after) {
     }
 
     if (after.phone_imei != undefined) {
-        if (before.phone_imei != after.phone_imei) {
+        if (before.phone_imei == undefined) {
+            // Allowed to add imei if missing
+            for_oink.phone_imei = after.phone_imei;
+        } else if (before.phone_imei != after.phone_imei) {
             return update_error('phone_imei', before, afterCopy, after);
         }
         delete after.phone_imei;
