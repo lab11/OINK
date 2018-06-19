@@ -108,7 +108,7 @@ def got_doc(doc):
 
 	if not args.ignore_active:
 		if 'active' not in d or d['active'] != True:
-			raise NotImplementedError('Inactive user!')
+			input('WARNING: Inactive user. Press any key to continue or Ctrl-C to cancel')
 
 	print("{} '{}'".format(key.upper(), phone_number))
 	to_update = {key: True}
