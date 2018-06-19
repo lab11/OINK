@@ -42,11 +42,15 @@ exports = module.exports = functions.firestore
                             phone_carrier: data.phone_carrier,
                         });
                     } else {
+                        var ids = [];
+                        docs.forEach(doc => {
+                            ids.push(doc.id);
+                        });
                         return db.collection('OINK_alarms_manual').doc().set({
                             reason: 'App install for existing phone number but mismatched user_id',
                             user_id_created: user_id,
                             phone_number: phone_number,
-                            found_docs: docs,
+                            found_docs: ids,
                         });
                     }
                 });
