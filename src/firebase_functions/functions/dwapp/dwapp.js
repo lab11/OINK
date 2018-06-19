@@ -35,13 +35,14 @@ function normalize(number) {
     return phone_number;
 }
 
-function update_error(why, before, after) {
+function update_error(why, before, afterCopy, after) {
     const b = util.inspect(before);
     const a = util.inspect(after);
     console.error(`Attempt to update an illegal key. ${b} -> ${a}`);
     return db.collection('OINK_alarms_manual').doc().set({
         reason: `Attempt to update an illegal key. First differing key: ${why}`,
         before: before,
+        afterCopy: afterCopy,
         after: after,
     });
 }
@@ -82,13 +83,13 @@ function onUpdate(before, after) {
 
     if (after.phone_imei != undefined) {
         if (before.phone_imei != after.phone_imei) {
-            return update_error('phone_imei', before, afterCopy);
+            return update_error('phone_imei', before, afterCopy, after);
         }
     }
 
     if (after.phone_number != undefined) {
         if (before.phone_number != after.phone_number) {
-            return update_error('phone_number', before, afterCopy);
+            return update_error('phone_number', before, afterCopy, after);
         }
     }
 
@@ -99,14 +100,14 @@ function onUpdate(before, after) {
 
     if (after.user_id != undefined) {
         if (before.user_id != after.user_id) {
-            return update_error('user_id', before, afterCopy);
+            return update_error('user_id', before, afterCopy, after);
         }
     }
 
     // Now verify there's nothing left that's changed
     // https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object
     if (! (Object.keys(after).length === 0 && after.constructor === Object) ) {
-        return update_error('user_id', before, afterCopy);
+        return update_error('Leftover Keys!', before, afterCopy, after);
     }
 
     // Good to go, let's update the real record.
