@@ -58,6 +58,8 @@ function do_payment(change, docId, data) {
                     namePaymentService = namePaymentService.charAt(0).toUpperCase() + namePaymentService.slice(1)
                     return change.after.ref.update({
                         status: 'pending',
+                        started_at: FieldValue.serverTimestamp(),
+                        timeout_ms: 1000 * 60 * 10, // 10 min, TODO: configuration parameter?
                         num_attempts: data.num_attempts + 1,
                     })
                     .then(() => {

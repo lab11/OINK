@@ -5,3 +5,6 @@ cron:
 - description: Daily trigger for any daily tasks
   url: /publish/tick-daily
   schedule: every day 00:00
+- description: Trigger periodic tasks, timer-like objects, etc
+  url: /publish/tick-periodic
+  schedule: every 5 minutes
