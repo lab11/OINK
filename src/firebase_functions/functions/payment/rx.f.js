@@ -75,7 +75,7 @@ exports = module.exports = functions.https
                 todo.push(db.collection('OINK_alarms_db').add({
                     timestamp: FieldValue.serverTimestamp(),
                     user_id: user_id,
-                    reason:`Transaction No. ${req.query.transaction_id} for ${type_doc} failed. ${req.query.message}`,
+                    reason:`Transaction ${req.query.transaction_id} failed. ${req.query.message}`,
                     tx_core_doc_id:tx_core_doc_id,
                 }));
                 todo.push(db.collection(stimulus_collection).doc(stimulus_doc_id).update({

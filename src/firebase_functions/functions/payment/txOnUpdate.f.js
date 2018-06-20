@@ -46,13 +46,12 @@ function do_payment(change, docId, data) {
                     // HTTP function based on the user payment service.
                     var userPaymentInfo = {}
                     userPaymentInfo['user_id'] = data.user_id;
-                    userPaymentInfo['type'] = data.type;
                     userPaymentInfo['payment_service'] = userPaymentData.payment_service;
                     userPaymentInfo['phone_number'] = userPaymentData.phone_number;
                     userPaymentInfo['phone_carrier'] = userPaymentData.phone_carrier;
                     userPaymentInfo['amount'] = data.amount;
                     userPaymentInfo['transaction_id'] = data.user_id + Math.random().toString(36).substr(2, 9);
-                    userPaymentInfo['description'] = 'payment of '+ userPaymentInfo.type +' to user : '+ userPaymentInfo.user_id;
+                    userPaymentInfo['description'] = `payment for ${userPaymentInfo.stimulus_collection} to user ${data.user_id}`;
                     console.log(`user payment info is: ${util.inspect(userPaymentInfo)}`);
 
                     var namePaymentService = userPaymentInfo.payment_service;
@@ -112,6 +111,10 @@ exports = module.exports = functions.firestore
     .document('OINK_payment_tx/{docId}').onUpdate((change, context) =>{
         const data = change.after.data();
         const docId = context.params.docId;
+
+        const _b = util.inspect(change.before.data(), {depth: 0});
+        const _a = util.inspect(change.after.data(), {depth: 0});
+        console.log(`Updated record: ${_b} -> ${_a}`);
 
         // Many payments trigger alerts on user phones, so we want to be
         // mindful of when we try to pay people. By default, payments start in
