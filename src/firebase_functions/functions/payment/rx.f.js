@@ -34,7 +34,7 @@ exports = module.exports = functions.https
         })
         // Logging on rx_core the result of the transaction
         .then(() => {
-            return db.collection('OINK_payment_rx').add({
+            const rx_to_add = {
                 user_id: user_id,
                 amount: amount,
                 stimulus_collection: stimulus_collection,
@@ -44,7 +44,9 @@ exports = module.exports = functions.https
                 status: req.query.status,
                 message: req.query.message,
                 timestamp: FieldValue.serverTimestamp(),
-            });
+            };
+            console.log(`Adding ${util.inspect(rx_to_add)}`);
+            return db.collection('OINK_payment_rx').add(rx_to_add);
         })
         .then(() => {
             // If confirmation from Korba successful, write on notification_db
@@ -76,7 +78,7 @@ exports = module.exports = functions.https
                     timestamp: FieldValue.serverTimestamp(),
                     user_id: user_id,
                     reason:`Transaction ${req.query.transaction_id} failed. ${req.query.message}`,
-                    tx_core_doc_id:tx_core_doc_id,
+                    tx_core_doc_id: tx_core_doc_id,
                 }));
                 todo.push(db.collection(stimulus_collection).doc(stimulus_doc_id).update({
                     status: 'failed',
