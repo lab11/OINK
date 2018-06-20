@@ -153,7 +153,7 @@ exports = module.exports = functions.firestore
             } else {
                 // Try again next payment tick.
                 const new_ref = db.collection('OINK_payment_tx').doc();
-                new_ref.set({
+                return new_ref.set({
                     user_id: data.user_id,
                     stimulus_doc_id: data.stimulus_doc_id,
                     stimulus_collection: data.stimulus_collection,
