@@ -157,7 +157,7 @@ exports = module.exports = functions.firestore
                     user_id: data.user_id,
                     stimulus_doc_id: data.stimulus_doc_id,
                     stimulus_collection: data.stimulus_collection,
-                    amount: amount,
+                    amount: data.amount,
                     retry: true,
                     last_tx_id: change.after.ref.id,
                     num_attempts: data.num_attempts,
