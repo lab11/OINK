@@ -17,6 +17,9 @@ exports = module.exports = functions.firestore
     .document('OINK_payment_tx/{docId}').onCreate((snapshot, context) =>{
         const data = snapshot.data();
 
+        const s = util.inspect(data, {depth: 0});
+        console.log(`Created record: ${s}`);
+
         to_update = {}
         // The only valid status for an external caller to set is
         // 'starting', to immediately trigger a payment. In most cases,

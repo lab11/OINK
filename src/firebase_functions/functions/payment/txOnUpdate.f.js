@@ -113,6 +113,10 @@ exports = module.exports = functions.firestore
         const data = change.after.data();
         const docId = context.params.docId;
 
+        const _b = util.inspect(change.before.data(), {depth: 0});
+        const _a = util.inspect(change.after.data(), {depth: 0});
+        console.log(`Updated record: ${_b} -> ${_a}`);
+
         // Many payments trigger alerts on user phones, so we want to be
         // mindful of when we try to pay people. By default, payments start in
         // the waiting state, and a future 'tick-payment' will update this to
