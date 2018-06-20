@@ -161,7 +161,7 @@ exports = module.exports = functions.firestore
                     retry: true,
                     last_tx_id: change.after.ref.id,
                     num_attempts: data.num_attempts,
-                    messages: messages,
+                    messages: data.messages,
                 })
                     .then(() => {
                         return change.after.ref.update({
