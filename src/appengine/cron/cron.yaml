@@ -3,3 +3,6 @@ cron:
   url: /publish/tick-payment
   schedule: every day 08:00
   timezone: GMT
+- description: Trigger periodic tasks, timer-like objects, etc
+  url: /publish/tick-periodic
+  schedule: every 5 minutes
