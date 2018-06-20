@@ -41,6 +41,7 @@ exports = module.exports = functions.https
                 stimulus_doc_id: stimulus_doc_id,
                 tx_core_doc_id: tx_core_doc_id,
                 transaction_id: req.query.transaction_id,
+                korba_trans_id: req.query.korba_trans_id,
                 status: req.query.status,
                 message: req.query.message,
                 timestamp: FieldValue.serverTimestamp(),
