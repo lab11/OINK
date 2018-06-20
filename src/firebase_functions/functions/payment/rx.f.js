@@ -56,7 +56,6 @@ exports = module.exports = functions.https
                 var todo = [];
 
                 // Update the status of the original stimulus record
-                // TODO: I actually think the notification to user should come from the stimulus record update anyway.
                 todo.push(db.collection(stimulus_collection).doc(stimulus_doc_id).update({
                     status: 'complete',
                     time_completed: FieldValue.serverTimestamp(),
