@@ -27,8 +27,10 @@ exports = module.exports = functions.firestore
         if (data.status != 'starting') {
             to_update.status = 'waiting';
         }
-        to_update.num_attempts = 0;
-        to_update.messages = [];
+        if (data.retry != true) {
+            to_update.num_attempts = 0;
+            to_update.messages = [];
+        }
 
         // On creation update internal record-keeping. An update call will
         // trigger right after this, which will trigger the actual payment
