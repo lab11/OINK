@@ -28,7 +28,7 @@ exports = module.exports = functions.pubsub.topic('tick-periodic').onPublish((me
                         started_at: FieldValue.serverTimestamp(),
                         timeout_ms: 1000 * 60 * 10, // 10 min, TODO: configuration parameter?
                     }));
-                } else if ((now - data.started_at.toMillis()) > data.timeout_ms) {
+                } else if ((now - Date.parse(data.started_at)) > data.timeout_ms) {
                     console.log(`Payment doc ${doc.id} timed out`);
                     writes.push(doc.ref.update({
                         status: 'error',
