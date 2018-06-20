@@ -93,7 +93,7 @@ function onUpdate(incentive, change, context) {
             }
 
             todo.push(db.collection('OINK_notifications_fcm').add({
-                user_id: user_id,
+                user_id: after.user_id,
                 title: 'Thank You!',
                 message: message,
                 timestamp: FieldValue.serverTimestamp(),
@@ -105,7 +105,7 @@ function onUpdate(incentive, change, context) {
         todo.push(db.collection('OINK_alarms_db').add({
             timestamp: FieldValue.serverTimestamp(),
             type: "error",
-            user_id: user_id,
+            user_id: after.user_id,
             reason: `Failed to incentive user for ${incentive}`,
         }));
     }
