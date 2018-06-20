@@ -1,7 +1,10 @@
 cron:
-- description: Push a "tick" onto pubsub every five minutes
+- description: Trigger processing of deferred payments
   url: /publish/tick-payment
-  schedule: every 5 minutes
+  schedule: every day 08:00
 - description: Daily trigger for any daily tasks
   url: /publish/tick-daily
   schedule: every day 00:00
+- description: Trigger periodic tasks, timer-like objects, etc
+  url: /publish/tick-periodic
+  schedule: every 5 minutes
