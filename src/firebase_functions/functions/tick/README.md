@@ -24,3 +24,12 @@ This task runs daily and performs any daily maintenance tasks. Currently:
   - User long-term incentives:
     - Increment `incentivized_days` if user still `incentived` and `active`
     - Increment `powerwatch_days` if user still `incentives` and `powerwatch`
+
+
+tick-periodic
+-------------
+
+This task runs periodically, for some reasonable definition of periodic
+(currently every 5 minutes in practice). Currently:
+
+  - Scan `pending` payments and possibly time them out

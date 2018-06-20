@@ -9,7 +9,7 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 // Promises to run once a day. No guarentees on when.
-exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((event) => {
+exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((message, event) => {
     var todo = [];
 
     todo.push(db.collection('OINK_user_list').get()
