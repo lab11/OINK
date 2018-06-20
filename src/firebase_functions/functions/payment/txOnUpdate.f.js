@@ -152,10 +152,29 @@ exports = module.exports = functions.firestore
                 });
             } else {
                 // Try again next payment tick.
-                return change.after.ref.update({
-                    status: 'waiting',
-                });
+                const new_ref = db.collection('OINK_payment_tx').doc();
+                new_ref.add({
+                    user_id: data.user_id,
+                    stimulus_doc_id: data.stimulus_doc_id,
+                    stimulus_collection: data.stimulus_collection,
+                    amount: amount,
+                    retry: true,
+                    last_tx_id: change.after.ref.id,
+                    num_attempts: data.num_attempts,
+                    messages: messages,
+                })
+                    .then(() => {
+                        return change.after.ref.update({
+                            status: 'retried',
+                            retry_tx_id: new_ref.id,
+                        });
+                    });
             }
+        }
+
+        // A new payment transaction is now responsible for this
+        if (data.status == 'retried') {
+            return null;
         }
 
         // If everything's failed, time to quit.
