@@ -123,6 +123,9 @@ function onUpdate(before, after) {
         for_oink.dwapp_install_time = FieldValue.serverTimestamp();
     }
 
+    // And mark the user as active
+    for_oink.active = true;
+
     // Good to go, let's update the real record.
     return db.collection('OINK_user_list').doc(before.user_id).update(for_oink);
 }
