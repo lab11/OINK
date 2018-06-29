@@ -10,13 +10,11 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 function doStimulus(incentive, ref, user_id, amount) {
-    const currentTimestamp = FieldValue.serverTimestamp();
-
     // TODO: This should be more robust, but is sufficient for DumsorWatch
     if ((amount == undefined) || (amount < 1) || (amount > 50)) {
         console.error(`'Impossible/unreasonable incentive amount: ${amount}'`);
         return db.collection('OINK_alarms_db').add({
-            timestamp: currentTimestamp,
+            timestamp: FieldValue.serverTimestamp(),
             type: "error",
             reason: `'Impossible/unreasonable incentive amount: ${amount}'`,
         });
@@ -39,7 +37,7 @@ function doStimulus(incentive, ref, user_id, amount) {
             }));
 
             todo.push(db.collection('OINK_alarms_db').add({
-                timestamp: currentTimestamp,
+                timestamp: FieldValue.serverTimestamp(),
                 type: "notification",
                 user_id: user_id,
                 reason: `'User is being incentivized for ${incentive}.'`,
@@ -50,7 +48,7 @@ function doStimulus(incentive, ref, user_id, amount) {
         else {
             console.error(`Stimulus for ${incentive} for user_id not in OINK_user_list`, user_id);
             return db.collection('OINK_alarms_db').add({
-                timestamp: currentTimestamp,
+                timestamp: FieldValue.serverTimestamp(),
                 type: "error",
                 user_id: user_id,
                 reason: `Stimulus for ${incentive} for user_id not in OINK_user_list`,
@@ -95,7 +93,7 @@ function onUpdate(incentive, change, context) {
             }
 
             todo.push(db.collection('OINK_notifications_fcm').add({
-                user_id: user_id,
+                user_id: after.user_id,
                 title: 'Thank You!',
                 message: message,
                 timestamp: FieldValue.serverTimestamp(),
@@ -105,9 +103,9 @@ function onUpdate(incentive, change, context) {
 
     if ((after.status == 'failed') && (before.status != 'failed')) {
         todo.push(db.collection('OINK_alarms_db').add({
-            timestamp: currentTimestamp,
+            timestamp: FieldValue.serverTimestamp(),
             type: "error",
-            user_id: user_id,
+            user_id: after.user_id,
             reason: `Failed to incentive user for ${incentive}`,
         }));
     }
