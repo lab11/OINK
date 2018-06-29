@@ -25,14 +25,18 @@ exports = module.exports = functions.database.ref('/dwapp/user_list_create/{push
                 return db.collection('DWAPP_user_list').doc(data.user_id).update(data);
             } else {
                 // New user
-                return db.collection('DWAPP_user_list').doc(data.user_id).set({
+                var to_set = {
                     user_id: data.user_id,
                     timestamp: data.timestamp,
                     payment_service: data.payment_service,
                     phone_number: data.phone_number,
                     phone_imei: data.phone_imei,
                     phone_carrier: data.phone_carrier,
-                });
+                };
+                if (data.fcm_token != undefined) {
+                    to_set.fcm_token = data.fcm_token;
+                }
+                return db.collection('DWAPP_user_list').doc(data.user_id).set(to_set);
             }
         });
     });
