@@ -43,20 +43,27 @@ for doc in docs:
 	count += 1
 	sys.stdout.write('\rProcessing user {}'.format(count))
 
-	# Never installed app
-	if 'dwapp_install_time' not in data:
-		if data.get('firstSurvey', False):
-			surveyed_no_app.append(data)
-		if data.get('incentivized', False):
-			marked_dw_no_app.append(data)
-		if data.get('powerwatch', False):
-			marked_pw_no_app.append(data)
+	try:
+		# Never installed app
+		if 'dwapp_install_time' not in data:
+			if data.get('firstSurvey', False):
+				surveyed_no_app.append(data)
+			if data.get('incentivized', False):
+				marked_dw_no_app.append(data)
+			if data.get('powerwatch', False):
+				marked_pw_no_app.append(data)
 
-	# Deleted app and in study
-	if 'dwapp_install_time' in data:
-		if data.get('incentivized', False):
-			if data['active'] == False:
-				marked_dw_deleted_app.append(data)
+		# Deleted app and in study
+		if 'dwapp_install_time' in data:
+			if data.get('incentivized', False):
+				if data['active'] == False:
+					marked_dw_deleted_app.append(data)
+	except:
+		print('\r' + '-'*80)
+		print(doc)
+		print(data)
+		raise
+
 sys.stdout.write('\r' + ' '*80 + '\r')
 
 print('There are {} total users in OINK'.format(count))
