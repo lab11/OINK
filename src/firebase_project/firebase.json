@@ -7,5 +7,18 @@
     "predeploy": [
       "npm --prefix \"$RESOURCE_DIR\" run lint"
     ]
+  },
+  "hosting": {
+    "predeploy": [
+      "pushd website && hugo"
+    ],
+    "public": "website/public",
+    "ignore": [
+      "firebase.json",
+      "firestore.indexes.json",
+      "firestore.rules",
+      "**/.*",
+      "**/node_modules/**"
+    ]
   }
 }
