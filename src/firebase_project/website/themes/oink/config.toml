@@ -1,0 +1,15 @@
+title = "The Open Incentive Kit"
+copyright = "(c) The Open Incentive Kit Development Team"
+
+theme = "hyde-y"
+
+[params]
+    topline = "An extensibe framework for simple, secure, robust, and reliable incentive-based studies."
+    footline = "https://github.com/lab11/oink"
+
+    # Sidebar position
+    # false, true, "left", "right"
+    sidebar = "left"
+
+    # Sidebar social links.
+    github = "lab11/oink"

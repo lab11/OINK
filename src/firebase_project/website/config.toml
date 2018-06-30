@@ -1,16 +1,6 @@
 baseURL = "https://paymenttoy.openincentivekit.com/"
 languageCode = "en-us"
 title = "The Open Incentive Kit"
-theme = "hyde-y"
+theme = "oink"
 copyright = "(c) The Open Incentive Kit Development Team"
 
-[params]
-    topline = "An extensibe framework for simple, secure, robust, and reliable incentive-based studies."
-    footline = "https://github.com/lab11/oink"
-
-    # Sidebar position
-    # false, true, "left", "right"
-    sidebar = "left"
-
-    # Sidebar social links.
-    github = "lab11/oink"
