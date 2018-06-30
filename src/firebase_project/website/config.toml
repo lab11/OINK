@@ -1,4 +1,4 @@
-baseURL = "https://openincentivekit.com/"
+baseURL = "https://paymenttoy.openincentivekit.com/"
 languageCode = "en-us"
 title = "The Open Incentive Kit"
 theme = "hyde-y"
