@@ -10,7 +10,7 @@
   },
   "hosting": {
     "predeploy": [
-      "pushd website && hugo"
+      "website/build.sh"
     ],
     "public": "website/public",
     "ignore": [
