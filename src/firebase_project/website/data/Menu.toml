@@ -1,0 +1,8 @@
+[about]
+    Name = "About"
+    URL = "/about"
+
+[posts]
+    Name = "Blog"
+    Title = "Show list of posts"
+    URL = "/post"
