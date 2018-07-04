@@ -11,7 +11,10 @@
   },
   "dependencies": {
     "camelcase": "^5.0.0",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
     "curlrequest": "^1.0.1",
+    "express": "^4.16.3",
     "firebase-admin": "^5.12.1",
     "firebase-functions": "^1.1.0",
     "glob": "^7.1.2",

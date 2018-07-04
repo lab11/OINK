@@ -1,0 +1,12 @@
+{{ partial "head" . }}
+{{ partial "logged-out" . }}
+<div id="auth-logged-in">
+  <article id="main-content" class="container main_content single">
+    {{ .Render "single.hat" }}
+    {{ .Render "single.content" }}
+    {{ .Render "single.boot" }}
+
+  <button id="auth-sign-out-button">Sign Out</button>
+  </article>
+</div>
+{{ partial "foot" . }}
