@@ -9,8 +9,13 @@ import time
 
 import openpyxl
 
-import google
-from google.cloud import firestore
+try:
+	import google
+	from google.cloud import firestore
+except ImportError:
+	print('pip install --upgrade google-cloud-firestore')
+	print()
+	raise
 
 parser = argparse.ArgumentParser(description='Update firestore records.')
 parser.add_argument('--project', type=str, required=True,
