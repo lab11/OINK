@@ -5,11 +5,21 @@
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-admin.initializeApp();
+try {admin.initializeApp();} catch(e) {}
 const express = require('express');
 const cookieParser = require('cookie-parser')();
 const cors = require('cors')({origin: true});
 const app = express();
+
+// XXX This should be somewhere better eventually
+const authorizedUsers = [
+  'pat.pannuto@gmail.com',
+  'ppannuto@berkeley.edu',
+  'nklugman@berkeley.edu',
+  'podolsky@berkeley.edu',
+  'scorreacardo@umass.edu',
+  'berkouwer@berkeley.edu',
+];
 
 // Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
 // The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
@@ -45,7 +55,14 @@ const validateFirebaseIdToken = (req, res, next) => {
   admin.auth().verifyIdToken(idToken).then((decodedIdToken) => {
     console.log('ID Token correctly decoded', decodedIdToken);
     req.user = decodedIdToken;
-    return next();
+
+    // Only allow from hardcoded list of users for now
+    if (authorizedUsers.indexOf(req.user.email) > -1) {
+      return next();
+    } else {
+      console.error('Request from unauthorized user: ' + req.user.email);
+      res.status(403).send('Unauthorized');
+    }
   }).catch((error) => {
     console.error('Error while verifying Firebase ID token:', error);
     res.status(403).send('Unauthorized');
@@ -59,11 +76,11 @@ app.get('/admin/hello', (req, res) => {
   res.send(`Hello (admin route) ${req.user.name}`);
 });
 app.get('/hello', (req, res) => {
-  res.send(`Hello (admin route) ${req.user.name}`);
+  res.send(`Hello (root route) ${req.user.name}`);
 });
 
 // This HTTPS endpoint can only be accessed by your Firebase Users.
 // Requests need to be authorized by providing an `Authorization` HTTP header
 // with value `Bearer <Firebase ID Token>`.
-exports.app = functions.https.onRequest(app);
-
+//exports.app = functions.https.onRequest(app);
+exports = module.exports = functions.https.onRequest(app);

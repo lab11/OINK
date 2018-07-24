@@ -12,7 +12,7 @@ function Auth() {
     this.loggedInDiv = document.getElementById('auth-logged-in');
     this.responseContainer = document.getElementById('demo-response');
     //this.helloUserUrl = window.location.href + 'hello';
-    this.helloUserUrl = 'http://localhost:5000/hello';
+    this.helloUserUrl = 'http://localhost:5001/paymenttoy/us-central1/websiteAdmin/hello';
 
     // Bind events.
     this.signInButton.addEventListener('click', this.signIn.bind(this));
