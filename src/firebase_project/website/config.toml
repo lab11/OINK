@@ -4,3 +4,7 @@ title = "The Open Incentive Kit"
 theme = "oink"
 copyright = "(c) The Open Incentive Kit Development Team"
 
+[params]
+  [params.oink]
+    firebase_api_key = "AIzaSyBO4ObG_dC_31Hng10GZWmfFry3mFz0bOA"
+    project = "paymenttoy"

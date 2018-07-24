@@ -3,11 +3,11 @@
 <script>
   // Initialize Firebase
   var config = {
-    apiKey: "AIzaSyBO4ObG_dC_31Hng10GZWmfFry3mFz0bOA",
-    authDomain: "paymenttoy.firebaseapp.com",
-    databaseURL: "https://paymenttoy.firebaseio.com",
-    projectId: "paymenttoy",
-    storageBucket: "paymenttoy.appspot.com",
+    apiKey: "{{ .Site.Params.oink.firebase_api_key }}",
+    authDomain: "{{ .Site.Params.oink.project }}.firebaseapp.com",
+    databaseURL: "https://{{ .Site.Params.oink.project }}.firebaseio.com",
+    projectId: "{{ .Site.Params.oink.project }}",
+    storageBucket: "{{ .Site.Params.oink.project }}.appspot.com",
     messagingSenderId: "473127682708"
   };
   firebase.initializeApp(config);
