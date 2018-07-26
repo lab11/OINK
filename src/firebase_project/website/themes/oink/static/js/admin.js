@@ -11,8 +11,7 @@ function Auth() {
     this.loggedOutDiv = document.getElementById('auth-logged-out');
     this.loggedInDiv = document.getElementById('auth-logged-in');
     this.responseContainer = document.getElementById('demo-response');
-    //this.helloUserUrl = window.location.href + 'hello';
-    this.helloUserUrl = 'http://localhost:5001/paymenttoy/us-central1/websiteAdmin/hello';
+    this.helloUserUrl = 'http://localhost:5001/paymenttoy/us-central1/websiteAdmin/api/v1/oink/payment/get-all-status/complete';
 
     // Bind events.
     this.signInButton.addEventListener('click', this.signIn.bind(this));
