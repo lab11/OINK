@@ -11,6 +11,7 @@
 
 // Need to load the app once up front to configure settings
 // TODO: Can we just pass this into the functions/modules instead then?
+const admin = require('firebase-admin');
 admin.initializeApp()
 var db = admin.firestore();
 db.settings({timestampsInSnapshots: true});
