@@ -14,6 +14,7 @@ exports = module.exports = functions.pubsub.topic('tick-periodic').onPublish((me
 
     var todo = [];
 
+    // Job that watches for payments to time out (no reply for payment request)
     todo.push(db.collection('OINK_payment_tx').where('status', '==', 'pending').get()
         .then(docs => {
             var writes = [];

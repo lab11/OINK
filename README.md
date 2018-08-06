@@ -23,23 +23,18 @@ started will require having your head reasonably well wrapped around the
 1. The first step is to install the [Firebase CLI tools](https://firebase.google.com/docs/cli/),
 be sure to follow the steps to log in to firebase too.
 
-2. Head to `src/firebase_functions` and create a file `.firebaserc`.
-This should be set to the canonical project name assigned to your project
-inside of firebase, as example:
+2. Oink deployments work via branches. The `master` branch is affiliated with
+no project. Currently the `dumsorwatch` branch represents the live code for the
+deployed DumsorWatch project and the `paymenttoy` branch is a test branch for
+running Oink code prior to deployment (and matches the PaymentToy google project).
 
-    ```bash
-    $ cat .firebaserc
-    {
-    "projects": {
-    "default": "oink-dumsorwatch"
-    }
-    }
-    ```
+  - If you want to test out a specific project:
 
-3. Now head to `src/firebase_functions/functions` and run
+      - Check out the appropriate branch (e.g. `git checkout paymenttoy`)
+      - Head to `src/firebase_project/functions` and run
 `firebase functions:config:get > .runtimeconfig.json`. **Careful**, these are
 private variables that are made available by the firebase environment, things
-such as passwords. Don't commit this file! (It's .gitignore'd).
+such as passwords. Don't commit this file! (It's .gitignored)
 
 > **NOTE: At this point, you've configured this directory to this project.
 > Changing branches _will not_ change to another project as these two magic
