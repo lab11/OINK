@@ -6,6 +6,11 @@ try {admin.initializeApp();} catch(e) {}
 
 // Creating a firebase object to navigate it:
 var db = admin.firestore();
+const settings = {
+    timestampsInSnapshots: true,
+};
+db.settings(settings);
+var FieldValue = admin.firestore.FieldValue;
 
 // Configuration
 INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
@@ -32,9 +37,7 @@ exports = module.exports = functions.firestore
         const newValue = change.after.data();
         const previousValue = change.before.data();
 
-        // n.b. Cannot use server timestamp due to API limitation:
-        // Error: FieldValue transformations are not supported inside of array values.
-        const timestamp = new Date().getTime();
+        const timestamp = FieldValue.serverTimestamp();
 
         // Collection of things to do
         var todo = []
