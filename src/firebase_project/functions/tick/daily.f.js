@@ -4,8 +4,9 @@ const util = require('util');
 try {admin.initializeApp();} catch(e) {}
  // You do that because the admin SDK can only be initialized once.
 
-//Creating a firebase object to navigate it:
-var db = admin.firestore({timestampsInSnapshots: true});
+// Creating a firebase object to navigate it:
+var db = admin.firestore();
+db.settings({timestampsInSnapshots: true});
 var FieldValue = admin.firestore.FieldValue;
 
 // Promises to run once a day. No guarentees on when.
