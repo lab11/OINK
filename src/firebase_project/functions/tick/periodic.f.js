@@ -11,7 +11,8 @@ var FieldValue = admin.firestore.FieldValue;
 // Promises to run reasonably often. No guarentees on when.
 exports = module.exports = functions.pubsub.topic('tick-periodic').onPublish((message, event) => {
     // This timestamp is of course not a `Timestamp`, so convert first
-    const timestamp = admin.firestore.Timestamp.fromDate(Date.parse(event.timestamp));
+    const millis = Date.parse(event.timestamp);
+    const timestamp = admin.firestore.Timestamp.fromMillis(millis);
     const now = timestamp.toMillis();
 
     var todo = [];
