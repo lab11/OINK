@@ -8,3 +8,4 @@ copyright = "(c) The Open Incentive Kit Development Team"
   [params.oink]
     firebase_api_key = "AIzaSyBO4ObG_dC_31Hng10GZWmfFry3mFz0bOA"
     project = "paymenttoy"
+    host = "http://localhost:5001/paymenttoy/us-central1/websiteAdmin/"

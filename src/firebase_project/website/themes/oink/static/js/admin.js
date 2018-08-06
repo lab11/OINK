@@ -11,7 +11,11 @@ function Auth() {
     this.loggedOutDiv = document.getElementById('auth-logged-out');
     this.loggedInDiv = document.getElementById('auth-logged-in');
     this.responseContainer = document.getElementById('demo-response');
-    this.helloUserUrl = 'http://localhost:5001/paymenttoy/us-central1/websiteAdmin/api/v1/oink/payment/get-all-status/complete';
+
+    // Configuration
+    // TODO: CURRENT STATUS, THIS IS IN /static SO CANT SUB VARIBLE
+    //this.firebaseHost = "{{ .Site.Params.oink.host }}";
+    this.firebaseHost = "http://localhost:5001/paymenttoy/us-central1/websiteAdmin/";
 
     // Bind events.
     this.signInButton.addEventListener('click', this.signIn.bind(this));
@@ -25,7 +29,14 @@ Auth.prototype.onAuthStateChanged = function(user) {
   if (user) {
     this.loggedOutDiv.style.display = 'none';
     this.loggedInDiv.style.display = 'block';
-    this.startFunctionsRequest();
+
+    // Once firebase is logged in, load all the panels that require authentication
+    $('.auth-required').each((index, elem) => {
+      this.request($(elem).attr('data-endpoint')).then((text) => {
+        console.log("Setting", elem, "to", text);
+        $(elem).text(text);
+      })
+    });
   } else {
     this.loggedOutDiv.style.display = 'block';
     this.loggedInDiv.style.display = 'none';
@@ -42,20 +53,19 @@ Auth.prototype.signOut = function() {
   firebase.auth().signOut();
 };
 
-// Does an authenticated request to a Firebase Functions endpoint using an Authorization header.
-Auth.prototype.startFunctionsRequest = function() {
-  firebase.auth().currentUser.getIdToken().then(function(token) {
-    console.log('Sending request to', this.helloUserUrl, 'with ID token in Authorization header.');
-    var req = new XMLHttpRequest();
-    req.onload = function() {
-      this.responseContainer.innerText = req.responseText;
-    }.bind(this);
-    req.onerror = function() {
-      this.responseContainer.innerText = 'There was an error';
-    }.bind(this);
-    req.open('GET', this.helloUserUrl, true);
-    req.setRequestHeader('Authorization', 'Bearer ' + token);
-    req.send();
+// Return a Promise that will give the result of the request
+Auth.prototype.request = function(endpoint) {
+  return firebase.auth().currentUser.getIdToken().then(function(token) {
+    const url = this.firebaseHost + endpoint;
+    return new Promise((resolve, reject) => {
+      console.log('Sending request to', url, 'with ID token in Authorization header.');
+      var req = new XMLHttpRequest();
+      req.onload = () => { resolve(req.responseText) };
+      req.onerror = () => { reject('request error') };
+      req.open('GET', url);
+      req.setRequestHeader('Authorization', 'Bearer ' + token);
+      req.send();
+    });
   }.bind(this));
 };
 

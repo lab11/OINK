@@ -1,3 +1,3 @@
 # Admin Interface
 
-Response: <span id="demo-response">...</span>
+Response: <span class="auth-required" data-endpoint="api/v1/oink/payment/get-all-status/complete">...</span>
