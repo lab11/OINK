@@ -42,17 +42,18 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                 */
 
                 const now = admin.firestore.Timestamp.now().toMillis();
+                let install_time = data.dwapp_install_time;
+                if (install_time instanceof admin.firestore.Timestamp) {
+                    install_time = install_time.toMillis();
+                }
+                const diff = now - install_time;
+                const days = diff / (1000 * 60 * 60 * 24);
 
                 // For now, just do math and update days:
                 if (data.incentivized && data.active) {
-                    const then = data.dwapp_install_time.toMillis();
-                    const diff = now - data.dwapp_install_time;
-                    const days = diff / (1000 * 60 * 60 * 24);
                     to_update.incentivized_days = days;
                 }
                 if (data.incentivized && data.powerwatch) {
-                    const diff = now - data.dwapp_install_time.toMillis();
-                    const days = diff / (1000 * 60 * 60 * 24);
                     to_update.powerwatch_days = days;
                 }
 
