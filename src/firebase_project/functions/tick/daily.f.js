@@ -50,6 +50,21 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                 const days = diff / (1000 * 60 * 60 * 24);
                 console.log(now, install_time, diff, days);
 
+                if (days > 365) {
+                    console.error("Unreasonable number of days -- bad timestamp?");
+                    writes.push(db.collection('OINK_alarms_manual').doc().set({
+                        reason: 'Unreasonable number of days -- bad timestamp?',
+                        timestamp: FieldValue.serverTimestamp(),
+                        now: now,
+                        install_time: install_time,
+                        diff: diff,
+                        days: days,
+                        data: data,
+                    }));
+                    return;
+                }
+
+
                 // For now, just do math and update days:
                 if (data.incentivized && data.active) {
                     to_update.incentivized_days = days;
