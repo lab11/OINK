@@ -57,7 +57,7 @@ exports = module.exports = functions.firestore
         if (data.timestamp) {
             body += `<b>Timestamp: </b> ${data.timestamp}<br>`;
         } else {
-            const now = new Date().getTime();
+            const now = admin.firestore.Timestamp.now();
             body += `<b>Timestamp: </b> ${now} -- Warn: Timestamp added by alarm layer, not reporting event. May be slightly delayed.<br>`;
         }
         if (data.reason) {

@@ -10,7 +10,7 @@ var FieldValue = admin.firestore.FieldValue;
 
 // Promises to run reasonably often. No guarentees on when.
 exports = module.exports = functions.pubsub.topic('tick-periodic').onPublish((message, event) => {
-    const now = Date.parse(event.timestamp);
+    const now = event.timestamp.toMillis();
 
     var todo = [];
 
@@ -29,11 +29,11 @@ exports = module.exports = functions.pubsub.topic('tick-periodic').onPublish((me
                         started_at: FieldValue.serverTimestamp(),
                         timeout_ms: 1000 * 60 * 10, // 10 min, TODO: configuration parameter?
                     }));
-                } else if ((now - Date.parse(data.started_at)) > data.timeout_ms) {
+                } else if ((now - data.started_at.toMillis()) > data.timeout_ms) {
                     console.log(`Payment doc ${doc.id} timed out`);
                     writes.push(doc.ref.update({
                         status: 'error',
-                        timeout_at: now,
+                        timeout_at: event.timestamp,
                     }));
                 } else {
                     console.log(`Payment doc ${doc.id} still waiting`);
