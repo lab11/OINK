@@ -47,7 +47,7 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                     install_time = install_time.toMillis();
                 }
                 const diff = now - install_time;
-                const days = diff / (1000 * 60 * 60 * 24);
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                 console.log(now, install_time, diff, days);
 
                 if (days > 365) {
