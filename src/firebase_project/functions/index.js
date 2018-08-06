@@ -8,6 +8,14 @@
  *   Based on this thread:
  *     https://github.com/firebase/functions-samples/issues/170
  */
+
+// Need to load the app once up front to configure settings
+// TODO: Can we just pass this into the functions/modules instead then?
+const admin = require('firebase-admin');
+admin.initializeApp()
+var db = admin.firestore();
+db.settings({timestampsInSnapshots: true});
+
 const dwapp = require("./dwapp/dwapp");
 const incentive = require("./incentive/incentive");
 const stimulus = require("./stimulus/stimulus");

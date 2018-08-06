@@ -10,10 +10,14 @@ var FieldValue = admin.firestore.FieldValue;
 
 // Promises to run reasonably often. No guarentees on when.
 exports = module.exports = functions.pubsub.topic('tick-periodic').onPublish((message, event) => {
-    const now = Date.parse(event.timestamp);
+    // This timestamp is of course not a `Timestamp`, so convert first
+    const millis = Date.parse(event.timestamp);
+    const timestamp = admin.firestore.Timestamp.fromMillis(millis);
+    const now = timestamp.toMillis();
 
     var todo = [];
 
+    // Job that watches for payments to time out (no reply for payment request)
     todo.push(db.collection('OINK_payment_tx').where('status', '==', 'pending').get()
         .then(docs => {
             var writes = [];
@@ -28,11 +32,11 @@ exports = module.exports = functions.pubsub.topic('tick-periodic').onPublish((me
                         started_at: FieldValue.serverTimestamp(),
                         timeout_ms: 1000 * 60 * 10, // 10 min, TODO: configuration parameter?
                     }));
-                } else if ((now - Date.parse(data.started_at)) > data.timeout_ms) {
+                } else if ((now - data.started_at.toMillis()) > data.timeout_ms) {
                     console.log(`Payment doc ${doc.id} timed out`);
                     writes.push(doc.ref.update({
                         status: 'error',
-                        timeout_at: now,
+                        timeout_at: timestamp,
                     }));
                 } else {
                     console.log(`Payment doc ${doc.id} still waiting`);

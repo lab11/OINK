@@ -23,7 +23,7 @@ function normalize(number) {
     if (phone_number.length < 9) {
         console.error('Phone number too short: ' + phone_number);
         return db.collection('OINK_alarms_db').add({
-            timestamp: new Date().getTime(),
+            timestamp: FieldValue.serverTimestamp(),
             reason: `Impossibly short phone number: "${phone_number}"`,
         });
     }

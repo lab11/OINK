@@ -6,6 +6,7 @@ try {admin.initializeApp();} catch(e) {}
 
 // Creating a firebase object to navigate it:
 var db = admin.firestore();
+var FieldValue = admin.firestore.FieldValue;
 
 // Configuration
 INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
@@ -32,9 +33,7 @@ exports = module.exports = functions.firestore
         const newValue = change.after.data();
         const previousValue = change.before.data();
 
-        // n.b. Cannot use server timestamp due to API limitation:
-        // Error: FieldValue transformations are not supported inside of array values.
-        const timestamp = new Date().getTime();
+        const timestamp = FieldValue.serverTimestamp();
 
         // Collection of things to do
         var todo = []
@@ -67,7 +66,10 @@ exports = module.exports = functions.firestore
         }
 
         // Check if this incentived user is due for a compliance incentive
+        // For the app...
         if (newValue.incentivized_days != previousValue.incentivized_days) {
+            console.log("New incentivized_days: ", newValue.incentivized_days);
+
             if (newValue.incentivized_days >= INCENTIVE_COMPLIANCEAPP_INTERVAL) {
                 // Look up any prior compliance stimuli
                 todo.push(db.collection('OINK_stimulus_complianceApp').where('user_id', '==', user_id).get().then(docs => {
@@ -83,15 +85,60 @@ exports = module.exports = functions.firestore
                         }
                     });
 
+                    console.log("last_day_count:", last_day_count);
+
                     if ((newValue.incentivized_days - last_day_count) >= INCENTIVE_COMPLIANCEAPP_INTERVAL) {
-                        const doc_name = user_id + '-' + newValue.incentivized_days;
+                        const day_id = newValue.incentivized_days - newValue.incentivized_days % INCENTIVE_COMPLIANCEAPP_INTERVAL;
+                        const doc_name = user_id + '-' + day_id;
+
+                        console.log("doc_name:", doc_name);
 
                         // TODO: should call incentivize_once here
                         return db.collection('OINK_stimulus_complianceApp').doc(doc_name).set({
                             user_id: user_id,
                             amount: INCENTIVE_COMPLIANCEAPP_AMOUNT,
                             timestamp: timestamp,
-                            day_count: newValue.incentivized_days,
+                            day_count: day_id,
+                        });
+                    }
+                }));
+            }
+        }
+
+        // Check if this incentived user is due for a compliance incentive
+        // For the powerwatch...
+        if (newValue.powerwatch_days != previousValue.powerwatch_days) {
+            console.log("New powerwatch_days:", newValue.powerwatch_days);
+
+            if (newValue.powerwatch_days >= INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL) {
+                // Look up any prior compliance stimuli
+                todo.push(db.collection('OINK_stimulus_compliancePowerwatch').where('user_id', '==', user_id).get().then(docs => {
+                    // n.b. cannot `orderBy` time or day because already filtering on 'user_id'
+                    // so instead, we'll iterate all the records, there won't be that many.
+                    var last_day_count = 0;
+
+                    docs.forEach(doc => {
+                        const data = doc.data();
+
+                        if (data.day_count > last_day_count) {
+                            last_day_count = data.day_count;
+                        }
+                    });
+
+                    console.log("last_day_count:", last_day_count);
+
+                    if ((newValue.incentivized_days - last_day_count) >= INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL) {
+                        const day_id = newValue.powerwatch_days - newValue.powerwatch_days % INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL;
+                        const doc_name = user_id + '-' + day_id;
+
+                        console.log("doc_name:", doc_name);
+
+                        // TODO: should call incentivize_once here
+                        return db.collection('OINK_stimulus_compliancePowerwatch').doc(doc_name).set({
+                            user_id: user_id,
+                            amount: INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT,
+                            timestamp: timestamp,
+                            day_count: day_id,
                         });
                     }
                 }));

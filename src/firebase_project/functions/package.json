@@ -2,6 +2,7 @@
   "name": "functions",
   "description": "Cloud Functions for Firebase",
   "scripts": {
+    "lint": "eslint .",
     "serve": "firebase serve --only functions",
     "shell": "firebase functions:config:get > .runtimeconfig.json && firebase functions:shell",
     "start": "npm run shell",
@@ -11,8 +12,8 @@
   "dependencies": {
     "camelcase": "^5.0.0",
     "curlrequest": "^1.0.1",
-    "firebase-admin": "^5.12.1",
-    "firebase-functions": "^1.0.4",
+    "firebase-admin": "^5.13.1",
+    "firebase-functions": "^2.0.2",
     "glob": "^7.1.2",
     "nodemailer": "^4.6.4",
     "request": "^2.85.0",

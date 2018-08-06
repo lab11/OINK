@@ -54,10 +54,15 @@ exports = module.exports = functions.firestore
             '<h2>Thank you for using OINK!</h2>' +
             '<p>An event has triggered one of your alarms. These are the details:</p>' +
             `<b>Alarm docId: </b> ${docId}<br>`;
+        // n.b. firestore.Timestamp doesn't pretty-print, so convert to a JS Date
         if (data.timestamp) {
-            body += `<b>Timestamp: </b> ${data.timestamp}<br>`;
+            let timestamp = data.timestamp;
+            if (timestamp instanceof admin.firestore.Timestamp) {
+                timestamp = timestamp.toDate();
+            }
+            body += `<b>Timestamp: </b> ${timestamp}<br>`;
         } else {
-            const now = new Date().getTime();
+            const now = admin.firestore.Timestamp.now().toDate();
             body += `<b>Timestamp: </b> ${now} -- Warn: Timestamp added by alarm layer, not reporting event. May be slightly delayed.<br>`;
         }
         if (data.reason) {

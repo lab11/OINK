@@ -1,0 +1,3 @@
+[submodule "src/firebase_project/website/themes/hyde-y"]
+	path = src/firebase_project/website/themes/hyde-y
+	url = https://github.com/enten/hyde-y
