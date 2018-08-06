@@ -66,7 +66,9 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
 
 
                 // For now, just do math and update days:
-                if (data.incentivized && data.active) {
+                //
+                // And only for the powerwatch users for now..
+                if (data.incentivized && data.active && data.powerwatch) {
                     to_update.incentivized_days = days;
                 }
                 if (data.incentivized && data.powerwatch) {
