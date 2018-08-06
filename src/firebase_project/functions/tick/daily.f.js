@@ -48,6 +48,7 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                 }
                 const diff = now - install_time;
                 const days = diff / (1000 * 60 * 60 * 24);
+                console.log(now, install_time, diff, days);
 
                 // For now, just do math and update days:
                 if (data.incentivized && data.active) {
