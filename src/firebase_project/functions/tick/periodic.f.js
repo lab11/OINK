@@ -8,7 +8,7 @@ try {admin.initializeApp();} catch(e) {}
 var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
-function timeoutStalledPayments(now, docs, state) {
+function timeoutStalledPayments(timestamp, docs, state) {
     console.log(`Checking for stalled payments in '${state}' state.`);
 
     var writes = [];
@@ -23,7 +23,7 @@ function timeoutStalledPayments(now, docs, state) {
                 started_at: FieldValue.serverTimestamp(),
                 timeout_ms: 1000 * 60 * 10, // 10 min, TODO: configuration parameter?
             }));
-        } else if ((now - data.started_at.toMillis()) > data.timeout_ms) {
+        } else if ((timestamp.toMillis() - data.started_at.toMillis()) > data.timeout_ms) {
             console.log(`Payment doc ${doc.id} timed out`);
             writes.push(doc.ref.update({
                 status: 'error',
@@ -43,14 +43,13 @@ exports = module.exports = functions.pubsub.topic('tick-periodic').onPublish((me
     // This timestamp is of course not a `Timestamp`, so convert first
     const millis = Date.parse(event.timestamp);
     const timestamp = admin.firestore.Timestamp.fromMillis(millis);
-    const now = timestamp.toMillis();
 
     var todo = [];
 
     // Job that watches for payments to time out (no reply for payment request)
     todo.push(db.collection('OINK_payment_tx').where('status', '==', 'pending').get()
         .then(docs => {
-            return timeoutStalledPayments(now, docs, 'pending');
+            return timeoutStalledPayments(timestamp, docs, 'pending');
         })
     );
 
@@ -62,7 +61,7 @@ exports = module.exports = functions.pubsub.topic('tick-periodic').onPublish((me
     // double-payment.
     todo.push(db.collection('OINK_payment_tx').where('status', '==', 'submitted').get()
         .then(docs => {
-            return timeoutStalledPayments(now, docs, 'submitted');
+            return timeoutStalledPayments(timestamp, docs, 'submitted');
         })
     );
 
