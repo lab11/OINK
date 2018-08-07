@@ -94,6 +94,7 @@ exports = module.exports = functions.firestore
             return snap.ref.set({status: "notified"}, {merge: true});
         }).catch(error => {
             console.error(`Error sending email to ${emails.join()}.`);
+            console.error(error);
             console.error(mailOptions);
             return snap.ref.set({status: "failed"}, {merge: true});
         })
