@@ -9,6 +9,8 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 function timeoutStalledPayments(now, docs, state) {
+    console.log(`Checking for stalled payments in '${state}' state.`);
+
     var writes = [];
 
     docs.forEach(doc => {
