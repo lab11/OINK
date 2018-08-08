@@ -1,2 +1,5 @@
 # Local cache of private info; careful!
 .runtimeconfig.json
+
+# Output of typescript build
+lib/
