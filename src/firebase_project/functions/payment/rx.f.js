@@ -10,19 +10,38 @@ var FieldValue = admin.firestore.FieldValue;
 
 exports = module.exports = functions.https
     .onRequest((req, res) => {
-        // Declaring variables of the document in tx_core_payment that triggered the payment.
-        var user_id;
-        var amount;
-        var stimulus_collection;
-        var stimulus_doc_id;
-        var tx_core_doc_id;
-
         console.log(util.inspect(req.query));
         console.log(req.query.transaction_id)
 
         // Getting the document in tx_core that matches the transaction id and updating the variables.
         return db.collection('OINK_payment_tx').where('transaction_id','==', req.query.transaction_id).get()
         .then(snapshot =>{
+            if (snapshot.empty) {
+                console.error('Korba completion called for missing transaction:', req.query.transaction_id);
+                console.error(req.query);
+                return db.collection('OINK_alarms_manual').doc().set({
+                    reason: `Korba completion for missing transaction_id: ${req.query.transaction_id}`,
+                    timestamp: FieldValue.serverTimestamp(),
+                    req: req,
+                });
+            }
+            if (snapshot.size != 1) {
+                console.error('Korba completion for duplicated transaction_id:', req.query.transaction_id);
+                console.error(req.query);
+                return db.collection('OINK_alarms_manual').doc().set({
+                    reason: `Korba completion for duplicated transaction_id: ${req.query.transaction_id}`,
+                    timestamp: FieldValue.serverTimestamp(),
+                    req: req,
+                    snapshot: snapshot,
+                });
+            }
+
+            let user_id;
+            let amount;
+            let stimulus_collection;
+            let stimulus_doc_id;
+            let tx_core_doc_id;
+
             snapshot.forEach(doc => {
                 user_id = doc.data().user_id;
                 amount = doc.data().amount;
@@ -31,9 +50,11 @@ exports = module.exports = functions.https
                 tx_core_doc_id = doc.id;
                 console.log(doc.id, " => ", doc.data());
             });
-        })
-        // Logging on rx_core the result of the transaction
-        .then(() => {
+
+
+            let todo = [];
+
+            // Logging on rx_core the result of the transaction
             const rx_to_add = {
                 user_id: user_id,
                 amount: amount,
@@ -41,20 +62,17 @@ exports = module.exports = functions.https
                 stimulus_doc_id: stimulus_doc_id,
                 tx_core_doc_id: tx_core_doc_id,
                 transaction_id: req.query.transaction_id,
-                korba_trans_id: req.query.korba_trans_id,
                 status: req.query.status,
                 message: req.query.message,
                 timestamp: FieldValue.serverTimestamp(),
             };
             console.log(`Adding ${util.inspect(rx_to_add)}`);
-            return db.collection('OINK_payment_rx').add(rx_to_add);
-        })
-        .then(() => {
+            todo.push(db.collection('OINK_payment_rx').add(rx_to_add));
+
+
             // If confirmation from Korba successful, write on notification_db
             // that triggers function of user notification.
             if (req.query.status == 'SUCCESS') {
-                var todo = [];
-
                 // Update the status of the original stimulus record
                 todo.push(db.collection(stimulus_collection).doc(stimulus_doc_id).update({
                     status: 'complete',
@@ -66,14 +84,10 @@ exports = module.exports = functions.https
                     status: 'complete',
                     time_completed: FieldValue.serverTimestamp(),
                 }));
-
-                return Promise.all(todo);
             }
             // If confirmation from Korba has fail status, write on alarms_db
             // that triggers function to send alarm to system admin.
             else {
-                var todo = [];
-
                 todo.push(db.collection('OINK_alarms_db').add({
                     timestamp: FieldValue.serverTimestamp(),
                     user_id: user_id,
@@ -88,9 +102,9 @@ exports = module.exports = functions.https
                     status: 'failed',
                     time_completed: FieldValue.serverTimestamp(),
                 }));
-
-                return Promise.all(todo);
             }
+
+            return Promise.all(todo);
         })
         .then(() => {
             res.status(200).send("OK");
