@@ -22,7 +22,7 @@ exports = module.exports = functions.https
                 return db.collection('OINK_alarms_manual').doc().set({
                     reason: `Korba completion for missing transaction_id: ${req.query.transaction_id}`,
                     timestamp: FieldValue.serverTimestamp(),
-                    req: req,
+                    req: `${util.inspect(req)}`,
                 });
             }
             if (snapshot.size != 1) {
@@ -31,7 +31,7 @@ exports = module.exports = functions.https
                 return db.collection('OINK_alarms_manual').doc().set({
                     reason: `Korba completion for duplicated transaction_id: ${req.query.transaction_id}`,
                     timestamp: FieldValue.serverTimestamp(),
-                    req: req,
+                    req: `${util.inspect(req)}`,
                     snapshot: snapshot,
                 });
             }
