@@ -63,7 +63,7 @@ app.post('/',function(req,res){
     .update(newArray) //This is the msg
     .digest('hex');
   request({
-    uri: 'https://korbaxchange.herokuapp.com/api/v1.0/topup/',
+    uri: 'https://xchange.korbaweb.com/api/v1.0/topup/',
     method: 'POST',
     headers:{
       'Content-Type':'application/json',

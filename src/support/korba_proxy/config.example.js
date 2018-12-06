@@ -24,7 +24,7 @@ config.port = 3111;
 // Korba keys
 //
 // Get from here:
-// https://korbaxchange.herokuapp.com/dashboard/api_credentials/
+// https://xchange.korbaweb.com/dashboard/api_credentials/
 config.korba = {
   secret_key: ,
   client_key: ,
