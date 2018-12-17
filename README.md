@@ -36,7 +36,7 @@ running Oink code prior to deployment (and matches the PaymentToy google project
 private variables that are made available by the firebase environment, things
 such as passwords. Don't commit this file! (It's .gitignored)
 
-> **NOTE: At this point, you've configured this directory to this project.
+> **NOTE:** At this point, you've configured this directory to this project.
 > Changing branches _will not_ change to another project as these two magic
 > hidden files are `.gitignore`d. Currently, we strongly advise one checkout
 > of this repo _for each_ firebase project you have.
