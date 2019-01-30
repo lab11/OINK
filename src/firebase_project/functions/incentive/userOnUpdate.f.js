@@ -70,37 +70,66 @@ exports = module.exports = functions.firestore
         if (newValue.incentivized_days != previousValue.incentivized_days) {
             console.log("New incentivized_days: ", newValue.incentivized_days);
 
+            // Okay, so for back pay I think there are two methods we might consider using
+            //
+            // We can either create an entirely new compliance - backpay category with a
+            // new backpay amount and an associated message...I kinda think this is very error-prone
+            // I'm a bit worried that people who already got paid will somehow end up in the backpay category
+            //
+            // We could also make is so that we just create ALL of the compliance payments
+            // that have not been created right here. Note that the current code just issues
+            // the most recent compliance payment (i.e. if we are at day 220, it will issue day 210 compliance)
+            // but we could make it issue all days not issued yet (i.e. days 30, 60, 90, ... 210 compliance)
+            // I tend to think this is better even though it means the users will receive multiple payments and text
             if (newValue.incentivized_days >= INCENTIVE_COMPLIANCEAPP_INTERVAL) {
                 // Look up any prior compliance stimuli
-                todo.push(db.collection('OINK_stimulus_complianceApp').where('user_id', '==', user_id).get().then(docs => {
+                var previous_stimuli = [];
+
+                //We might have to append multiple items, so I think we can use the spread operator here
+                todo.push(...db.collection('OINK_stimulus_complianceApp').where('user_id', '==', user_id).get().then(docs => {
                     // n.b. cannot `orderBy` time or day because already filtering on 'user_id'
                     // so instead, we'll iterate all the records, there won't be that many.
-                    var last_day_count = 0;
+                    //var last_day_count = 0;
 
                     docs.forEach(doc => {
                         const data = doc.data();
 
-                        if (data.day_count > last_day_count) {
-                            last_day_count = data.day_count;
-                        }
+                        previous_stimuli.push(data.day_count);
+
+                        //if (data.day_count > last_day_count) {
+                        //    last_day_count = data.day_count;
+                        //}
                     });
 
-                    console.log("last_day_count:", last_day_count);
+                    //console.log("last_day_count:", last_day_count);
+                    console.log("Previous stimuli issued:", previous_stimuli);
 
-                    if ((newValue.incentivized_days - last_day_count) >= INCENTIVE_COMPLIANCEAPP_INTERVAL) {
-                        const day_id = newValue.incentivized_days - newValue.incentivized_days % INCENTIVE_COMPLIANCEAPP_INTERVAL;
-                        const doc_name = user_id + '-' + day_id;
+                    //Okay find the last payment we should issue
+                    const max_day_id = newValue.incentivized_days - newValue.incentivized_days % INCENTIVE_COMPLIANCEAPP_INTERVAL;
 
-                        console.log("doc_name:", doc_name);
+                    //Now loop and create compliance records for every day until the last day
+                    //As long as those compliance records don't already exist
+                    toReturn = []
+                    for(var i = 1; i*INCENTIVE_COMPLIANCEAPP_INTERVAL <= max_day_id; i++) {
+                        if(previous_stimuli.indexOf(i*INCENTIVE_COMPLIANCEAPP_INTERVAL) == -1) {
+                            const day_id = i*INCENTIVE_COMPLIANCEAPP_INTERVAL
+                            const doc_name = user_id + '-' + day_id;
 
-                        // TODO: should call incentivize_once here
-                        return db.collection('OINK_stimulus_complianceApp').doc(doc_name).set({
-                            user_id: user_id,
-                            amount: INCENTIVE_COMPLIANCEAPP_AMOUNT,
-                            timestamp: timestamp,
-                            day_count: day_id,
-                        });
+                            console.log("doc_name:", doc_name);
+
+                            // TODO: should call incentivize_once here
+                            toReturn.push(db.collection('OINK_stimulus_complianceApp').doc(doc_name).set({
+                                user_id: user_id,
+                                amount: INCENTIVE_COMPLIANCEAPP_AMOUNT,
+                                timestamp: timestamp,
+                                day_count: day_id,
+                            }));
+                        }
                     }
+
+                    //now return the list, which will push multiple promises onto todo via the spread
+                    //operator above
+                    return toReturn;
                 }));
             }
         }

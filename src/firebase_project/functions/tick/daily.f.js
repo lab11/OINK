@@ -64,6 +64,16 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                     return;
                 }
 
+                //Okay so for backpay, I think the only thing we do here
+                //is make the number of incentivized days for all users match
+                //their install time noted in the survey
+                //
+                //The only confusing bit here is data.active -- when was this taken
+                //Since we aren't checking constantly whether the app installed
+                //is it meaningless?
+                if (data.incentivized && data.active) {
+                    to_update.incentivized_days = days;
+                }
 
                 // For now, just do math and update days:
                 //
