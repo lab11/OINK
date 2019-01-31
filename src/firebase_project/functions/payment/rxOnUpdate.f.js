@@ -39,7 +39,8 @@ exports = module.exports = functions.firestore
                         To: '+233' + phone_number,
                         From: 'GridWatch',
                         Body: MESSAGE_TEXT
-                        MessagingServiceSid: 'MG903f019d540c51a281440dd279453229'
+                        MessagingServiceSid: 'MG903f019d540c51a281440dd279453229',
+                        StatusCallback: INSTANCE_URI + '/paymentnotificationReceiver
                     },
                     username: 'AC8a918563320ddfb97ec59ecb64675ca8',
                     password: TWILIO_API_KEY
