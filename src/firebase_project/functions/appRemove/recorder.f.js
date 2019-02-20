@@ -11,6 +11,9 @@ var FieldValue = admin.firestore.FieldValue;
 exports = module.exports = functions.analytics.event('app_remove').onLog(event => {
     console.log(util.inspect(event));
 
+    //This could probably update a user with uninstall time, unless
+    //instead we use the app remove table to do that
+
     const s = util.inspect(event, {depth: null});
     const user_id = event.user.userId;
 

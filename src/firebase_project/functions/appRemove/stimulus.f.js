@@ -31,6 +31,8 @@ exports = module.exports = functions.firestore
 
         var user = db.collection('OINK_user_list').doc(user_id)
 
+        //we should add an uninstall time to the user
+        //just to make it more explicit that the app is uninstalled
         return user.update({active:false})
         .then(() => {
             return db.collection('OINK_user_activity').add({

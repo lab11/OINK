@@ -10,33 +10,39 @@ var FieldValue = admin.firestore.FieldValue;
 exports = module.exports = functions.database.ref('/dwapp/user_list_create/{pushId}')
     .onCreate((snapshot, context) => {
         // Grab the current value of what was written to the Realtime Database.
-        const data = snapshot.val();
+        
+        //The app is no longer creating OINK USERS! - Only surveyCTO is
+        //creating OINK users. We will use this space to associate
+        //the app with OINK users/verify we are receiving things from the
+        //app
 
-        console.log(data);
+        //const data = snapshot.val();
 
-        // Check if this user already exists
-        return db.collection('DWAPP_user_list').doc(data.user_id).get().then(doc => {
-            if (doc.exists) {
-                // User already exists
-                console.warn(`Create record for user_id ${data.user_id}, which already exists`);
+        //console.log(data);
 
-                // Update all the fields DWAPP_user_list, the update handler
-                // will validate that nothing meaningful changed
-                return db.collection('DWAPP_user_list').doc(data.user_id).update(data);
-            } else {
-                // New user
-                var to_set = {
-                    user_id: data.user_id,
-                    timestamp: data.timestamp,
-                    payment_service: data.payment_service,
-                    phone_number: data.phone_number,
-                    phone_imei: data.phone_imei,
-                    phone_carrier: data.phone_carrier,
-                };
-                if (data.fcm_token != undefined) {
-                    to_set.fcm_token = data.fcm_token;
-                }
-                return db.collection('DWAPP_user_list').doc(data.user_id).set(to_set);
-            }
-        });
+        //// Check if this user already exists
+        //return db.collection('DWAPP_user_list').doc(data.user_id).get().then(doc => {
+        //    if (doc.exists) {
+        //        // User already exists
+        //        console.warn(`Create record for user_id ${data.user_id}, which already exists`);
+
+        //        // Update all the fields DWAPP_user_list, the update handler
+        //        // will validate that nothing meaningful changed
+        //        return db.collection('DWAPP_user_list').doc(data.user_id).update(data);
+        //    } else {
+        //        // New user
+        //        var to_set = {
+        //            user_id: data.user_id,
+        //            timestamp: data.timestamp,
+        //            payment_service: data.payment_service,
+        //            phone_number: data.phone_number,
+        //            phone_imei: data.phone_imei,
+        //            phone_carrier: data.phone_carrier,
+        //        };
+        //        if (data.fcm_token != undefined) {
+        //            to_set.fcm_token = data.fcm_token;
+        //        }
+        //        return db.collection('DWAPP_user_list').doc(data.user_id).set(to_set);
+        //    }
+        //});
     });

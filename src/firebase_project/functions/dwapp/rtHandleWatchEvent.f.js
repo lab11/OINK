@@ -10,6 +10,10 @@ var FieldValue = admin.firestore.FieldValue;
 exports = module.exports = functions.database.ref('/dwapp/watch_event_create/{pushId}')
     .onCreate((snapshot, context) => {
         // Grab the current value of what was written to the Realtime Database.
+        
+        //We could use this to track whether the app is still installed
+        //with some time since reported field
+        
         const data = snapshot.val();
 
         console.log(data);
