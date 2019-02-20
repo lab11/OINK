@@ -13,6 +13,7 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
     var todo = [];
 
     // DW-specific: Job that monitors adherence incentives
+    // Also sends compliance incentives if that adherence has been met
     todo.push(db.collection('OINK_user_list').get()
         .then(docs => {
             var writes = [];
@@ -21,36 +22,25 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                 const data = doc.data();
                 var to_update = {};
 
-                /*
-
-                Ideally eventually something of this ilk here that's monitoring actual
-                compliance.
+                //Ideally eventually something of this ilk here that's monitoring actual
+                //compliance.
 
                 if (data.incentivized && data.active) {
-                    if (data.incentivized_days == undefined) {
-                        data.incentivized_days = 0;
+                    if (data.app_incentivized_days == undefined) {
+                        data.app_incentivized_days = 0;
                     }
-                    to_update.incentivized_days = data.incentivized_days + 1;
+                    to_update.dwapp_incentivized_days = data.dwapp_incentivized_days + 1;
                 }
 
+                //We could add some checks to see if powerwatch is active/plugged in here if we want
                 if (data.incentivized && data.powerwatch) {
-                    if (data.powerwatch_days == undefined) {
-                        data.powerwatch_days = 0;
+                    if (data.powerwatch_incentivized_days == undefined) {
+                        data.powerwatch_incentivized_days = 0;
                     }
-                    to_update.powerwatch_days = data.powerwatch_days + 1;
+                    to_update.powerwatch_incentivized_days = data.powerwatch_incentivized_days + 1;
                 }
-                */
 
-                const now = admin.firestore.Timestamp.now().toMillis();
-                let install_time = data.dwapp_install_time;
-                if (install_time instanceof admin.firestore.Timestamp) {
-                    install_time = install_time.toMillis();
-                }
-                const diff = now - install_time;
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                console.log(now, install_time, diff, days);
-
-                if (days > 365) {
+                /*if (days > 365) {
                     console.error("Unreasonable number of days -- bad timestamp?");
                     writes.push(db.collection('OINK_alarms_manual').doc().set({
                         reason: 'Unreasonable number of days -- bad timestamp?',
@@ -62,18 +52,7 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                         data: data,
                     }));
                     return;
-                }
-
-
-                // For now, just do math and update days:
-                //
-                // And only for the powerwatch users for now..
-                if (data.incentivized && data.active && data.powerwatch) {
-                    to_update.incentivized_days = days;
-                }
-                if (data.incentivized && data.powerwatch) {
-                    to_update.powerwatch_days = days;
-                }
+                }*/
 
                 if (Object.keys(to_update).length > 0) {
                     writes.push(doc.ref.update(to_update));

@@ -29,10 +29,12 @@ function doStimulus(incentive, ref, user_id, amount) {
                 status: 'pending',
             }));
 
+
             todo.push(db.collection('OINK_payment_tx').add({
                 user_id: user_id,
                 stimulus_doc_id: ref.id,
-                stimulus_collection: 'OINK_stimulus_' + incentive,
+                stimulus_incentive: incentive;
+                stimulus_collection: 'OINK_stimulus',
                 amount: amount,
             }));
 
@@ -57,19 +59,22 @@ function doStimulus(incentive, ref, user_id, amount) {
     });
 }
 
-function onCreate(incentive, snapshot, context) {
+function onCreate(snapshot, context) {
     const data = snapshot.data()
     const user_id = data.user_id;
     const amount = data.amount;
+    const incntive = data.incentive;
 
     return doStimulus(incentive, snapshot.ref, user_id, amount);
 }
 
-function onUpdate(incentive, change, context) {
+function onUpdate(change, context) {
     var todo = [];
 
     const before = change.before.data();
     const after = change.after.data();
+
+    var incentive = after.incentive;
 
     if ((after.status == 'complete') && (before.status != 'complete')) {
         if (after.notify == true) {

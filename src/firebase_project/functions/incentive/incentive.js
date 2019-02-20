@@ -9,20 +9,24 @@ var FieldValue = admin.firestore.FieldValue;
 // Handle the logic of creating a specific incentive, including de-dup checking
 //
 // Returns a promise chain to run
-function incentivize_once(user_id, timestamp, incentive, amount) {
+function incentivize_once(user_id, phone_number, network, timestamp, incentive, amount) {
     console.log(`'user_id ${user_id} just marked as eligible for ${incentive}'`);
 
-    const stimulus_collection = 'OINK_stimulus_' + incentive;
+    const stimulus_collection = 'OINK_stimulus';
+
+    var doc_name = user_id + '-' + phone_number + '-' + network + '-' + incentive;
 
     // Check if this user has been incentivized for this before
-    return db.collection(stimulus_collection).doc(user_id).get().then(doc => {
+    return db.collection(stimulus_collection).doc(doc_name).get().then(doc => {
         if (!doc.exists) {
             console.log(`'No ${stimulus_collection} for ${user_id}. Incentivizing.'`);
 
-            return db.collection(stimulus_collection).doc(user_id).set({
+
+            return db.collection(stimulus_collection).doc(doc_name).set({
                 user_id: user_id,
                 amount: amount,
                 timestamp: timestamp,
+                incentive: incentive
             })
                 .catch(err => {
                     console.error(`'Error adding document to ${stimulus_collection}'`, err);
@@ -33,10 +37,9 @@ function incentivize_once(user_id, timestamp, incentive, amount) {
             console.log(`'user_id ${user_id} already in ${stimulus_collection}:'`, doc.data());
             return null;
         }
+    }).catch(err => {
+        console.error(`'Error looking up previous ${incentive} for user.'`, err);
     })
-        .catch(err => {
-            console.error(`'Error looking up previous ${incentive} for user.'`, err);
-        })
 }
 
 module.exports.incentivize_once = incentivize_once;
