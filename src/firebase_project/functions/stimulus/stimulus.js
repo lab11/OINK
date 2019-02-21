@@ -63,7 +63,7 @@ function onCreate(snapshot, context) {
     const data = snapshot.data()
     const user_id = data.user_id;
     const amount = data.amount;
-    const incntive = data.incentive;
+    const incentive = data.incentive;
 
     return doStimulus(incentive, snapshot.ref, user_id, amount);
 }
