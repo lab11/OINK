@@ -40,6 +40,7 @@ exports = module.exports = functions.https
             let amount;
             let stimulus_collection;
             let stimulus_doc_id;
+            let stimulus_incentive;
             let tx_core_doc_id;
 
             snapshot.forEach(doc => {
@@ -47,6 +48,7 @@ exports = module.exports = functions.https
                 amount = doc.data().amount;
                 stimulus_collection = doc.data().stimulus_collection;
                 stimulus_doc_id = doc.data().stimulus_doc_id;
+                stimulus_incentive = doc.data().stimulus_incentive;
                 tx_core_doc_id = doc.id;
                 console.log(doc.id, " => ", doc.data());
             });
@@ -60,6 +62,7 @@ exports = module.exports = functions.https
                 amount: amount,
                 stimulus_collection: stimulus_collection,
                 stimulus_doc_id: stimulus_doc_id,
+                stimulus_incentive: stimulus_incentive,
                 tx_core_doc_id: tx_core_doc_id,
                 transaction_id: req.query.transaction_id,
                 status: req.query.status,
