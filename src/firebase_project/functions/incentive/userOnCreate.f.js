@@ -9,8 +9,8 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 // Configuration
-INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
-INCENTIVE_FIRSTPOWERWATCH_AMOUNT = functions.config().incentives.firstpowerwatch.amount;
+const INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
+const INCENTIVE_FIRSTPOWERWATCH_AMOUNT = functions.config().incentives.firstpowerwatch.amount;
 
 const incentive = require('./incentive');
 

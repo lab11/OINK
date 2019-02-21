@@ -33,7 +33,7 @@ function doStimulus(incentive, ref, user_id, amount) {
             todo.push(db.collection('OINK_payment_tx').add({
                 user_id: user_id,
                 stimulus_doc_id: ref.id,
-                stimulus_incentive: incentive;
+                stimulus_incentive: incentive,
                 stimulus_collection: 'OINK_stimulus',
                 amount: amount,
             }));

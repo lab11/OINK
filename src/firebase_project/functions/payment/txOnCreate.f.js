@@ -20,7 +20,7 @@ exports = module.exports = functions.firestore
         const s = util.inspect(data, {depth: 0});
         console.log(`Created record: ${s}`);
 
-        to_update = {}
+        var to_update = {};
         // The only valid status for an external caller to set is
         // 'starting', to immediately trigger a payment. In most cases,
         // this will likely be `undefined`.

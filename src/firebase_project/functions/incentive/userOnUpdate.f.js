@@ -9,12 +9,12 @@ var db = admin.firestore();
 var FieldValue = admin.firestore.FieldValue;
 
 // Configuration
-INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
-INCENTIVE_FIRSTPOWERWATCH_AMOUNT = functions.config().incentives.firstpowerwatch.amount;
-INCENTIVE_COMPLIANCEAPP_AMOUNT = functions.config().incentives.complianceapp.amount;
-INCENTIVE_COMPLIANCEAPP_INTERVAL = functions.config().incentives.complianceapp.interval;
-INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT = functions.config().incentives.compliancepowerwatch.amount;
-INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL = functions.config().incentives.compliancepowerwatch.interval;
+const INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
+const INCENTIVE_FIRSTPOWERWATCH_AMOUNT = functions.config().incentives.firstpowerwatch.amount;
+const INCENTIVE_COMPLIANCEAPP_AMOUNT = functions.config().incentives.complianceapp.amount;
+const INCENTIVE_COMPLIANCEAPP_INTERVAL = functions.config().incentives.complianceapp.interval;
+const INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT = functions.config().incentives.compliancepowerwatch.amount;
+const INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL = functions.config().incentives.compliancepowerwatch.interval;
 
 const incentive = require('./incentive');
 
@@ -72,7 +72,7 @@ exports = module.exports = functions.firestore
         if(typeof newValue.app_incentivized_days != 'undefined') {
             var number_of_incentives = Math.floor(newValue.app_incentivized_days/INCENTIVE_COMPLIANCEAPP_INTERVAL);
             for(var i = 1; i <= number_of_incentives; i++) {
-                let day_number = INCENTIVE_COMPLIANCE_INTERVAL * i;
+                let day_number = INCENTIVE_COMPLIANCEAPP_INTERVAL * i;
                 todo.push(incentive.incentivize_once(user_id, phone_number, network, timestamp, 'complianceApp-' + day_number.toString(), INCENTIVE_COMPLIANCEAPP_AMOUNT));
             }
         }
@@ -80,7 +80,7 @@ exports = module.exports = functions.firestore
         if(typeof newValue.powerwatch_incentivized_days != 'undefined') {
             var number_of_incentives = Math.floor(newValue.powerwatch_incentivized_days/INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL);
             for(var i = 1; i <= number_of_incentives; i++) {
-                let day_number = INCENTIVE_COMPLIANCE_INTERVAL * i;
+                let day_number = INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL * i;
                 todo.push(incentive.incentivize_once(user_id, phone_number, network, timestamp, 'compliancePowerwatch-' + day_number.toString(), INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT));
             }
         }
