@@ -13,4 +13,5 @@ exports = module.exports = functions.https
         //Log the payments new status I suppose?? I don't really know how the
         //callback will work
         console.log(req)
+        console.log(res)
 });

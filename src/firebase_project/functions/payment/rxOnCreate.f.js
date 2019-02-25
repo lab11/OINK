@@ -22,6 +22,7 @@ const INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amoun
 const INCENTIVE_FIRSTPOWERWATCH_AMOUNT = functions.config().incentives.firstpowerwatch.amount;
 const INCENTIVE_COMPLIANCEAPP_AMOUNT = functions.config().incentives.complianceapp.amount;
 const INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT = functions.config().incentives.compliancepowerwatch.amount;
+const TWILIO_CALLBACK = functions.config().twilio.callback;
 
 //The primary use of the real RX trigger is to issue SMS text messages once payments
 //have been completed - so we will need both an onCreate method and an onUpdate method
@@ -62,13 +63,14 @@ exports = module.exports = functions.firestore
                     });
                 }
 
+
                 console.log("Sending message to", phone_number, "with message", message);
-                    
-                 client.messages.create({
+
+                client.messages.create({
                         to: '+233' + phone_number,
                         from: 'GridWatch',
                         body: message,
-                        statusCallback: INSTANCE_URI + '/paymentnotificationReceiver'
+                        statusCallback: TWILIO_CALLBACK,
                  }).then((response) => {
                     //Write the result of that request to a final table about user notification
                     console.log(response.statusCode)
