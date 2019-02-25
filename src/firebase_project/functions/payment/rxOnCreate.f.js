@@ -35,16 +35,16 @@ exports = module.exports = functions.firestore
                 var phone_number = user_data.phone_number;
                 
                 let message;
-                if(data.incentive == 'firstOpen') {
+                if(data.stimulus_incentive == 'firstOpen') {
                     message = "Thank you for installing DumsorWatch! We have paid you ${INCENTIVE_FIRSTOPEN_AMOUNT} Cedis."
-                } else if (data.incentive == 'complianceApp') {
+                } else if (data.stimulus_incentive == 'complianceApp') {
                     message = "Thank you for keeping DumsorWatch installed! We have paid you ${INCENTIVE_COMPLIANEAPP_AMOUNT} Cedis."
-                } else if (data.incentive == 'firstPowerwatch') {
+                } else if (data.stimulus_incentive == 'firstPowerwatch') {
                     message = "Thank you for installing PowerWatch! We have paid you ${INCENTIVE_FIRSTPOWERWATCH_AMOUNT} Cedis."
-                } else if (data.incentive == 'compliancePowerwatch') {
+                } else if (data.stiumulus_incentive == 'compliancePowerwatch') {
                     message = "Thank you for keeping PowerWatch installed! We have paid you ${INCENTIVE_COMPLIANEPOWERWATCH_AMOUNT} Cedis."
                 } else {
-                    console.log('We dount know how to send a message for this incentive');
+                    console.log("We don't know how to send a message for this incentive");
                     return db.collection('OINK_alarms_db').add({
                         timestamp: FieldValue.serverTimestamp(),
                         user_id: data.user_id,
