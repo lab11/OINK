@@ -71,19 +71,19 @@ exports = module.exports = functions.firestore
                         from: 'GridWatch',
                         body: message,
                         statusCallback: TWILIO_CALLBACK,
-                 }).then((response) => {
+                 }).then(message => {
                     //Write the result of that request to a final table about user notification
-                    console.log(response.statusCode)
-                    console.log(response.body)
-                    return db.collection('OINK_payment_notification').add({
+                    console.log(message.status)
+                    console.log(message.error_code)
+                    return db.collection('OINK_payment_notification').doc(message.sid).set({
                         timestamp: FieldValue.serverTimestamp(),
                         user_id: data.user_id,
                         notification_method: 'Twilio',
-                        status: response.body.status,
-                        status_code: response.statusCode,
-                        message_id: response.body.sid,
-                        messaging_service_sid: response.body.messaging_service_sid
-                    }); 
+                        message_id: message.sid,
+                        message_uri: message.uri,
+                        rx_doc_id: docId,
+                        stimulus_doc_id: data.stimulus_doc_id
+                    }, {merge: true}); 
                  });
             });
         }
