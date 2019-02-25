@@ -19,7 +19,8 @@
     "request": "^2.85.0",
     "request-promise": "^4.2.2",
     "sort-object": "^3.0.2",
-    "util": "^0.10.3"
+    "util": "^0.10.3",
+    "twilio": "3.28.1"
   },
   "private": true
 }
