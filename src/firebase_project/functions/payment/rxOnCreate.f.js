@@ -52,7 +52,7 @@ exports = module.exports = functions.firestore
                 } else if (data.stiumulus_incentive == 'compliancePowerwatch') {
                     amount = INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT.toString();
                     message = "Thank you for keeping PowerWatch installed! We have paid you " + amount + "GHS."
-                } else 
+                } else {
                     console.log("We don't know how to send a message for this incentive");
                     return db.collection('OINK_alarms_db').add({
                         timestamp: FieldValue.serverTimestamp(),
@@ -83,34 +83,6 @@ exports = module.exports = functions.firestore
                         messaging_service_sid: response.body.messaging_service_sid
                     }); 
                  });
-
-                //Form the api request and issue request
-                /*return request({
-                    uri: 'https://api.twilio.com/2010-04-01/Accounts/AC8a918563320ddfb97ec59ecb64675ca8/Messages.json',
-                    method: 'POST',
-                    form: {
-                        To: '+233' + phone_number,
-                        From: 'GridWatch',
-                        Body: message,
-                        MessagingServiceSid: 'MG903f019d540c51a281440dd279453229',
-                        StatusCallback: INSTANCE_URI + '/paymentnotificationReceiver'
-                    },
-                    username: 'AC8a918563320ddfb97ec59ecb64675ca8',
-                    password: TWILIO_API_KEY
-                }).then((response) => {
-                    //Write the result of that request to a final table about user notification
-                    console.log(response.statusCode)
-                    console.log(response.body)
-                    return db.collection('OINK_payment_notification').add({
-                        timestamp: FieldValue.serverTimestamp(),
-                        user_id: data.user_id,
-                        notification_method: 'Twilio',
-                        status: response.body.status,
-                        status_code: response.statusCode,
-                        message_id: response.body.sid,
-                        messaging_service_sid: response.body.messaging_service_sid
-                    }); 
-                });*/
             });
         }
 });
