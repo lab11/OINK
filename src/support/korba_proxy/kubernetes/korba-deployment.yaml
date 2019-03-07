@@ -1,0 +1,60 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: korba-proxy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: korba-proxy
+    spec:
+      containers:
+        - name: korba-proxy
+          image: lab11/korba-proxy:latest
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 3111
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3111
+          volumeMounts:
+          - name: korba-secret
+            mountPath: /etc/config/
+            readOnly: true
+
+      volumes:
+      - name: korba-secret
+        secret:
+          secretName: korba-secret
+          items:
+          - key: korba.js
+            path: korba.js
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: korba-proxy
+  labels:
+    app: korba-proxy
+spec:
+  ports:
+   - port: 80
+     targetPort: 3111
+  selector:
+   app: korba-proxy
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: korba-proxy
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: korba-proxy
+spec:
+  backend:
+    serviceName: korba-proxy
+    servicePort: 80
+  tls:
+  - secretName: korba-proxy-tls

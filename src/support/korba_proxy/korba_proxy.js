@@ -4,7 +4,7 @@ var bodyParser = require("body-parser");
 const crypto = require('crypto');
 var express = require('express');
 var fs = require('fs');
-var https = require('https');
+var http = require('http');
 const request = require('request');
 const sortObj = require('sort-object');
 const sudoBlock = require('sudo-block');
@@ -17,29 +17,32 @@ sudoBlock();
 
 //////////////////////////////////////////////////////////////////////////////
 // Local configuration
-var config = require('./config');
+var command = require('commander');
+command.option('-k, --korba [korba]', 'Korba configuration file.').parse(process.argv);
 
-// Strip trailing '/' off path if needed
-if (config.certificate_path.slice(-1) == '/') {
-  config.certificate_path = config.certificate_path.slice(0,-1);
+if(typeof command.korba !== 'undefined') {
+    config = require(command.korba);
+} else {
+    config = require('./config');
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set up express app
 var app = express();
 
-// This is from the Node.js HTTPS documentation.
-var credentials = {
-  key: fs.readFileSync(`${config.certificate_path}/privkey.pem`),
-  cert: fs.readFileSync(`${config.certificate_path}/fullchain.pem`),
-};
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+//
 
-var httpsServer = https.createServer(credentials, app);
-httpsServer.listen(config.port);
+
+console.log('Starting http server on port 3111...');
+var httpServer = http.createServer(app);
+httpServer.listen(3111);
+
+app.get('/', function(req,res) {
+  res.send('OK');
+});
 
 app.post('/',function(req,res){
   var body = req.body;
@@ -63,7 +66,7 @@ app.post('/',function(req,res){
     .update(newArray) //This is the msg
     .digest('hex');
   request({
-    uri: 'https://korbaxchange.herokuapp.com/api/v1.0/topup/',
+    uri: 'https://xchange.korbaweb.com/api/v1.0/topup/',
     method: 'POST',
     headers:{
       'Content-Type':'application/json',

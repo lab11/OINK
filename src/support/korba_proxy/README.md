@@ -9,6 +9,10 @@ The proxy does a little sanity-checking and correction. Ideally, the higher
 layers would have handled these already, but no harm in applying some
 idempotent rules here.
 
+Previous version of this proxy relied on HTTPS locally - now we are going to 
+use a google cloud ingress to provide https so this has been removed. DO NOT
+RUN THIS PROXY as a standalone program.
+
 
 config.js
 ---------

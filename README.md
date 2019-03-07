@@ -36,7 +36,7 @@ running Oink code prior to deployment (and matches the PaymentToy google project
 private variables that are made available by the firebase environment, things
 such as passwords. Don't commit this file! (It's .gitignored)
 
-> **NOTE: At this point, you've configured this directory to this project.
+> **NOTE:** At this point, you've configured this directory to this project.
 > Changing branches _will not_ change to another project as these two magic
 > hidden files are `.gitignore`d. Currently, we strongly advise one checkout
 > of this repo _for each_ firebase project you have.
@@ -56,3 +56,19 @@ session).
 ### Digging in
 
 Head into the [src](src/README.md) to start learning about how Oink works.
+
+
+## License
+
+Licensed under either of
+
+ * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+at your option.
+
+### Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall
+be dual licensed as above, without any additional terms or conditions.

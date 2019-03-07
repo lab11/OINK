@@ -59,6 +59,6 @@ print()
 
 auth = hmac.new(bytes(sk, 'utf-8'), s.encode('ascii'), hashlib.sha256).hexdigest()
 
-print('curl -X POST -H "Content-Type: application/json" -H "Authorization: HMAC {}:{}" -d \'{}\' \'https://korbaxchange.herokuapp.com/api/v1.0/{}/\''.format(\
+print('curl -X POST -H "Content-Type: application/json" -H "Authorization: HMAC {}:{}" -d \'{}\' \'https://xchange.korbaweb.com/api/v1.0/{}/\''.format(\
 		ck, auth, json.dumps(stuff), endpoint
 		))

@@ -55,7 +55,7 @@ exports = module.exports = functions.https.onRequest((req, res) => {
     console.log(`The Disbursement API request is: ${util.inspect(jsonInfo)}`);
     console.log(util.inspect(reqBody));
     return request({
-            uri: 'https://korba.grid.watch/api',
+            uri: 'https://korba-proxy.powerwatch.io/api',
             method: 'POST',
             headers:{
             'Content-Type':'application/json',
@@ -74,7 +74,7 @@ exports = module.exports = functions.https.onRequest((req, res) => {
                 console.log('Status from korba: ', response.statusCode);
                 res.status(response.statusCode).send(response.body)
 
-        }).catch((error) => { 
+        }).catch((error) => {
             console.log(`This is the error: ${error}`)
             res.send(error)
         });
