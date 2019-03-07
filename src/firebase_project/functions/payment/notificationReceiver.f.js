@@ -14,17 +14,19 @@ exports = module.exports = functions.https
         //callback will work
         console.log(req.body.MessageStatus)
         console.log(req.body.MessageSid)
-        
+
         //look through the payment notifications and change the status
         var update = {status: req.body.MessageStatus};
         if(req.body.MessageStatus == 'delivered' || req.body.MessageStatus == 'failed' || req.body.MessageStatus == 'undelivered') {
             //Delivered is the final message so update
             db.collection("OINK_payment_notification").doc(req.body.MessageSid).set(update, {merge: true}).then(() =>{
                 console.log('Updated OINK notification with', update);
-                return res.status(200).send("OK");
+                return res.status(200).send("OK - logging status");
             }).catch(err => {
                 console.log(err);
-                return res.status(200).send("OK");
+                return res.status(200).send("OK - logging status");
             });
-        } 
-    });
+        } else {
+            return res.status(200).send("Received, but did not log status");
+        }
+});
