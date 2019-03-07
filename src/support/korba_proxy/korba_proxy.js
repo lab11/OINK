@@ -40,6 +40,10 @@ console.log('Starting http server on port 3111...');
 var httpServer = http.createServer(app);
 httpServer.listen(3111);
 
+app.get('/', function(req,res) {
+  res.send('OK');
+}
+
 app.post('/',function(req,res){
   var body = req.body;
   console.log(body);
