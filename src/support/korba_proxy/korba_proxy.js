@@ -42,7 +42,7 @@ httpServer.listen(3111);
 
 app.get('/', function(req,res) {
   res.send('OK');
-}
+});
 
 app.post('/',function(req,res){
   var body = req.body;
