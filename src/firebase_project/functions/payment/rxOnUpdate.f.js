@@ -17,11 +17,11 @@ var FieldValue = admin.firestore.FieldValue;
 
 const REGION = functions.config().general.region;
 const PROJECT = functions.config().general.project;
-const TWILIO_API_KEY = functions.config().twilio.api_key;
 const INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
 const INCENTIVE_FIRSTPOWERWATCH_AMOUNT = functions.config().incentives.firstpowerwatch.amount;
 const INCENTIVE_COMPLIANCEAPP_AMOUNT = functions.config().incentives.complianceapp.amount;
 const INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT = functions.config().incentives.compliancepowerwatch.amount;
+const TWILIO_CALLBACK = functions.config().twilio.callback;
 
 //The primary use of the real RX trigger is to issue SMS text messages once payments
 //have been completed - so we will need both an onCreate method and an onUpdate method
