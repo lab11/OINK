@@ -3,6 +3,12 @@ const admin = require('firebase-admin');
 const util = require('util');
 const request = require('request-promise');
 try {admin.initializeApp();} catch(e) {}
+const twilio = require('twilio');
+
+const TWILIO_API_KEY = functions.config().twilio.api_key;
+var accountSid = "AC6b6498d3c4f277a9ddbc16860d801a8d";
+var authToken = TWILIO_API_KEY;
+var client = new twilio(accountSid, authToken);
  // You do that because the admin SDK can only be initialized once.
 
 //Creating a firebase object to navigate it:
@@ -11,7 +17,6 @@ var FieldValue = admin.firestore.FieldValue;
 
 const REGION = functions.config().general.region;
 const PROJECT = functions.config().general.project;
-const INSTANCE_URI = 'https://'+REGION+'-'+PROJECT+'.cloudfunctions.net';
 const TWILIO_API_KEY = functions.config().twilio.api_key;
 const INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
 const INCENTIVE_FIRSTPOWERWATCH_AMOUNT = functions.config().incentives.firstpowerwatch.amount;
@@ -30,8 +35,8 @@ exports = module.exports = functions.firestore
         if(data_after.status == 'SUCCESS' && data_before.status != 'SUCCESS') {
             //Okay first we should get the user's phone number based on their userid
             return db.collection('OINK_user_list')
-                     .doc(data.user_id).get().then(user_data =>{     
-            
+                     .doc(data.user_id).get().then(user_data =>{
+
                 //Okay now we want to record the user's phone number for the SMS
                 var phone_number = user_data.phone_number;
 
@@ -54,33 +59,27 @@ exports = module.exports = functions.firestore
                     });
                 }
 
-                //Form the api request and issue request
-                return request({
-                    uri: 'https://api.twilio.com/2010-04-01/Accounts/AC8a918563320ddfb97ec59ecb64675ca8/Messages.json',
-                    method: 'POST',
-                    form: {
-                        To: '+233' + phone_number,
-                        From: 'GridWatch',
-                        Body: message,
-                        MessagingServiceSid: 'MG903f019d540c51a281440dd279453229',
-                        StatusCallback: INSTANCE_URI + '/paymentnotificationReceiver',
-                    },
-                    username: 'AC8a918563320ddfb97ec59ecb64675ca8',
-                    password: TWILIO_API_KEY
-                }).then((response) => {
+                console.log("Sending message to", phone_number, "with message", message);
+
+                client.messages.create({
+                        to: '+233' + phone_number,
+                        from: 'GridWatch',
+                        body: message,
+                        statusCallback: TWILIO_CALLBACK,
+                 }).then(message => {
                     //Write the result of that request to a final table about user notification
-                    console.log(response.statusCode)
-                    console.log(response.body)
-                    return db.collection('OINK_payment_notification').add({
+                    console.log(message.status)
+                    console.log(message.error_code)
+                    return db.collection('OINK_payment_notification').doc(message.sid).set({
                         timestamp: FieldValue.serverTimestamp(),
                         user_id: data.user_id,
                         notification_method: 'Twilio',
-                        status: response.body.status,
-                        status_code: response.statusCode,
-                        message_id: response.body.sid,
-                        messaging_service_sid: response.body.messaging_service_sid
-                    }); 
-                });
+                        message_id: message.sid,
+                        message_uri: message.uri,
+                        rx_doc_id: docId,
+                        stimulus_doc_id: data.stimulus_doc_id
+                    }, {merge: true});
+                 });
             });
         }
 });

@@ -6,7 +6,7 @@ try {admin.initializeApp();} catch(e) {}
 const twilio = require('twilio');
 
 const TWILIO_API_KEY = functions.config().twilio.api_key;
-var accountSid = "AC8a918563320ddfb97ec59ecb64675ca8";
+var accountSid = "AC6b6498d3c4f277a9ddbc16860d801a8d";
 var authToken = TWILIO_API_KEY;
 var client = new twilio(accountSid, authToken);
  // You do that because the admin SDK can only be initialized once.
@@ -17,7 +17,6 @@ var FieldValue = admin.firestore.FieldValue;
 
 const REGION = functions.config().general.region;
 const PROJECT = functions.config().general.project;
-const INSTANCE_URI = 'https://'+REGION+'-'+PROJECT+'.cloudfunctions.net';
 const INCENTIVE_FIRSTOPEN_AMOUNT = functions.config().incentives.firstopen.amount;
 const INCENTIVE_FIRSTPOWERWATCH_AMOUNT = functions.config().incentives.firstpowerwatch.amount;
 const INCENTIVE_COMPLIANCEAPP_AMOUNT = functions.config().incentives.complianceapp.amount;
@@ -35,11 +34,11 @@ exports = module.exports = functions.firestore
         if(data.status == 'SUCCESS') {
             //Okay first we should get the user's phone number based on their userid
             return db.collection('OINK_user_list')
-                     .doc(data.user_id).get().then(user_data =>{     
-            
+                     .doc(data.user_id).get().then(user_data =>{
+
                 //Okay now we want to record the user's phone number for the SMS
                 var phone_number = user_data.data().phone_number;
-                
+
                 let message;
                 if(data.stimulus_incentive == 'firstOpen') {
                     amount = INCENTIVE_FIRSTOPEN_AMOUNT.toString();
@@ -83,7 +82,7 @@ exports = module.exports = functions.firestore
                         message_uri: message.uri,
                         rx_doc_id: docId,
                         stimulus_doc_id: data.stimulus_doc_id
-                    }, {merge: true}); 
+                    }, {merge: true});
                  });
             });
         }
