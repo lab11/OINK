@@ -4,7 +4,8 @@
   "description": "Proxy for Korba Exchange API",
   "main": "korba_proxy.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "./korba_proxy.js -k /etc/config/korba.js"
   },
   "keywords": [
     "korba",
@@ -14,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "commander": "",
     "express": "^4.16.3",
     "request": "^2.87.0",
     "sort-object": "^3.0.2",
