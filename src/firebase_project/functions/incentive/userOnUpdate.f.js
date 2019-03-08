@@ -49,12 +49,12 @@ exports = module.exports = functions.firestore
 
         //created with just an app install -> Pay them for first install
         if (newValue.incentivized && newValue.app_installed) {
-            todo.push(incentive.incentivize_once(user_id, phone_number, network, timestamp, 'firstOpen', INCENTIVE_FIRSTOPEN_AMOUNT));
+            //todo.push(incentive.incentivize_once(user_id, phone_number, network, timestamp, 'firstOpen', INCENTIVE_FIRSTOPEN_AMOUNT));
         }
 
         //created with an app install and powerwatch -> incentivize them for both
         if (newValue.incentivized &&  newValue.powerwatch_installed){
-            todo.push(incentive.incentivize_once(user_id, phone_number, network, timestamp, 'firstPowerwatch', INCENTIVE_FIRSTPOWERWATCH_AMOUNT));
+            //todo.push(incentive.incentivize_once(user_id, phone_number, network, timestamp, 'firstPowerwatch', INCENTIVE_FIRSTPOWERWATCH_AMOUNT));
         }
 
         //created but not active -> This user should not be incentivized
@@ -65,7 +65,7 @@ exports = module.exports = functions.firestore
         //Again we strictly DO NOT need to worry about double paying
         //because records cannot be created twice and we don't update
         //records that exist
-        
+
         //Find the number of incentives that should be issued and issue them
         //based on the number of days
 
@@ -84,6 +84,6 @@ exports = module.exports = functions.firestore
                 todo.push(incentive.incentivize_once(user_id, phone_number, network, timestamp, 'compliancePowerwatch-' + day_number.toString(), INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT));
             }
         }
-            
+
         return Promise.all(todo);
 });
