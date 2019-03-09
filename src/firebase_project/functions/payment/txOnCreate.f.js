@@ -7,7 +7,6 @@ try {admin.initializeApp();} catch(e) {}
 
 //Creating a firebase object to navigate it:
 var db = admin.firestore();
-var FieldValue = admin.firestore.FieldValue;
 
 const REGION = functions.config().general.region;
 const PROJECT = functions.config().general.project;

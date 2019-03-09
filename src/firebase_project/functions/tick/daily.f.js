@@ -26,33 +26,18 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                 //compliance.
 
                 if (data.incentivized && data.active) {
-                    if (data.app_incentivized_days == undefined) {
-                        data.app_incentivized_days = 0;
-                    }
-                    to_update.dwapp_incentivized_days = data.dwapp_incentivized_days + 1;
+                    //update the number of incentivized days
+                    console.log(Date.now())
+                    console.log(data.app_install_time)
+                    to_update.app_incentivized_days = Math.round((Date.now() - data.app_install_time)/1000/(24*3600));
                 }
 
                 //We could add some checks to see if powerwatch is active/plugged in here if we want
                 if (data.incentivized && data.powerwatch) {
-                    if (data.powerwatch_incentivized_days == undefined) {
-                        data.powerwatch_incentivized_days = 0;
-                    }
-                    to_update.powerwatch_incentivized_days = data.powerwatch_incentivized_days + 1;
+                    console.log(Date.now())
+                    console.log(data.powerwatch_install_time)
+                    to_update.powerwatch_incentivized_days = Math.round((Date.now() - data.powerwatch_install_time)/1000/(24*3600));
                 }
-
-                /*if (days > 365) {
-                    console.error("Unreasonable number of days -- bad timestamp?");
-                    writes.push(db.collection('OINK_alarms_manual').doc().set({
-                        reason: 'Unreasonable number of days -- bad timestamp?',
-                        timestamp: FieldValue.serverTimestamp(),
-                        now: now,
-                        install_time: install_time,
-                        diff: diff,
-                        days: days,
-                        data: data,
-                    }));
-                    return;
-                }*/
 
                 if (Object.keys(to_update).length > 0) {
                     writes.push(doc.ref.update(to_update));
