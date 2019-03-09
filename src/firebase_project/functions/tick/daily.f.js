@@ -25,7 +25,7 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                 //Ideally eventually something of this ilk here that's monitoring actual
                 //compliance.
 
-                if (data.incentivized && data.active) {
+                if (data.incentivized && data.app_installed) {
                     //update the number of incentivized days
                     console.log(Date.now())
                     console.log(data.app_install_time)
@@ -33,7 +33,7 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                 }
 
                 //We could add some checks to see if powerwatch is active/plugged in here if we want
-                if (data.incentivized && data.powerwatch) {
+                if (data.incentivized && data.powerwatch_installed) {
                     console.log(Date.now())
                     console.log(data.powerwatch_install_time)
                     to_update.powerwatch_incentivized_days = Math.round((Date.now() - data.powerwatch_install_time)/1000/(24*3600));
