@@ -1,11 +1,12 @@
 cron:
 - description: Trigger processing of deferred payments
   url: /publish/tick-payment
-  schedule: every day 08:00
+  schedule: every day 11:00
   timezone: GMT
 - description: Daily trigger for any daily tasks
   url: /publish/tick-daily
-  schedule: every day 00:00
+  schedule: every day 08:00
+  timezone: GMT
 - description: Trigger periodic tasks, timer-like objects, etc
   url: /publish/tick-periodic
   schedule: every 5 minutes
