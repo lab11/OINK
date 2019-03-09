@@ -28,15 +28,17 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                 if (data.incentivized && data.app_installed) {
                     //update the number of incentivized days
                     console.log(Date.now())
-                    console.log(data.app_install_time)
-                    to_update.app_incentivized_days = Math.round((Date.now() - data.app_install_time)/1000/(24*3600));
+                    console.log(data.app_install_time.toDate())
+                    console.log(Date.now() - data.app_install_time.toDate())
+                    to_update.app_incentivized_days = Math.round((Date.now() - data.app_install_time.toDate())/1000/(24*3600));
                 }
 
                 //We could add some checks to see if powerwatch is active/plugged in here if we want
                 if (data.incentivized && data.powerwatch_installed) {
                     console.log(Date.now())
-                    console.log(data.powerwatch_install_time)
-                    to_update.powerwatch_incentivized_days = Math.round((Date.now() - data.powerwatch_install_time)/1000/(24*3600));
+                    console.log(data.powerwatch_install_time.toDate())
+                    console.log(Date.now() - data.powerwatch_install_time.toDate())
+                    to_update.powerwatch_incentivized_days = Math.round((Date.now() - data.powerwatch_install_time.toDate())/1000/(24*3600));
                 }
 
                 if (Object.keys(to_update).length > 0) {
