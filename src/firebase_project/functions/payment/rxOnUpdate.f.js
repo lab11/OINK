@@ -22,6 +22,7 @@ const INCENTIVE_FIRSTPOWERWATCH_AMOUNT = functions.config().incentives.firstpowe
 const INCENTIVE_COMPLIANCEAPP_AMOUNT = functions.config().incentives.complianceapp.amount;
 const INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT = functions.config().incentives.compliancepowerwatch.amount;
 const TWILIO_CALLBACK = functions.config().twilio.callback;
+const PHONE_NUMBER = functions.config().twilio.phone_number
 
 //The primary use of the real RX trigger is to issue SMS text messages once payments
 //have been completed - so we will need both an onCreate method and an onUpdate method
@@ -47,12 +48,12 @@ exports = module.exports = functions.firestore
                     amount = INCENTIVE_FIRSTOPEN_AMOUNT.toString();
                     message = "Thank you for installing DumsorWatch! We have paid you " + amount + "GHS."
                 } else if (incentive == 'complianceApp') {
-                    message = "Thank you for participating in GridWatch. We have sent you airtime for your participation. If you have questions please contact 024 6536896"
+                    message = "Thank you for participating in GridWatch. We have sent you airtime for your participation. If you have questions please contact " + PHONE_NUMBER;
                 } else if (incentive == 'firstPowerwatch') {
                     amount = INCENTIVE_FIRSTPOWERWATCH_AMOUNT.toString();
                     message = "Thank you for installing PowerWatch! We have paid you " + amount + "GHS."
                 } else if (incentive == 'compliancePowerwatch') {
-                    message = "Thank you for participating in GridWatch. We have sent you airtime for your participation. If you have questions please contact 024 6536896"
+                    message = "Thank you for participating in GridWatch. We have sent you airtime for your participation. If you have questions please contact " + PHONE_NUMBER;
                 } else {
                     console.log("We don't know how to send a message for this incentive");
                     return db.collection('OINK_alarms_db').add({
