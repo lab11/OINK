@@ -48,12 +48,12 @@ exports = module.exports = functions.firestore
                     amount = INCENTIVE_FIRSTOPEN_AMOUNT.toString();
                     message = "Thank you for installing DumsorWatch! We have paid you " + amount + "GHS."
                 } else if (incentive == 'complianceApp') {
-                    message = "Thank you for participating in GridWatch. We have sent you airtime for your participation. If you have questions please contact " + PHONE_NUMBER;
+                    message = "Thank you for participating in GridWatch. We have sent you airtime for your participation. If you have questions please contact " + PHONE_NUMBER + ".";
                 } else if (incentive == 'firstPowerwatch') {
                     amount = INCENTIVE_FIRSTPOWERWATCH_AMOUNT.toString();
                     message = "Thank you for installing PowerWatch! We have paid you " + amount + "GHS."
                 } else if (incentive == 'compliancePowerwatch') {
-                    message = "Thank you for participating in GridWatch. We have sent you airtime for your participation. If you have questions please contact " + PHONE_NUMBER;
+                    message = "Thank you for participating in GridWatch. We have sent you airtime for your participation. If you have questions please contact " + PHONE_NUMBER + ".";
                 } else {
                     console.log("We don't know how to send a message for this incentive");
                     return db.collection('OINK_alarms_db').add({
