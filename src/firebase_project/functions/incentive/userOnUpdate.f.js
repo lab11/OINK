@@ -77,7 +77,7 @@ exports = module.exports = functions.firestore
                             user_id: user_id,
                             amount: INCENTIVE_COMPLIANCEAPP_AMOUNT,
                             timestamp: timestamp,
-                            day_count: day_id,
+                            day_count: day_number,
                         }));
             }
         }
@@ -92,7 +92,7 @@ exports = module.exports = functions.firestore
                             user_id: user_id,
                             amount: INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT,
                             timestamp: timestamp,
-                            day_count: day_id,
+                            day_count: day_number,
                         }));
             }
         }
