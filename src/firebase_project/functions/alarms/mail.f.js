@@ -36,7 +36,7 @@ exports = module.exports = functions.firestore
         const docId = context.params.docId;
 
         // TODO: Make configurable
-        const emails = ["scorreacardo@umass.edu","ppannuto@berkeley.edu", "nklugman@berkeley.edu", "podolsky@berkeley.edu"]
+        const emails = ["scorreacardo@umass.edu","ppannuto@berkeley.edu", "adkins@berkeley.edu", "nklugman@berkeley.edu", "podolsky@berkeley.edu"]
         console.log("sending emails to " + emails.join())
 
         var subject = `"${APP_NAME}: OINK Alarm"`;
@@ -50,8 +50,7 @@ exports = module.exports = functions.firestore
             subject += ' ' + data.title;
         }
 
-        var body = '<img src="cid:oinklogo"/>' +
-            '<h2>Thank you for using OINK!</h2>' +
+        var body = '<h2>Thank you for using OINK!</h2>' +
             '<p>An event has triggered one of your alarms. These are the details:</p>' +
             `<b>Alarm docId: </b> ${docId}<br>`;
         // n.b. firestore.Timestamp doesn't pretty-print, so convert to a JS Date
@@ -76,6 +75,7 @@ exports = module.exports = functions.firestore
             body += `<b>Document that triggered the alarm: </b> ${data.tx_core_doc_id}</p>`;
         }
         body += '<p>Best,<br> OINK Team.</p>';
+	body += '<img src="cid:oinklogo"/>';
 
         const mailOptions = {
             from: `"OINK" <${alarmEmail}>`,
