@@ -83,8 +83,8 @@ exports = module.exports = functions.firestore
         }
 
         //For powerwatch
-        if(typeof newValue.powerwatch_incentivized_days != 'undefined') {
-            var number_of_incentives = Math.floor(newValue.powerwatch_incentivized_days/INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL);
+        if(typeof newValue.powerwatch_days != 'undefined') {
+            var number_of_incentives = Math.floor(newValue.powerwatch_days/INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL);
             for(var i = 1; i <= number_of_incentives; i++) {
                 let day_number = INCENTIVE_COMPLIANCEPOWERWATCH_INTERVAL * i;
                 const doc_name = user_id + '-' + day_number;
