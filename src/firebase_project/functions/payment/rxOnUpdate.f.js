@@ -38,19 +38,23 @@ exports = module.exports = functions.firestore
                      .doc(data.user_id).get().then(user_data =>{
 
                 //Okay now we want to record the user's phone number for the SMS
-                var phone_number = user_data.phone_number;
+                var phone_number = user_data.data().phone_number;
 
                 let message;
-                if(data.incentive == 'firstOpen') {
-                    message = "Thank you for installing DumsorWatch! We have paid you ${INCENTIVE_FIRSTOPEN_AMOUNT} Cedis."
-                } else if (data.incentive == 'complianceApp') {
-                    message = "Thank you for keeping DumsorWatch installed! We have paid you ${INCENTIVE_COMPLIANEAPP_AMOUNT} Cedis."
-                } else if (data.incentive == 'firstPowerwatch') {
-                    message = "Thank you for installing PowerWatch! We have paid you ${INCENTIVE_FIRSTPOWERWATCH_AMOUNT} Cedis."
-                } else if (data.incentive == 'compliancePowerwatch') {
-                    message = "Thank you for keeping PowerWatch installed! We have paid you ${INCENTIVE_COMPLIANEPOWERWATCH_AMOUNT} Cedis."
+                if(data.stimulus_incentive == 'firstOpen') {
+                    amount = INCENTIVE_FIRSTOPEN_AMOUNT.toString();
+                    message = "Thank you for installing DumsorWatch! We have paid you " + amount + "GHS."
+                } else if (data.stimulus_incentive == 'complianceApp') {
+                    amount = INCENTIVE_COMPLIANCEAPP_AMOUNT.toString();
+                    message = "Thank you for keeping DumsorWatch installed! We have paid you " + amount + "GHS."
+                } else if (data.stimulus_incentive == 'firstPowerwatch') {
+                    amount = INCENTIVE_FIRSTPOWERWATCH_AMOUNT.toString();
+                    message = "Thank you for installing PowerWatch! We have paid you " + amount + "GHS."
+                } else if (data.stimulus_incentive == 'compliancePowerwatch') {
+                    amount = INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT.toString();
+                    message = "Thank you for keeping PowerWatch installed! We have paid you " + amount + "GHS."
                 } else {
-                    console.log('We dount know how to send a message for this incentive');
+                    console.log("We don't know how to send a message for this incentive");
                     return db.collection('OINK_alarms_db').add({
                         timestamp: FieldValue.serverTimestamp(),
                         user_id: data.user_id,

@@ -49,7 +49,7 @@ exports = module.exports = functions.firestore
                 } else if (data.stimulus_incentive == 'firstPowerwatch') {
                     amount = INCENTIVE_FIRSTPOWERWATCH_AMOUNT.toString();
                     message = "Thank you for installing PowerWatch! We have paid you " + amount + "GHS."
-                } else if (data.stiumulus_incentive == 'compliancePowerwatch') {
+                } else if (data.stimulus_incentive == 'compliancePowerwatch') {
                     amount = INCENTIVE_COMPLIANCEPOWERWATCH_AMOUNT.toString();
                     message = "Thank you for keeping PowerWatch installed! We have paid you " + amount + "GHS."
                 } else {
