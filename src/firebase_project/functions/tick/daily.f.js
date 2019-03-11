@@ -41,7 +41,7 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                 }
                 */
 
-                const now = admin.firestore.Timestamp.now().toMillis();
+                /*const now = admin.firestore.Timestamp.now().toMillis();
                 let install_time = data.dwapp_install_time;
                 if (install_time instanceof admin.firestore.Timestamp) {
                     install_time = install_time.toMillis();
@@ -62,17 +62,23 @@ exports = module.exports = functions.pubsub.topic('tick-daily').onPublish((messa
                         data: data,
                     }));
                     return;
-                }
+                }*/
 
 
-                // For now, just do math and update days:
-                //
-                // And only for the powerwatch users for now..
-                if (data.incentivized && data.active && data.powerwatch) {
-                    to_update.incentivized_days = days;
+                if (data.incentivized) {
+                    if(typeof data.incentivized_days != 'undefined' && data.incentivized_days < 30) {
+                        to_update.incentivized_days = 30;
+                    } else if(typeof data.incentivized_days == 'undefined') {
+                        to_update.incentivized_days = 30
+                    }
                 }
+
                 if (data.incentivized && data.powerwatch) {
-                    to_update.powerwatch_days = days;
+                    if(typeof data.powerwatch_days != 'undefined' && data.powerwatch_days < 30) {
+                        to_update.powerwatch_days = 30;
+                    } else if(typeof data.incentivized_days == 'undefined') {
+                        to_update.powerwatch_days = 30
+                    }
                 }
 
                 if (Object.keys(to_update).length > 0) {
