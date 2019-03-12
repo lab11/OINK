@@ -3,6 +3,10 @@ cron:
   url: /publish/tick-payment
   schedule: every day 11:00
   timezone: GMT
+- description: Try to clean up some failures in same day
+  url: /publish/tick-payment
+  schedule: every day 12:00
+  timezone: GMT
 - description: Daily trigger for any daily tasks
   url: /publish/tick-daily
   schedule: every day 08:00
