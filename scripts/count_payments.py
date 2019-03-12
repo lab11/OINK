@@ -31,8 +31,10 @@ user_list_ref = db.collection('OINK_user_list')
 
 number_app_compliance = 0
 number_app_compliance_now = 0
+number_app_compliance_total = 0
 number_powerwatch_compliance = 0
 number_powerwatch_compliance_now = 0
+number_powerwatch_compliance_total = 0
 
 
 docs = db.collection('OINK_user_list').get()
@@ -43,6 +45,7 @@ for doc in docs:
 		incentives = 0
 		if('incentivized_days' in data):
 			number_app_compliance_now += math.floor(data['incentivized_days']/30)
+			number_app_compliance_total += 7
 			incentives = math.floor((210 - data['incentivized_days'])/30)
 			if(incentives > 7):
 				print(incentives)
@@ -55,6 +58,7 @@ for doc in docs:
 		incentives = 0
 		if('powerwatch_days' in data and not math.isnan(data['powerwatch_days'])):
 			number_powerwatch_compliance_now += math.floor(data['incentivized_days']/30)
+			number_powerwatch_compliance_total += 7
 			incentives = math.floor((210 - data['powerwatch_days'])/30)
 		else:
 			incentives = 7
@@ -133,3 +137,12 @@ print()
 
 print('There are {} complete powerwatch compliances in the transaction list'.format(number_complete_powerwatch_transactions))
 print()
+
+print("Compliances for App")
+print('Total\tShould be issued\tTo issue in future\tIn stimulus collection\tIn transaction collection\tComplete')
+print('{}\t{}\t\t\t{}\t\t\t{}\t\t\t{}\t\t\t\t{}'.format(number_app_compliance_total,number_app_compliance_now,number_app_compliance,number_app_stimulus,number_app_transactions,number_complete_app_transactions))
+
+print()
+print("Compliances for Powerwatch")
+print('Total\tShould be issued\tTo issue in future\tIn stimulus collection\tIn transaction collection\tComplete')
+print('{}\t{}\t\t\t{}\t\t\t{}\t\t\t{}\t\t\t\t{}'.format(number_powerwatch_compliance_total,number_powerwatch_compliance_now,number_powerwatch_compliance,number_powerwatch_stimulus,number_powerwatch_transactions,number_complete_powerwatch_transactions))
