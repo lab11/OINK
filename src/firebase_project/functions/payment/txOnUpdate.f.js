@@ -147,7 +147,7 @@ exports = module.exports = functions.firestore
         // Something went wrong :(
         if (data.status == 'error') {
             // TODO: Parameterize limit. Maybe think more about other options here.
-            if (data.num_attempts >= 5) {
+            if (data.num_attempts >= 20) {
                 var messages = data.messages;
                 messages.push('Payment attempt limit exceeded.');
                 return change.after.ref.update({
