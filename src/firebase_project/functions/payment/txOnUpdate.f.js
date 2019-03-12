@@ -62,6 +62,7 @@ function do_payment(change, docId, data) {
                         started_at: FieldValue.serverTimestamp(),
                         timeout_ms: 1000 * 60 * 10, // 10 min, TODO: configuration parameter?
                         num_attempts: data.num_attempts + 1,
+                        transaction_id: userPaymentInfo.transaction_id
                     })
                     .then(() => {
                         // TODO: This should probably mux at some point based
@@ -98,7 +99,7 @@ function do_payment(change, docId, data) {
                                 });
                             } else {
                                 console.error('Error in transaction:', response.body);
-                                localMsgs.push('Transaction Error')
+                                localMsgs.push('Transaction Error: ' + response.statusCode)
                                 return change.after.ref.update({
                                     status: 'error',
                                     messages: localMsgs
@@ -146,7 +147,7 @@ exports = module.exports = functions.firestore
         // Something went wrong :(
         if (data.status == 'error') {
             // TODO: Parameterize limit. Maybe think more about other options here.
-            if (data.num_attempts >= 5) {
+            if (data.num_attempts >= 20) {
                 var messages = data.messages;
                 messages.push('Payment attempt limit exceeded.');
                 return change.after.ref.update({
