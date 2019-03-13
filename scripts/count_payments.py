@@ -25,7 +25,9 @@ if args.project not in ('paymenttoy', 'crafty-shade-837'):
 
 # GCloud configuration
 os.environ['GCLOUD_PROJECT'] = args.project
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getcwd() + '/service-account.json'
 db = firestore.Client()
+
 
 user_list_ref = db.collection('OINK_user_list')
 
@@ -69,18 +71,6 @@ for doc in docs:
 
 sys.stdout.write('\r' + ' '*80 + '\r')
 
-print('There are {} app compliances to eventually pay in the user list'.format(number_app_compliance))
-print()
-
-print('There are {} powerwatch compliances to eventually pay in the user list'.format(number_powerwatch_compliance))
-print()
-
-print('There are {} app compliances to currently pay in the user list'.format(number_app_compliance_now))
-print()
-
-print('There are {} powerwatch compliances to currently pay in the user list'.format(number_powerwatch_compliance_now))
-print()
-
 number_app_stimulus = 0
 docs = db.collection('OINK_stimulus_complianceApp').get()
 for doc in docs:
@@ -91,17 +81,12 @@ docs = db.collection('OINK_stimulus_compliancePowerwatch').get()
 for doc in docs:
 	number_powerwatch_stimulus += 1
 
-
-print('There are {} app compliances in the stimulus list'.format(number_app_stimulus))
-print()
-
-print('There are {} powerwatch compliances in the stimulus list'.format(number_powerwatch_stimulus))
-print()
-
 number_app_transactions = 0
 number_complete_app_transactions = 0
 number_powerwatch_transactions = 0
 number_complete_powerwatch_transactions = 0
+number_failed_app_transactions = 0
+number_failed_powerwatch_transactions = 0
 docs = db.collection('OINK_payment_tx').get()
 stimulus_app_list = [];
 stimulus_powerwatch_list = [];
@@ -116,6 +101,9 @@ for doc in docs:
 		if('status' in data and data['status'] == 'complete'):
 			number_complete_app_transactions += 1
 
+		if('status' in data and data['status'] == 'failed'):
+			number_failed_app_transactions += 1
+
 
 	if('stimulus_collection' in data and data['stimulus_collection'] == 'OINK_stimulus_compliancePowerwatch'):
 		if(data['stimulus_doc_id'] not in stimulus_powerwatch_list):
@@ -125,24 +113,15 @@ for doc in docs:
 		if('status' in data and data['status'] == 'complete'):
 			number_complete_powerwatch_transactions += 1
 
+		if('status' in data and data['status'] == 'failed'):
+			number_failed_powerwatch_transactions += 1
 
-print('There are {} app compliances in the transaction list'.format(number_app_transactions))
-print()
-
-print('There are {} powerwatch compliances in the transaction list'.format(number_powerwatch_transactions))
-print()
-
-print('There are {} complete app compliances in the transaction list'.format(number_complete_app_transactions))
-print()
-
-print('There are {} complete powerwatch compliances in the transaction list'.format(number_complete_powerwatch_transactions))
-print()
 
 print("Compliances for App")
-print('Total\tShould be issued\tTo issue in future\tIn stimulus collection\tIn transaction collection\tComplete')
-print('{}\t{}\t\t\t{}\t\t\t{}\t\t\t{}\t\t\t\t{}'.format(number_app_compliance_total,number_app_compliance_now,number_app_compliance,number_app_stimulus,number_app_transactions,number_complete_app_transactions))
+print('Total\tShould be issued\tTo issue in future\tIn stimulus collection\tIn transaction collection\tComplete\tFailed')
+print('{}\t{}\t\t\t{}\t\t\t{}\t\t\t{}\t\t\t\t{}\t\t{}'.format(number_app_compliance_total,number_app_compliance_now,number_app_compliance,number_app_stimulus,number_app_transactions,number_complete_app_transactions,number_failed_app_transactions))
 
 print()
 print("Compliances for Powerwatch")
-print('Total\tShould be issued\tTo issue in future\tIn stimulus collection\tIn transaction collection\tComplete')
-print('{}\t{}\t\t\t{}\t\t\t{}\t\t\t{}\t\t\t\t{}'.format(number_powerwatch_compliance_total,number_powerwatch_compliance_now,number_powerwatch_compliance,number_powerwatch_stimulus,number_powerwatch_transactions,number_complete_powerwatch_transactions))
+print('Total\tShould be issued\tTo issue in future\tIn stimulus collection\tIn transaction collection\tComplete\tFailed')
+print('{}\t{}\t\t\t{}\t\t\t{}\t\t\t{}\t\t\t\t{}\t\t{}'.format(number_powerwatch_compliance_total,number_powerwatch_compliance_now,number_powerwatch_compliance,number_powerwatch_stimulus,number_powerwatch_transactions,number_complete_powerwatch_transactions,number_failed_powerwatch_transactions))
