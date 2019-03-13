@@ -99,7 +99,7 @@ function do_payment(change, docId, data) {
                                 });
                             } else {
                                 console.error('Error in transaction:', response.body);
-                                localMsgs.push('Transaction Error: ' + response.statusCode)
+                                localMsgs.push('Transaction Error: ' + response.statusCode + '-' + response.body.error_code)
                                 return change.after.ref.update({
                                     status: 'error',
                                     messages: localMsgs
