@@ -34,8 +34,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //
-
-
 console.log('Starting http server on port 3111...');
 var httpServer = http.createServer(app);
 httpServer.listen(3111);
@@ -43,6 +41,46 @@ httpServer.listen(3111);
 app.get('/', function(req,res) {
   res.send('OK');
 });
+
+app.post('/status', function(req,res)) {
+  var body = req.body;
+  console.log(body);
+  bodySorted = sortObj(body)
+  emptyArray = []
+  for (var key in bodySorted) {
+    if (bodySorted.hasOwnProperty(key)) {
+      //console.log(key + "=" + newLocalSorted[key]);
+      emptyArray.push(key + "=" + bodySorted[key])
+    }
+  }
+  newArray = emptyArray.join('&');
+  console.log(newArray);
+
+  // Getting the HMAC SHA-256 digest
+  const secret_key = config.korba.secret_key;
+  const client_key = config.korba.client_key;
+
+  const hash = crypto.createHmac('sha256', secret_key)
+    .update(newArray) //This is the msg
+    .digest('hex');
+  request({
+    uri: 'https://xchange.korbaweb.com/api/v1.0/transaction_status/',
+    method: 'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':`HMAC ${client_key}:${hash}`
+    },
+    json: true,
+    body: bodySorted,
+    resolveWithFullResponse: true,
+  },function(error, response, bodyKorba){
+    console.log('error: ', error);
+    console.log('statusCode: ', response.statusCode);
+    console.log('response: ', response);
+    console.log(bodyKorba);
+    res.send(bodyKorba)
+  });
+}
 
 app.post('/',function(req,res){
   var body = req.body;
