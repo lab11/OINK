@@ -42,7 +42,7 @@ app.get('/', function(req,res) {
   res.send('OK');
 });
 
-app.post('/status', function(req,res)) {
+app.post('/status', function(req,res) {
   var body = req.body;
   console.log(body);
   bodySorted = sortObj(body)
@@ -80,7 +80,7 @@ app.post('/status', function(req,res)) {
     console.log(bodyKorba);
     res.send(bodyKorba)
   });
-}
+});
 
 app.post('/',function(req,res){
   var body = req.body;
